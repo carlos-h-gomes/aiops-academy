@@ -1,0 +1,15 @@
+{
+  "id": "resilience-canary",
+  "title": "Resiliência, game days e canários",
+  "summary": "Planeje experimentos limitados e decida quando interromper uma mudança.",
+  "category": "extension",
+  "minutes": 75,
+  "recommended_after": 28,
+  "body": "## Uma falha planejada precisa de uma pergunta\nUm game day ensaia resposta a falhas com cenário, participantes e critérios conhecidos. Um teste de resiliência deve começar com hipótese, estado saudável mensurável, escopo descartável, duração e condição de parada. Exemplos de perguntas: o timeout limita o atraso? O circuit breaker evita fila crescente? O runbook leva à verificação funcional?\n\nNão confunda ensaio controlado com causar indisponibilidade em um ambiente compartilhado. Neste módulo todo o experimento é feito sobre números sintéticos. O laboratório HTTP do kit oferece uma alternativa real em loopback com estado healthy ou degraded e tempo limitado. Não envie tráfego de teste para sistemas externos por inferência.\n\n## Laboratório Python: avaliação de canário\nImplemente canary(control_errors, control_total, candidate_errors, candidate_total). Totais são inteiros positivos; erros inteiros entre zero e o total. A rubrica usa uma janela já encerrada e comparável para os dois grupos.\n\n1. Se qualquer grupo tiver menos de 1000 requisições, retorne hold.\n2. Calcule a taxa de erro de cada grupo.\n3. Se candidate_rate - control_rate for maior que 0,005, retorne rollback.\n4. Caso contrário, retorne promote.\n\n```python\ncanary(1, 1000, 20, 1000)  # 'rollback'\ncanary(1, 1000, 1, 1000)   # 'promote'\ncanary(0, 100, 0, 100)     # 'hold'\n```\n\nExecute python check.py canary. Mude a candidata para 6 erros em 1000: diferença de 0,005, exatamente o limite didático, deve produzir promote. A função apenas recomenda; não realiza implantação ou rollback. Em uma operação real, critérios de latência, correção, saturação e erro budget também podem bloquear promoção.\n\n## Por que uma comparação pode enganar\nSe o controle recebe tráfego fácil e a candidata recebe um segmento mais pesado, a diferença não identifica o efeito da mudança. Compare janelas e populações, considere intervalos de confiança e dados insuficientes. Mil amostras são uma exigência do exercício, não garantia estatística. Um rollback também pode falhar por incompatibilidade de schema ou efeito irreversível já realizado.\n\n## Evidência e revisão do ensaio\nEntregue as três decisões, as duas taxas e uma hipótese alternativa. Escreva condição de parada, owner da decisão, forma de comunicar e verificação após retorno. Termine com um postmortem curto: o que foi observado, o que era esperado e uma ação com critério verificável. Incidentes sintéticos bem resolvidos demonstram raciocínio dentro daquele escopo, não imunidade a falhas reais.",
+  "sources": [
+    {
+      "title": "Google SRE — Canarying releases",
+      "url": "https://sre.google/workbook/canarying-releases/"
+    }
+  ]
+}

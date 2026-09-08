@@ -1,0 +1,31 @@
+name: Content review / Revisão de conteúdo / Revisión de contenido
+description: Suggest a technical correction, source update or translation fix.
+title: "[Content] "
+body:
+  - type: markdown
+    attributes:
+      value: "Use Portuguese, English or Spanish. Include public sources and synthetic examples only."
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson or lab ID, version and language
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Type of revision
+      options:
+        - Technical accuracy
+        - Outdated tool or source
+        - Translation
+        - Accessibility or unclear instructions
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What should change and why?
+      description: Include the relevant public documentation URL and version when available.
+    validations:
+      required: true

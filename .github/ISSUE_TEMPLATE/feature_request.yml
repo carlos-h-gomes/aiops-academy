@@ -1,0 +1,23 @@
+name: Suggestion / Sugestão / Sugerencia
+description: Propose a learning need, practical scenario or app improvement.
+title: "[Idea] "
+body:
+  - type: markdown
+    attributes:
+      value: "Use Portuguese, English or Spanish. Avoid personal or corporate information."
+  - type: textarea
+    id: need
+    attributes:
+      label: Who needs this and what problem does it solve?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What should a learner be able to demonstrate?
+    validations:
+      required: true
+  - type: textarea
+    id: resources
+    attributes:
+      label: Public references, prerequisites and possible costs

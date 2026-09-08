@@ -1,0 +1,19 @@
+{
+  "id": "llmops-agents",
+  "title": "LLMOps e operação de agentes",
+  "summary": "Avalie utilidade, evidência, custo, latência e ações permitidas.",
+  "category": "extension",
+  "minutes": 90,
+  "recommended_after": 27,
+  "body": "## Operar IA exige mais que uma resposta plausível\nUma resposta pode estar correta e chegar tarde demais. Pode citar um documento que não sustenta a conclusão. Pode recomendar uma ação fora da autorização. Avalie dimensões separadas: sucesso da tarefa, sustentação por evidência, latência, custo e efeitos das ferramentas. Mantenha versão do modelo, instruções, ferramentas e conjunto de avaliação junto dos resultados.\n\nTelemetria de IA precisa preservar privacidade. Registre duração, contagens e IDs sintéticos de correlação; não habilite captura irrestrita de prompts, respostas, segredos ou dados de clientes. Convenções semânticas evoluem: confirme os nomes e a estabilidade no projeto OpenTelemetry antes de instrumentar um produto real.\n\n## Laboratório Python: gate de uma versão\nImplemente agent_gate(cases). Cada caso tem success, grounded e unauthorized como booleanos, latency_ms não negativo e cost não negativo em unidade monetária fictícia. Retorne decision, success_rate, grounded_rate, p95_ms e total_cost. Use p95 pelo método nearest-rank: posição ceil(0.95*n) na lista ordenada, contando a partir de 1.\n\nA política didática permite promote apenas com: pelo menos 80% de sucesso, 90% de grounding, nenhuma ação não autorizada, p95 até 2000ms e custo total até 0,05. Todos os critérios precisam passar. Caso contrário, retorne block. Conjunto vazio gera ValueError.\n\n```python\ncases = [dict(success=True, grounded=True, unauthorized=False,\n              latency_ms=800, cost=0.003) for _ in range(10)]\n# decision='promote', success_rate=1.0, grounded_rate=1.0,\n# p95_ms=800, total_cost=0.03\n```\n\nExecute python check.py agents. Mude apenas unauthorized para True em um caso: a versão bloqueia mesmo que todo o resto seja excelente. Mude apenas a latência de um caso para 3000: com dez casos, o p95 pelo método escolhido também bloqueia. Critérios e preços são fictícios; nenhuma API ou agente é chamado.\n\n## Da avaliação ao controle de ferramentas\nA autorização pertence ao código que executa a ação, não ao texto gerado. Separe leitura de escrita, limite alvos, número de passos, tentativas e duração. Uma aprovação precisa estar vinculada ao alvo e à ação; conteúdo de logs ou documentos não pode concedê-la. Tool outputs são dados não confiáveis. Uma boa nota em uma avaliação não elimina prompt injection ou abuso de ferramentas.\n\n## Evidência\nEntregue baseline aprovada e duas variações bloqueadas. Mostre qual critério falhou em cada uma. Grounded e success são rótulos de referência fornecidos no exercício; no mundo real exigem rubrica e revisão, não devem ser aceitos da autoavaliação do mesmo modelo. Inclua exemplos adversariais sintéticos e um plano de desativação segura do agente.",
+  "sources": [
+    {
+      "title": "OpenTelemetry — Convenções de GenAI",
+      "url": "https://opentelemetry.io/docs/specs/semconv/registry/attributes/gen-ai/"
+    },
+    {
+      "title": "OWASP — Prompt injection",
+      "url": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    }
+  ]
+}

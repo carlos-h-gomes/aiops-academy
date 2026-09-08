@@ -1,0 +1,1648 @@
+{
+  "version": "1.1.0",
+  "lessons": [
+    {
+      "day": 1,
+      "title": "Seu primeiro plantão começa aqui",
+      "track": "Fundamentos",
+      "summary": "Entenda o caminho de uma requisição e investigue seu primeiro incidente.",
+      "objectives": [
+        "Diferenciar serviço, processo e servidor",
+        "Separar sintoma, hipótese e evidência",
+        "Priorizar impacto no usuário"
+      ],
+      "body": "## Antes de qualquer comando\nInfraestrutura é o conjunto que permite uma aplicação funcionar: computadores, rede, armazenamento e serviços. Um servidor pode ser uma máquina física, uma máquina virtual ou um processo que atende pedidos. Um processo é um programa em execução. Um serviço é uma capacidade que alguém consome, como consultar uma cotação. Seu trabalho começa identificando qual capacidade falhou, para quem e desde quando.\n\nImagine uma consulta: navegador → DNS → balanceador → API → banco. DNS converte um nome em endereço. O balanceador distribui pedidos entre instâncias. A API aplica regras e consulta o banco. Uma página lenta pode ter origem em qualquer elo. Reiniciar a API sem investigar pode apagar evidências e deixar o banco igualmente lento.\n\n## AIOps sem mistério\nAIOps aplica análise de dados e IA à operação: agrupar alertas, detectar desvios, enriquecer incidentes e sugerir ações. Ansible executa configurações declaradas. Dynatrace ajuda a observar relações e comportamento. Uma sugestão de IA continua sendo uma hipótese até ser confrontada com sinais. Você precisa saber operar sem depender dela.\n\n## Um método que cabe no plantão\n1. Defina impacto: consultas falhando em uma região desde 09:05, por exemplo.\n2. Compare com o normal: taxa de erros, latência, tráfego e saturação.\n3. Monte duas hipóteses e diga qual observação refutaria cada uma.\n4. Escolha uma mitigação reversível e de alcance limitado.\n5. Verifique a experiência do usuário após agir e registre o aprendizado.\n\nDisponibilidade e correção são diferentes: retornar HTTP 200 com uma cotação antiga é falha de qualidade. Ambiente de estudo usa dados fictícios; nunca copie informação corporativa para um assistente pessoal. Neste curso os consoles integrados são simulações explícitas. Os roteiros de laboratório real são outra etapa.\n\n## Primeiro vocabulário\nHost é uma máquina identificável. Deploy é uma nova versão instalada. Incidente é interrupção ou degradação não planejada. Runbook é um procedimento operacional repetível. Rollback é voltar a uma versão ou configuração anterior. Blast radius é quantos usuários e sistemas uma ação pode afetar. Não memorize apenas nomes: associe cada termo a uma decisão.",
+      "steps": [
+        "Abra o laboratório Plantão Linux e use help",
+        "Execute status, logs e metrics; anote horário, impacto e duas hipóteses",
+        "Compare a linha do tempo com changes",
+        "Explique em voz alta por que uma ação seria segura antes de remediar"
+      ],
+      "deliverable": "Registro de incidente com impacto, dois indícios, hipótese descartada e próximo passo.",
+      "senior": "Separe mitigação de correção definitiva. Mostre qual informação faria você mudar de hipótese.",
+      "sources": [
+        "sre",
+        "otel"
+      ],
+      "lab": "linux",
+      "quiz": [
+        {
+          "question": "Uma API ficou lenta. Qual primeiro passo é mais útil?",
+          "options": [
+            "Reiniciar todos os hosts",
+            "Definir impacto e comparar sinais com a linha de base",
+            "Trocar a ferramenta de monitoramento"
+          ],
+          "answer": 1,
+          "explanation": "Impacto e evidências orientam a investigação; reinícios amplos aumentam o alcance da falha."
+        },
+        {
+          "question": "Uma sugestão de IA aponta o banco. Isso representa:",
+          "options": [
+            "Uma hipótese a verificar",
+            "Prova definitiva",
+            "Autorização para alterar produção"
+          ],
+          "answer": 0,
+          "explanation": "A evidência precisa sustentar a hipótese; o modelo não concede autorização."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 2,
+      "title": "Linux: enxergue o que está acontecendo",
+      "track": "Fundamentos",
+      "summary": "Arquivos, permissões, processos, memória e disco com um roteiro de diagnóstico.",
+      "objectives": [
+        "Ler permissões e caminhos",
+        "Diagnosticar recurso saturado",
+        "Investigar antes de reiniciar"
+      ],
+      "body": "## Navegar com intenção\nO Linux organiza arquivos a partir de /. /etc contém configurações; /var costuma conter dados variáveis e logs; /home guarda arquivos de usuários. pwd mostra onde você está, ls lista e cd muda de diretório. Caminho absoluto começa em /; relativo depende de onde você está. Use um diretório chamado aiops-lab dentro da sua home para os exercícios reais.\n\n```bash\npwd\nls -lah\nmkdir -p ~/aiops-lab\ncd ~/aiops-lab\nprintf 'servico=cotacoes\\n' > configuracao.txt\ncat configuracao.txt\n```\n\n## Permissão não é decoração\nEm rw-r-----, o dono pode ler/escrever, o grupo pode ler e outros não têm acesso. Os números 4, 2 e 1 representam leitura, escrita e execução. 640 significa rw-r-----. Dar 777 para resolver um erro distribui acesso desnecessário. Primeiro identifique usuário efetivo, dono e grupo. Um diretório precisa de execução para permitir travessia.\n\n## Quatro perguntas de diagnóstico\nCPU: há trabalho computacional ou espera? Memória: há pressão, swap ou processo morto pelo OOM killer? Disco: acabou espaço ou inodes? Rede: o processo está escutando a porta esperada? Carga média alta não significa automaticamente CPU alta; tarefas esperando I/O também influenciam.\n\n```bash\nps aux\nfree -m\ndf -h\ndf -i\nss -lnt\nsystemctl status nginx --no-pager\njournalctl -u nginx --since '10 minutes ago' --no-pager -n 40\n```\n\nEsses comandos são para uma VM/WSL Linux sua, quando o serviço existir. No console do app só as variantes listadas em help são aceitas. Não simula um shell completo. Um disco cheio pede identificar o consumidor e a política de retenção. Não apague logs cegamente: pode ser outro filesystem, um arquivo aberto ou uma necessidade de auditoria.\n\n## Evidência útil\nRegistre valores com unidade e janela: disco 98% às 09:05, API com 22% de erros nos últimos cinco minutos. Depois de mitigar, compare a mesma janela e confirme que dados novos chegam. Ausência de logs pode ser falha do coletor, não saúde do serviço.",
+      "steps": [
+        "No console Linux, use df -h, free -m e journalctl -u quotes",
+        "Localize o recurso saturado e compare com os logs",
+        "Execute a remediação limitada indicada no help somente após reunir evidências",
+        "Valide com status e metrics; tente uma hipótese incorreta e compare"
+      ],
+      "deliverable": "Runbook de disco cheio com diagnóstico, pré-condição, ação, validação e escalonamento.",
+      "senior": "Explique por que retenção, rotação e capacidade são controles diferentes. Inclua rollback quando a ação permitir.",
+      "sources": [
+        "linux",
+        "sre"
+      ],
+      "lab": "linux",
+      "quiz": [
+        {
+          "question": "Disco com espaço livre, mas não cria arquivos. O que investigar?",
+          "options": [
+            "Inodes com df -i",
+            "Apenas CPU",
+            "Trocar DNS"
+          ],
+          "answer": 0,
+          "explanation": "Muitos arquivos pequenos podem esgotar inodes antes dos bytes."
+        },
+        {
+          "question": "O que 640 permite?",
+          "options": [
+            "Execução para todos",
+            "Dono lê/escreve; grupo lê; outros sem acesso",
+            "Todos escrevem"
+          ],
+          "answer": 1,
+          "explanation": "4=leitura, 2=escrita, 1=execução; os três dígitos separam dono, grupo e outros."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 3,
+      "title": "Redes, DNS e HTTP na prática",
+      "track": "Fundamentos",
+      "summary": "Separe falha de resolução, conexão, TLS e aplicação.",
+      "objectives": [
+        "Explicar DNS, TCP, TLS e HTTP",
+        "Interpretar códigos HTTP",
+        "Evitar retries que amplificam incidentes"
+      ],
+      "body": "## Siga as camadas\nUma URL como https://api.exemplo.test/cotacoes contém protocolo, nome e caminho. Primeiro o cliente resolve DNS; depois abre uma conexão TCP; em HTTPS negocia TLS para autenticar o servidor e proteger o tráfego; finalmente envia HTTP. Se DNS falha, nem houve conexão à API. Se a conexão é recusada, provavelmente ninguém escuta ali ou há rejeição ativa. Timeout pode envolver rede, fila ou dependência lenta.\n\nUma porta identifica um ponto de comunicação no host. 443 costuma atender HTTPS; esse costume não garante o serviço. 127.0.0.1 é loopback: o próprio computador. Dentro de um container, localhost é o próprio container, não outro serviço do Compose.\n\n## HTTP é um contrato\nGET consulta, POST normalmente cria ou dispara uma operação, PUT costuma representar substituição. 200 indica sucesso HTTP, 400 entrada inválida, 401 ausência/invalidade de autenticação, 403 falta de permissão, 404 recurso não encontrado, 429 limite e 5xx falha do servidor. Nunca suponha que repetir um POST é seguro. Use uma chave de idempotência quando o contrato prevê e reutilize a mesma chave para a mesma ação lógica.\n\n```bash\ncurl -i --max-time 5 http://127.0.0.1:8765/api/v1/health\n```\n\nEsse exemplo consulta o app local quando ele está aberto. No Windows use curl.exe para não confundir com aliases antigos. O laboratório sintético aceita sua lista de comandos, não este terminal arbitrário.\n\n## Timeout e retry\nDefina prazo por tentativa e total. Exemplo didático: três tentativas, esperas de 1s e 2s com jitter, prazo total de 10s. Jitter espalha o retry para muitos clientes não voltarem ao mesmo tempo. Respeite Retry-After e interrompa diante de erro permanente. Timeout não prova que uma operação de escrita deixou de acontecer.\n\n## Diagnóstico orientado por comparação\nCompare uma instância saudável com a afetada, mesma janela e mesma rota. Trace IDs ligam eventos de uma requisição. Relógios desalinhados atrapalham a linha do tempo. Em nuvem, investigue rotas, resolução privada, security groups/firewalls e identidade separadamente. Não libere acesso global como teste.",
+      "steps": [
+        "No Plantão Linux compare status e logs",
+        "Desenhe DNS → TCP → TLS → HTTP → dependência e marque onde cada erro apareceria",
+        "Use curl.exe no health local em um terminal seu",
+        "Documente comportamento para 401, 403, 429 e 503"
+      ],
+      "deliverable": "Tabela de sintomas com camada, comando de observação e ação de baixo risco.",
+      "senior": "Defina orçamento total de retries e explique duplicidade após timeout.",
+      "sources": [
+        "http",
+        "sre"
+      ],
+      "lab": "linux",
+      "quiz": [
+        {
+          "question": "Receber 403 normalmente pede investigar:",
+          "options": [
+            "DNS antes de tudo",
+            "Permissão da identidade no recurso",
+            "Quantidade de memória do navegador"
+          ],
+          "answer": 1,
+          "explanation": "A resposta HTTP foi recebida; a autorização é o primeiro eixo a verificar."
+        },
+        {
+          "question": "Um POST sofreu timeout. Qual risco existe ao repeti-lo?",
+          "options": [
+            "Criar o mesmo efeito duas vezes",
+            "Nenhum, timeout desfaz a operação",
+            "Sempre corrompe DNS"
+          ],
+          "answer": 0,
+          "explanation": "O servidor pode ter concluído mesmo sem o cliente receber a resposta."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 4,
+      "title": "Windows e PowerShell para operações",
+      "track": "Fundamentos",
+      "summary": "Observe serviços e eventos e entenda o gerenciamento com Ansible.",
+      "objectives": [
+        "Ler objetos no PowerShell",
+        "Consultar serviço e evento",
+        "Entender WinRM e privilégios"
+      ],
+      "body": "## Objetos, não só texto\nO PowerShell encadeia objetos. Get-Service retorna objetos com Name e Status. Where-Object filtra propriedades; Select-Object escolhe colunas. Isso reduz parsing frágil de texto, mas não elimina a necessidade de validar entradas.\n\n```powershell\nGet-Service | Select-Object -First 10 Name, Status\nGet-Process | Sort-Object CPU -Descending | Select-Object -First 5 Name, CPU\nGet-WinEvent -LogName System -MaxEvents 10 |\n  Select-Object TimeCreated, Id, LevelDisplayName\n```\n\nExecute as consultas em sua máquina de laboratório. Acesso a certos logs depende da permissão. Não use Start-Service, Restart-Service ou comandos administrativos em serviços do seu computador de trabalho sem um ambiente e uma mudança autorizados.\n\n## Um serviço parado tem contexto\nInvestigue dependências, identidade que o executa, configuração, espaço em disco e evento anterior à parada. CPU no Get-Process é tempo acumulado, não uma porcentagem instantânea. Um serviço reiniciado e saudável por dez segundos pode continuar em um ciclo de falha. Valide estabilidade e função do usuário durante uma janela definida.\n\n## Ansible com Windows\nO nó de controle do Ansible deve ser um ambiente suportado; use Linux/WSL para estudo, não suponha execução nativa no Windows. Alvos Windows usam módulos próprios, como ansible.windows.win_service. Transporte e autenticação são parte do desenho: WinRM/PSRP, certificados, políticas e identidade de menor privilégio. Não desative a validação TLS para fazer funcionar.\n\n## Caminhos e segurança\nUse -LiteralPath quando um caminho deve ser tratado literalmente. Aspas protegem espaços; curingas podem expandir além do desejado. No YAML, aspas simples ajudam a preservar barras de caminhos Windows. O editor didático suporta apenas os módulos exibidos; não configura WinRM, não abre conexões e não testa autenticação real.",
+      "steps": [
+        "Execute apenas as três consultas de leitura do exemplo em ambiente pessoal",
+        "Liste diferenças entre nome do serviço e nome de exibição",
+        "No laboratório Ansible selecione o cenário Windows e corrija o serviço sintético",
+        "Escreva pré-requisitos de acesso para um host Windows real"
+      ],
+      "deliverable": "Procedimento de investigação Windows com três consultas e interpretação dos resultados.",
+      "senior": "Explique como falha de credencial difere de falha do serviço e como evitar segredo em log.",
+      "sources": [
+        "powershell",
+        "ansible-windows"
+      ],
+      "lab": "ansible-windows",
+      "quiz": [
+        {
+          "question": "O pipeline PowerShell transporta principalmente:",
+          "options": [
+            "Objetos com propriedades",
+            "Somente strings sem estrutura",
+            "Pacotes TCP"
+          ],
+          "answer": 0,
+          "explanation": "Cmdlets normalmente retornam objetos, que podem ser filtrados por propriedade."
+        },
+        {
+          "question": "Ansible para serviço Windows deve usar:",
+          "options": [
+            "apt",
+            "ansible.windows.win_service",
+            "chmod 777"
+          ],
+          "answer": 1,
+          "explanation": "Módulos Windows refletem a plataforma e não são intercambiáveis com módulos Linux."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 5,
+      "title": "Python do zero: dados viram decisões",
+      "track": "Fundamentos",
+      "summary": "Leia JSON, agrupe eventos e trate erros de maneira previsível.",
+      "objectives": [
+        "Usar listas, dicionários e funções",
+        "Distinguir parsing e validação",
+        "Construir classificação determinística"
+      ],
+      "body": "## O essencial para automação\nUma variável dá nome a um valor. Uma lista guarda uma sequência; um dicionário mapeia chaves para valores. if escolhe caminhos, for percorre dados e def declara uma função. Indentação faz parte da sintaxe. Comece com funções pequenas que recebem dados e retornam resultado, sem rede nem escrita em disco.\n\n```python\neventos = [\n    {\"service\": \"quotes\", \"status\": 503},\n    {\"service\": \"quotes\", \"status\": 200},\n    {\"service\": \"orders\", \"status\": 200},\n]\n\ndef taxa_erro(itens):\n    if not itens:\n        return None\n    erros = sum(1 for item in itens if item[\"status\"] >= 500)\n    return erros / len(itens)\n\nassert taxa_erro([]) is None\nassert taxa_erro(eventos) == 1 / 3\nprint(taxa_erro(eventos))\n```\n\nNone comunica ausência de medida. Retornar zero para uma amostra vazia faria um painel parecer saudável sem observações. O resultado é uma fração; multiplique por 100 apenas ao apresentar porcentagem.\n\n## Parsear não é confiar\njson.loads transforma texto JSON em objetos. Ainda é preciso checar campos, tipos, limites e significado. Um status como \"quebrou\" não serve como número HTTP. Não use eval para interpretar dados. Capture exceções específicas, acrescente contexto seguro e falhe de forma explícita; except: pass esconde perda de dados.\n\n## Automação operável\nUse timeout para rede, logs estruturados sem segredos, um correlation_id e resultado estável. Uma função pura pode ser testada com casos vazios, limítrofes e inválidos. A regra de retry deve distinguir falha transitória de permanente e preservar a chave de idempotência. Nunca coloque token diretamente no código.\n\nNo kit labs/real/python existe um exercício incompleto e testes. Edite o arquivo e rode o verificador local em terminal. O app não executa código arbitrário: o laboratório integrado de dados corrige o resultado calculado, enquanto o kit verifica sua implementação Python de verdade.",
+      "steps": [
+        "Copie o exemplo para um arquivo em sua pasta de estudo e rode com Python",
+        "Abra labs/real/python/exercise.py e implemente as funções propostas",
+        "Execute python labs/real/python/check.py no diretório do app",
+        "No laboratório de dados calcule taxa de erro e deduplicação; registre a diferença entre vazio e zero"
+      ],
+      "deliverable": "Funções Python com testes para lista vazia, dados inválidos e evento duplicado.",
+      "senior": "Separe erro de negócio de erro de transporte e mostre como retomaria processamento parcial.",
+      "sources": [
+        "python",
+        "aws-lambda"
+      ],
+      "lab": "events",
+      "quiz": [
+        {
+          "question": "Sem observações, uma taxa deve ser:",
+          "options": [
+            "Sempre 0%",
+            "Sempre 100%",
+            "Ausente, com estado de dados insuficientes"
+          ],
+          "answer": 2,
+          "explanation": "Zero comunicaria sucesso sem evidência."
+        },
+        {
+          "question": "json.loads garante que o dado é válido para seu domínio?",
+          "options": [
+            "Não; ainda precisa validar campos, tipos e limites",
+            "Sim; JSON válido é dado confiável",
+            "Só quando usa aspas duplas"
+          ],
+          "answer": 0,
+          "explanation": "Sintaxe e semântica são camadas diferentes de validação."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 6,
+      "title": "Git, APIs e mudanças revisáveis",
+      "track": "Fundamentos",
+      "summary": "Transforme uma correção local em algo que outra pessoa consegue revisar.",
+      "objectives": [
+        "Entender working tree, stage e commit",
+        "Revisar diff sem segredos",
+        "Definir contrato HTTP"
+      ],
+      "body": "## Um histórico explicável\nGit guarda versões. Working tree é seu diretório editável; stage seleciona o que entrará no próximo commit; commit registra um conjunto de mudanças. Branch permite uma linha de trabalho; pull request permite revisão em um servidor de colaboração. Um commit não é deploy. Use um repositório descartável para aprender, sem publicar nada.\n\n```bash\ngit init\ngit status\ngit diff\ngit diff --staged\n```\n\nExecute git init somente na pasta nova de exercício. Crie README.md, selecione-o com git add README.md e observe o diff staged. Se sua identidade Git não estiver configurada, não precisa alterá-la globalmente para entender o fluxo. Um erro já versionado exige avaliar histórico e rotação do segredo; apagar a linha não remove versões antigas.\n\n## Contrato de uma API\nDocumente método, caminho, campos, tipos, erros, limite e autenticação. Exemplo fictício: POST /v1/remediations recebe incident_id, action_id e idempotency_key. A identidade do chamador é verificada pelo servidor; receber um campo approved=true do cliente não prova aprovação. A política deve consultar uma autorização confiável.\n\n## Antes de propor uma automação\nEscreva problema, comportamento desejado, riscos, forma de testar e rollback. O diff deve ter uma intenção. Revisão útil procura efeitos colaterais, credenciais, alvos amplos, valores mágicos, tratamento de falha e documentação divergente. Check mode e um teste verde têm cobertura limitada, não são autorização de produção.\n\n## Configuração e código\nParâmetros mudam por ambiente; regras e contratos precisam ser versionados. Arquivos .env e credenciais ficam fora do histórico. Não copie exemplos que enviem dados reais para destinos não aprovados. Neste curso só há leitura de fontes públicas e exemplos sintéticos; você prepara o artefato antes de escolher qualquer destino externo.",
+      "steps": [
+        "Crie uma pasta descartável e observe git status antes/depois de editar um README",
+        "Escreva um contrato de remediação com respostas 200, 400, 403 e 409",
+        "Revise o diff e liste cinco verificações de segurança",
+        "Resolva o laboratório de aprovação e deduplicação sem executar ação real"
+      ],
+      "deliverable": "Descrição de mudança com contrato, evidência de teste e plano de rollback.",
+      "senior": "Explique como uma revisão detecta autorização confiada indevidamente ao frontend.",
+      "sources": [
+        "git",
+        "http"
+      ],
+      "lab": "workflow",
+      "quiz": [
+        {
+          "question": "Um commit equivale a:",
+          "options": [
+            "Publicação em produção",
+            "Uma versão registrada no histórico",
+            "Uma aprovação de segurança"
+          ],
+          "answer": 1,
+          "explanation": "Commit é versionamento, independente de revisão ou implantação."
+        },
+        {
+          "question": "O cliente enviou approved=true. O servidor deve:",
+          "options": [
+            "Confiar porque é JSON",
+            "Conferir autorização no limite do recurso",
+            "Desativar autenticação"
+          ],
+          "answer": 1,
+          "explanation": "A autoridade precisa existir no servidor, não em um campo controlado pelo cliente."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 7,
+      "title": "Checkpoint 1: diagnosticar sem adivinhar",
+      "track": "Revisão",
+      "summary": "Consolide a base com um incidente e recupere os pontos que faltaram.",
+      "objectives": [
+        "Investigar sem consultar solução",
+        "Revisar fundamentos por recuperação ativa",
+        "Escrever um handoff claro"
+      ],
+      "body": "## Dia de consolidar — 3 horas\nNão adicione uma ferramenta nova. Reserve 30 minutos para explicar Linux, DNS, HTTP, Python e Git sem abrir as notas. Marque o que não consegue explicar em linguagem simples. A recuperação ativa revela lacunas que reler o texto costuma esconder.\n\nPasse 90 minutos no Plantão Linux: abra um cenário novo, colete evidências e resolva sem consultar a solução. Anote a sequência, inclusive tentativas incorretas. Use os 60 minutos restantes para o simulado da semana e para reescrever seu runbook.\n\n## O que precisa aparecer na entrega\nImpacto observável, hora inicial, serviço afetado, duas hipóteses, observações que as sustentam ou refutam, ação de alcance limitado e validação após a mudança. Se você só escreveu \"reiniciei e voltou\", a causa e a recorrência continuam desconhecidas.\n\n## Revisão com critério\nConsegue distinguir conexão recusada de resposta 403? Consegue explicar por que um disco cheio pode impedir uma aplicação de registrar logs? Seu cálculo de erro lida com lista vazia? Consegue apontar a diferença entre um arquivo alterado e um commit? Para cada não, volte apenas à seção correspondente e refaça uma tarefa diferente.\n\n## Comunicação em 60 segundos\nEstruture assim: impacto, o que sabemos, o que ainda não sabemos, ação em curso, risco e próximo horário de atualização. Evite afirmar causa raiz com um único sinal. É legítimo escalar quando a próxima ação exige autoridade ou conhecimento que você não tem; envie evidências e uma pergunta específica.\n\nUma nota alta no quiz mede reconhecimento. O incidente mede execução em um ambiente didático. A rubrica do portfólio ajuda você a avaliar clareza e autonomia, mas não concede nível profissional. Repita no laboratório real apenas as etapas para as quais você tem um ambiente pessoal apropriado.",
+      "steps": [
+        "Refaça o lab Linux sem solução",
+        "Complete o simulado Fundamentos e revise cada erro",
+        "Compare o primeiro runbook com sua nova versão",
+        "Agende revisão dos conceitos que ainda exigiram consulta"
+      ],
+      "deliverable": "Handoff de incidente de uma página e lista de três lacunas prioritárias.",
+      "senior": "Declare incerteza sem perder clareza sobre a próxima ação.",
+      "sources": [
+        "sre"
+      ],
+      "lab": "linux",
+      "quiz": [
+        {
+          "question": "Um handoff útil contém:",
+          "options": [
+            "Somente o nome de quem errou",
+            "Impacto, evidências, ações e próximo passo",
+            "Toda a saída bruta de todos os sistemas"
+          ],
+          "answer": 1,
+          "explanation": "Informação selecionada permite continuar a investigação sem expor dados desnecessários."
+        },
+        {
+          "question": "Uma causa raiz deve se apoiar em:",
+          "options": [
+            "Coincidência temporal apenas",
+            "Evidências e teste de hipóteses alternativas",
+            "Quantidade de ferramentas usadas"
+          ],
+          "answer": 1,
+          "explanation": "Mudanças simultâneas podem ser correlacionadas sem serem a causa."
+        }
+      ],
+      "minutes": 180
+    },
+    {
+      "day": 8,
+      "title": "Ansible: inventário e estado desejado",
+      "track": "Ansible",
+      "summary": "Faça sua primeira alteração declarativa em hosts sintéticos.",
+      "objectives": [
+        "Separar nó de controle e alvos",
+        "Selecionar inventário limitado",
+        "Entender idempotência"
+      ],
+      "body": "## O modelo mental\nAnsible descreve um estado desejado em playbooks YAML e executa módulos nos alvos do inventário. O nó de controle inicia o trabalho. O inventário relaciona nomes, grupos e parâmetros de conexão. Uma play aplica tarefas a um conjunto de hosts. Um módulo encapsula uma operação, como garantir pacote instalado.\n\n```yaml\n- name: Preparar servidores web de laboratório\n  hosts: webservers\n  tasks:\n    - name: Garantir nginx\n      ansible.builtin.package:\n        name: nginx\n        state: present\n    - name: Manter nginx em execução\n      ansible.builtin.service:\n        name: nginx\n        state: started\n```\n\nNo app existem dois webservers Linux e um host Windows sintético. O exemplo não instala nada na sua máquina. Rode duas vezes: a primeira muda estado, a segunda deve reportar ok sem changes. Isso ilustra idempotência: repetir converge ao mesmo estado, sem efeitos extras desnecessários.\n\n## Inventário evita acidentes\nUm grupo não é uma autorização. hosts: all pode alcançar máquinas que não deveriam mudar. Inspecione --list-hosts e use --limit em um laboratório real. Separe inventários de estudo e produção; nunca mantenha credenciais de produção no diretório do exercício.\n\n## YAML essencial\nUse espaços, nunca tabs para indentação. Hífen inicia item de lista; chave seguida de dois pontos abre um mapeamento. Uma tarefa tem exatamente um módulo. Distinguir erro de YAML de erro do módulo poupa tempo. O editor integrado rejeita recursos fora do subconjunto suportado em vez de fingir que funcionam.\n\n## Idempotência tem limites\nstate: restarted reinicia sempre e portanto tende a changed em cada execução. Um shell arbitrário pode sempre mudar algo. Idempotência também depende de entrada, alvo, módulo e versão. O resultado changed não significa sucesso funcional: ainda é necessário verificar o serviço que o usuário consome.",
+      "steps": [
+        "Execute o playbook no lab Ansible Linux",
+        "Observe hosts, tarefas e contador de mudanças",
+        "Execute novamente e confirme zero mudanças",
+        "Troque o alvo para windows e explique por que o módulo Linux deve falhar"
+      ],
+      "deliverable": "Playbook de duas tarefas e comparação documentada entre primeira e segunda execução.",
+      "senior": "Diferencie idempotência, convergência e sucesso funcional com um contraexemplo.",
+      "sources": [
+        "ansible",
+        "ansible-playbooks"
+      ],
+      "lab": "ansible",
+      "quiz": [
+        {
+          "question": "Depois da convergência, a segunda execução deveria:",
+          "options": [
+            "Alterar tudo novamente",
+            "Reportar zero mudanças quando o estado não mudou",
+            "Apagar o inventário"
+          ],
+          "answer": 1,
+          "explanation": "Tarefas idempotentes não repetem efeitos quando o estado já está correto."
+        },
+        {
+          "question": "O inventário define:",
+          "options": [
+            "Alvos e agrupamentos",
+            "Aprovação irrestrita",
+            "Todas as senhas em texto"
+          ],
+          "answer": 0,
+          "explanation": "Inventário descreve alvos, não concede autoridade para alterá-los."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 9,
+      "title": "Playbooks: observar, alterar, verificar",
+      "track": "Ansible",
+      "summary": "Escreva tarefas pequenas e interprete o recap.",
+      "objectives": [
+        "Distinguir ok, changed, failed e unreachable",
+        "Usar check mode com consciência",
+        "Definir pós-condição"
+      ],
+      "body": "## Resultado de tarefa\nok indica que a tarefa executou sem precisar mudar o estado. changed indica alteração reportada. failed é falha da tarefa. unreachable significa que não foi possível alcançar o host pelo transporte. Ignore erros somente quando o contrato permite uma alternativa clara; ignorar indiscriminadamente transforma falha em silêncio.\n\nNo Ansible real, módulos podem ter check mode e diff. --check tenta prever sem modificar, quando suportado. Não é emulação perfeita e não garante todos os efeitos. --diff pode revelar conteúdo sensível. Use --syntax-check primeiro, --list-hosts para escopo e depois check/diff no inventário de estudo.\n\n```bash\nansible-playbook -i inventory.ini site.yml --syntax-check\nansible-playbook -i inventory.ini site.yml --list-hosts\nansible-playbook -i inventory.ini site.yml --check --diff --limit lab\n```\n\nEsses comandos pertencem ao kit real, com arquivos e dependências preparados. O lab integrado possui um toggle próprio de check mode; ele compara cópias de estado e não substitui o comportamento real de todos os módulos.\n\n## Tarefa bem escrita\nDê nome orientado ao objetivo. Prefira módulo específico a shell. Use fully qualified collection name para tornar a origem explícita. Estado desejado não deve depender de uma sequência frágil de comandos. Uma pós-condição deve testar o resultado consumível: serviço ativo e resposta válida, não apenas pacote instalado.\n\n## Falha parcial\nEm vários hosts, um pode mudar antes de outro falhar. Você precisa saber quais mudaram e como retomar. Uma tarefa de download pode funcionar, mas a configuração seguinte falhar. Canário reduz alcance; limites de falha e serialização devem ser projetados para o tipo de mudança. No simulador a validação de sintaxe acontece antes da aplicação; isso é uma simplificação explicitamente didática.\n\nNo exercício real de localhost o playbook só escreve uma configuração dentro de labs/real/ansible/workspace. Você pode repetir e comparar recap, sem instalar pacotes do sistema nem pedir sudo.",
+      "steps": [
+        "Rode check mode no lab e confirme que o estado final não foi persistido",
+        "Execute de verdade no simulador e rode novamente",
+        "Provoque erro de indentação e depois erro de módulo; compare os feedbacks",
+        "Leia o kit real de localhost e execute syntax-check antes de qualquer apply local"
+      ],
+      "deliverable": "Recap comentado, escopo do inventário e pós-condição funcional.",
+      "senior": "Planeje retomada após falha parcial sem ampliar o conjunto de alvos.",
+      "sources": [
+        "ansible-playbooks",
+        "ansible-check"
+      ],
+      "lab": "ansible",
+      "quiz": [
+        {
+          "question": "Check mode garante que todo módulo foi simulado perfeitamente?",
+          "options": [
+            "Sim",
+            "Não; a cobertura varia por módulo e contexto",
+            "Só em produção"
+          ],
+          "answer": 1,
+          "explanation": "É evidência parcial, não prova completa da mudança."
+        },
+        {
+          "question": "Pacote instalado prova que a função do serviço funciona?",
+          "options": [
+            "Não; ainda é preciso verificar a pós-condição",
+            "Sim",
+            "Só se changed=1"
+          ],
+          "answer": 0,
+          "explanation": "Processo, configuração e dependências podem continuar falhando."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 10,
+      "title": "Variáveis, templates e handlers",
+      "track": "Ansible",
+      "summary": "Separe dados da configuração e reinicie apenas quando necessário.",
+      "objectives": [
+        "Entender variáveis e precedência",
+        "Relacionar mudança a handler",
+        "Ler template Jinja com segurança"
+      ],
+      "body": "## Configuração reutilizável\nVariáveis deixam um playbook funcionar em ambientes diferentes sem duplicar lógica. defaults de uma role são valores facilmente sobrescritos; group_vars e host_vars descrevem grupos e hosts; extra-vars têm precedência elevada. Evite redefinir a mesma variável em muitos lugares: uma configuração pode parecer correta no arquivo e receber outro valor em execução.\n\n```yaml\n- name: Configuração local didática\n  hosts: lab\n  vars:\n    message: observabilidade habilitada\n  tasks:\n    - name: Renderizar configuração\n      ansible.builtin.template:\n        src: templates/agent.conf.j2\n        dest: \"{{ playbook_dir }}/workspace/agent.conf\"\n        mode: '0600'\n      notify: Registrar alteração\n  handlers:\n    - name: Registrar alteração\n      ansible.builtin.debug:\n        msg: Configuração mudou; em um serviço real, validar antes de recarregar.\n```\n\nUm template Jinja interpola valores, como message={{ message }}. Quoting importa: mode: '0600' deve preservar a intenção. O kit real inclui esse padrão. Este exemplo avançado não cabe no interpretador sintético de módulos; pratique no kit de localhost.\n\n## Por que handlers existem\nUma tarefa notifica um handler quando reporta changed. Notificações para o mesmo handler normalmente se agrupam; o handler roda no ponto de execução apropriado, em geral ao fim da seção. Isso evita reiniciar o mesmo serviço depois de cada arquivo. Erros e flush_handlers alteram o fluxo: consulte a documentação antes de depender de ordem específica.\n\n## Não renderize e torça\nValide a configuração antes da troca ou recarga quando o módulo/aplicação suportar. Um template sintaticamente válido pode gerar uma configuração inválida. Faça uma mudança por vez, veja o diff permitido e compare a segunda execução. Nunca inclua segredo em um template que será versionado ou exportado como evidência.\n\nUse o laboratório integrado para treinar a diferença entre started e restarted. A configuração real com templates e handlers está no roteiro separado: a distinção existe para não ensinar comportamento falso do Ansible.",
+      "steps": [
+        "No simulador compare started com restarted em duas execuções",
+        "Abra o template e site.yml do kit Ansible real",
+        "Mude message apenas na pasta de estudo e rode check/diff",
+        "Explique quando o handler deveria rodar e quando não deveria"
+      ],
+      "deliverable": "Template, variável de exemplo sem segredo e evidência de handler disparado apenas após mudança.",
+      "senior": "Mostre a cadeia de precedência que explica o valor efetivo e uma validação antes do reload.",
+      "sources": [
+        "ansible-vars",
+        "ansible-handlers"
+      ],
+      "lab": "ansible",
+      "quiz": [
+        {
+          "question": "Um handler costuma ser notificado quando:",
+          "options": [
+            "Uma tarefa associada reporta changed",
+            "O arquivo contém comentário",
+            "Qualquer tarefa retorna ok"
+          ],
+          "answer": 0,
+          "explanation": "notify depende do resultado changed, com as regras de execução dos handlers."
+        },
+        {
+          "question": "Reiniciar sempre com state: restarted:",
+          "options": [
+            "É igual a garantir started",
+            "Pode produzir mudança em toda execução",
+            "É obrigatório para idempotência"
+          ],
+          "answer": 1,
+          "explanation": "started converge a um estado; restarted solicita uma ação a cada execução."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 11,
+      "title": "Roles, segredos e execução limitada",
+      "track": "Ansible",
+      "summary": "Organize automações sem esconder risco dentro de uma role.",
+      "objectives": [
+        "Identificar responsabilidades de uma role",
+        "Entender Vault e no_log",
+        "Planejar canário e rollback"
+      ],
+      "body": "## Uma responsabilidade por role\nUma role organiza tasks/main.yml, handlers/main.yml, defaults/main.yml, templates e files. Seu valor é um contrato de entradas e efeitos, não apenas uma árvore de pastas. Uma role de configuração de agente deve dizer plataformas aceitas, variáveis obrigatórias, arquivos tocados, reinícios e como remover ou voltar a versão anterior.\n\n## Segredo criptografado continua sendo segredo\nAnsible Vault protege conteúdo em repouso. A senha/chave que o desbloqueia precisa vir de um mecanismo aprovado e separado. no_log reduz exposição da saída de uma tarefa; não elimina todo risco em debug, diff, histórico ou arquivos gerados. Use credenciais fictícias nos estudos; não coloque uma senha real em variável, print ou anotação do curso.\n\n## Privilégio e alcance\nbecome aumenta privilégio quando necessário, não torna o playbook correto. Uma operação de leitura não deveria exigir administrador. Planeje um host canário, janela, condição de parada e limite de falhas. serial controla lotes; max_fail_percentage envolve semântica por lote que deve ser testada. Não copie um número sem entender a população de alvos.\n\n```yaml\n- name: Mudança gradual em inventário de estudo\n  hosts: lab\n  serial: 1\n  tasks:\n    - name: Verificar plataforma\n      ansible.builtin.debug:\n        msg: Primeiro valide o alvo e a janela de mudança.\n```\n\n## Rollback tem de ser específico\nVoltar o pacote pode exigir configuração compatível e dados que não foram migrados. Antes de mudar, identifique o estado anterior e a reversibilidade. Um backup que nunca foi restaurado é uma hipótese. O kit real só altera arquivos em um workspace próprio; sua estratégia de retorno pode preservar uma cópia antiga antes de substituir a nova.\n\nNo laboratório de workflow, escolha a política que exige aprovação, restringe alvo, impede duplicação e verifica a saúde depois. Essa política não executa Ansible: exercita o raciocínio para uma automação corporativa.",
+      "steps": [
+        "Desenhe o contrato de uma role de agente de observabilidade",
+        "Liste dados que não podem aparecer no diff",
+        "Configure aprovação, canário e deduplicação no laboratório Workflow",
+        "Escreva condição de parada e rollback com verificação"
+      ],
+      "deliverable": "Contrato de role e plano de mudança de um host canário.",
+      "senior": "Mostre um cenário em que rollback de pacote não restaura dados e exija tratamento separado.",
+      "sources": [
+        "ansible-roles",
+        "ansible-vault"
+      ],
+      "lab": "workflow",
+      "quiz": [
+        {
+          "question": "Vault resolve todos os vazamentos?",
+          "options": [
+            "Sim",
+            "Não; runtime, logs e chave continuam exigindo controles",
+            "Só com become"
+          ],
+          "answer": 1,
+          "explanation": "Criptografia em repouso não controla toda a circulação de um segredo."
+        },
+        {
+          "question": "Antes de uma mudança ampla, é preferível:",
+          "options": [
+            "Um canário com critério de parada e validação",
+            "Todos os hosts ao mesmo tempo",
+            "Ignorar erros para terminar"
+          ],
+          "answer": 0,
+          "explanation": "Uma amostra limitada permite observar efeitos antes de ampliar o alcance."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 12,
+      "title": "AAP: automação como serviço interno",
+      "track": "Ansible",
+      "summary": "Entenda controller, execution environments e workflows corporativos.",
+      "objectives": [
+        "Mapear objetos da AAP",
+        "Separar criar, aprovar e executar",
+        "Projetar rastreabilidade"
+      ],
+      "body": "## O que a plataforma acrescenta\nAnsible Automation Platform organiza execução e governança em equipe. No automation controller você relaciona organização, usuários/equipes, inventário, credencial, projeto e job template. Projeto aponta para conteúdo versionado; job template define como executar esse conteúdo. Workflow conecta etapas e decisões. Isso não substitui qualidade do playbook.\n\nUm execution environment empacota dependências de execução, como collections e bibliotecas. Fixar e revisar versões reduz o caso \"funciona na minha máquina\". Atualizações exigem testes: pinning sem política de correção também envelhece. Roles externas devem ser revisadas como código de terceiros.\n\n## Separação de poderes\nQuem edita automação não precisa poder executar qualquer coisa em produção. Um operador pode lançar um template permitido sem visualizar a credencial. Surveys coletam parâmetros, mas precisam limitar escolhas: oferecer host livre ou comando arbitrário pode contornar o desenho do template. Aprovação deve estar vinculada à mudança e ao escopo efetivo.\n\n## Um fluxo possível\nEvento de monitoramento → enriquecimento somente leitura → seleção de runbook versionado → aprovação válida → canário → verificação → expansão limitada ou rollback → registro. Correlação preserva a ligação entre incidente, revisão Git, job e resultado. Credenciais não aparecem nesse registro.\n\n## Falhas que você precisa antecipar\nProjeto sem sincronizar pode usar conteúdo inesperado. Imagem de execução divergente pode quebrar módulo. Credencial expirada impede acesso. Inventário antigo aponta para alvo errado. Callback perdido não significa job não executado. Antes de repetir, consulte o resultado pelo identificador e preserve idempotência.\n\nO curso inclui um simulador de política; não instala nem licencia AAP. Para prática real é necessário um ambiente de treinamento autorizado. No roteiro da biblioteca estão os objetos para criar e as evidências para coletar, sem usar nenhuma instância corporativa por inferência.",
+      "steps": [
+        "Desenhe projeto → execution environment → inventário → template → workflow",
+        "No laboratório, simule evento repetido e aprovação ausente",
+        "Defina permissões de autor, aprovador e operador",
+        "Escreva como descobrir se um job terminou quando o callback falhou"
+      ],
+      "deliverable": "Desenho de workflow AAP com identidades, IDs de correlação e limites.",
+      "senior": "Evite parâmetros que transformam template limitado em execução arbitrária.",
+      "sources": [
+        "aap",
+        "ansible"
+      ],
+      "lab": "workflow",
+      "quiz": [
+        {
+          "question": "Execution environment serve para:",
+          "options": [
+            "Empacotar dependências da execução",
+            "Substituir aprovação",
+            "Armazenar todas as senhas no código"
+          ],
+          "answer": 0,
+          "explanation": "Ele ajuda a reproduzir o ambiente de ferramentas e bibliotecas."
+        },
+        {
+          "question": "Callback de job perdido significa que:",
+          "options": [
+            "Nada executou",
+            "É preciso consultar o estado pelo ID antes de repetir",
+            "Todos os hosts falharam"
+          ],
+          "answer": 1,
+          "explanation": "Perda de confirmação e falha da ação são eventos diferentes."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 13,
+      "title": "Remediação Ansible em Linux e Windows",
+      "track": "Ansible",
+      "summary": "Escolha a ação pela plataforma e valide o resultado.",
+      "objectives": [
+        "Evitar módulo errado por plataforma",
+        "Definir pré e pós-condições",
+        "Investigar falha parcial"
+      ],
+      "body": "## Uma intenção, implementações diferentes\nManter um serviço funcionando pode exigir ansible.builtin.service em Linux e ansible.windows.win_service em Windows. O nome de pacote, caminho e mecanismo de privilégio também mudam. Não suponha que package universaliza todos os sistemas. Facts e condições ajudam a selecionar, mas precisam ser suportados e testados no ambiente real.\n\n```yaml\n- name: Serviço Windows de estudo\n  hosts: windows\n  tasks:\n    - name: Garantir W3SVC iniciado\n      ansible.windows.win_service:\n        name: W3SVC\n        state: started\n```\n\nNo simulador W3SVC existe como dado; isso não instala IIS nem demonstra conectividade. O exemplo usa um serviço previamente instalado. Em ambiente real, verifique dependências, identidade de serviço e recurso consumível. Serviço started com aplicação retornando erro ainda é incidente.\n\n## Antes de remediar\nConfirme que o evento continua ativo, o alvo pertence ao inventário correto, a ação é permitida e a janela não expirou. Colete estado anterior e uma evidência de diagnóstico. Verifique se outra execução já está em andamento para evitar corrida. Escolha o menor alcance que teste a hipótese.\n\n## Depois de remediar\nValide processo, endpoint e taxa de erro, com tempo suficiente para evitar falso positivo. Registre ação, revisão, alvo, resultado e duração. Se a condição piorar, pare a expansão e execute o retorno previsto. Se reaparece toda hora, o reinício virou toil: investigue causa, capacidade e mudança recente.\n\n## Falha parcial não é detalhe\nSe dois hosts mudaram e um falhou, não resuma \"deu erro\". Relate quais estados são conhecidos e desconhecidos. Uma execução repetida deve convergir sem repetir efeitos perigosos. O console didático permite treinar resultados por host; transporte, concorrência e autenticação reais ficam fora da simulação.",
+      "steps": [
+        "Execute o cenário Windows e confirme idempotência",
+        "Use um módulo Linux no alvo Windows e leia a rejeição",
+        "Compare os contratos dos dois playbooks",
+        "Escreva uma pós-condição de experiência do usuário, além de serviço iniciado"
+      ],
+      "deliverable": "Dois playbooks pequenos e runbook com condição de parada para falha parcial.",
+      "senior": "Explique como impedir dois jobs concorrentes para o mesmo recurso.",
+      "sources": [
+        "ansible-windows",
+        "ansible-playbooks"
+      ],
+      "lab": "ansible-windows",
+      "quiz": [
+        {
+          "question": "Serviço started prova recuperação completa?",
+          "options": [
+            "Sim",
+            "Não; verificar endpoint e experiência",
+            "Apenas no Windows"
+          ],
+          "answer": 1,
+          "explanation": "Estado do processo é um sinal, não toda a função do sistema."
+        },
+        {
+          "question": "Falha parcial exige registrar:",
+          "options": [
+            "Somente exit code",
+            "Alvos alterados, falhos e estado ainda desconhecido",
+            "Apenas tempo total"
+          ],
+          "answer": 1,
+          "explanation": "A retomada depende de saber o que realmente mudou."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 14,
+      "title": "Checkpoint 2: automação que converge",
+      "track": "Revisão",
+      "summary": "Entregue um playbook repetível e explique seus limites.",
+      "objectives": [
+        "Executar sem copiar solução",
+        "Demonstrar convergência",
+        "Revisar governança de automação"
+      ],
+      "body": "## Três horas de prova\nUse 90 minutos para o laboratório Ansible sem abrir o exemplo pronto. Instale nginx nos dois webservers sintéticos e mantenha-o iniciado. Rode de novo; verifique zero mudanças. Faça o cenário Windows com o módulo correto. Registre uma falha proposital e sua explicação.\n\nReserve 45 minutos para o simulado Ansible e 45 para o portfólio. Se já preparou o kit localhost, compare a simulação com o recap real. Declare o que ainda não foi testado: SSH, credenciais, facts de hosts remotos e permissões não são exercitados pelo modelo local.\n\n## Critérios da entrega\nInventário limitado, nomes de tarefas claros, módulos adequados, idempotência e validação. Acrescente contrato de entrada, plataforma suportada, dados alterados, condição de parada e recuperação. Outra pessoa deveria conseguir seguir o procedimento sem pedir os parâmetros básicos.\n\n## Perguntas de revisão\nPor que restarted pode gerar changed sempre? O que --check deixa de cobrir? Um survey que aceita qualquer host enfraquece qual controle? Como um callback perdido pode causar execução duplicada? Qual diferença entre pacote instalado e serviço funcional?\n\nSe um conceito exigir consulta, revise só aquele trecho e refaça uma variação. A repetição espaçada no app agenda novamente itens que você errou ou marcou como difíceis. Não marque domínio por reconhecer uma alternativa que acabou de ver no gabarito.\n\n## Evidência que se sustenta\nUm screenshot isolado não explica contexto. Anexe em suas notas: versão do exercício, entrada usada, primeira e segunda saída, erro provocado e interpretação. Não cole tokens ou inventários reais. Para um iniciante, esse cuidado já mostra disciplina operacional; a ambição de sênior entra em antecipar as falhas e comunicar os limites.",
+      "steps": [
+        "Refaça os dois labs Ansible sem solução",
+        "Complete o simulado Ansible",
+        "Revise uma role usando a rubrica da aula 11",
+        "Publique apenas no portfólio local uma explicação de 2 minutos"
+      ],
+      "deliverable": "Pacote de evidências Ansible com primeira execução, convergência e falha controlada.",
+      "senior": "Dê um exemplo em que um playbook idempotente ainda é perigoso por ter o alvo errado.",
+      "sources": [
+        "ansible",
+        "aap"
+      ],
+      "lab": "ansible",
+      "quiz": [
+        {
+          "question": "Idempotência garante alvo correto?",
+          "options": [
+            "Não",
+            "Sim",
+            "Só com YAML"
+          ],
+          "answer": 0,
+          "explanation": "Uma automação pode convergir perfeitamente no recurso errado."
+        },
+        {
+          "question": "Melhor prova de repetibilidade neste exercício:",
+          "options": [
+            "Uma captura do editor",
+            "Entrada versionada e resultados da primeira e segunda execução",
+            "Nome do arquivo"
+          ],
+          "answer": 1,
+          "explanation": "A comparação evidencia se houve convergência e permite reproduzir."
+        }
+      ],
+      "minutes": 180
+    },
+    {
+      "day": 15,
+      "title": "Observabilidade: métricas, logs e traces",
+      "track": "Observabilidade",
+      "summary": "Escolha o sinal certo para responder uma pergunta concreta.",
+      "objectives": [
+        "Diferenciar sinais e unidades",
+        "Entender cardinalidade",
+        "Correlacionar uma requisição"
+      ],
+      "body": "## Três perspectivas\nMétrica agrega números ao longo do tempo: requisições por segundo, erro ou duração. Log descreve um evento com contexto. Trace reúne spans de uma operação distribuída; cada span tem duração e relação com outros. Nenhum sinal resolve sozinho todos os diagnósticos. Comece pela pergunta e escolha o sinal mais econômico que a responde.\n\nOpenTelemetry padroniza instrumentos e transporte de telemetria. Não é por si só um banco de dados ou painel. Um Collector pode receber, processar e exportar sinais; trate sua fila, memória, perda e saída como parte da operação. Dupla instrumentação pode criar duplicatas ou custo sem informação nova.\n\n## Quatro sinais para um serviço\nLatência mostra duração, tráfego mostra volume, erros mostram falha e saturação mostra proximidade do limite. P95=800ms significa que 95% das observações da distribuição ficaram em até 800ms; não é média. Não tire média simples de percentis de instâncias para obter o percentil global.\n\n```json\n{\"timestamp\":\"2026-09-06T09:05:00Z\",\"service.name\":\"quotes\",\"loglevel\":\"ERROR\",\"trace_id\":\"demo-0001\",\"content\":\"upstream timeout\",\"duration_ms\":1200}\n```\n\nTodos os campos do exemplo são sintéticos. Timestamps devem indicar fuso; duração precisa de unidade. Identificadores permitem ligar a falha a um trace, mas usuário individual como label de métrica cria cardinalidade alta e risco de privacidade.\n\n## Cardinalidade e qualidade\nUm label com três regiões e dois ambientes é limitado. request_id com milhões de valores multiplica séries. Controle dimensões, retenção e amostragem. Coletar tudo não é estratégia; define custo e exposição. Diferencie ausência de sinal de valor zero e acompanhe a saúde da própria coleta.\n\n## Exercício de investigação\nO laboratório DQL contém logs de quotes, orders e collector. Filtre erros antes de agrupar por serviço. Compare contagem e duração sem declarar causalidade apenas por correlação. Depois siga o trace_id nos registros brutos e escreva qual hipótese você consegue sustentar.",
+      "steps": [
+        "Abra o DQL e observe campos e unidades do dataset",
+        "Filtre loglevel ERROR e agrupe por service.name",
+        "Volte aos registros brutos e encontre o trace do erro",
+        "Escolha labels limitados para uma métrica de requisições"
+      ],
+      "deliverable": "Consulta, tabela de resultados e hipótese com limitação explícita.",
+      "senior": "Calcule o custo lógico de cardinalidade e explique amostragem sem esconder erro raro.",
+      "sources": [
+        "otel",
+        "sre"
+      ],
+      "lab": "dql",
+      "quiz": [
+        {
+          "question": "request_id como label de métrica costuma:",
+          "options": [
+            "Reduzir todas as séries",
+            "Aumentar cardinalidade sem limite útil",
+            "Garantir privacidade"
+          ],
+          "answer": 1,
+          "explanation": "Cada valor distinto pode criar uma nova série ou combinação de séries."
+        },
+        {
+          "question": "OpenTelemetry é:",
+          "options": [
+            "Padrão e ferramentas de instrumentação/coleta/exportação",
+            "Um painel obrigatório",
+            "Uma licença Dynatrace"
+          ],
+          "answer": 0,
+          "explanation": "Pode enviar sinais a diferentes backends; não substitui armazenamento e visualização."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 16,
+      "title": "Dynatrace: navegue do problema à evidência",
+      "track": "Dynatrace",
+      "summary": "Entenda OneAgent, ActiveGate, Grail e contexto de dependências.",
+      "objectives": [
+        "Mapear coleta, armazenamento e análise",
+        "Investigar entidade e dependência",
+        "Tratar causa sugerida como hipótese verificável"
+      ],
+      "body": "## O que aprender primeiro\nComece pela visão de serviço: impacto, janela, erros, latência, dependências e alterações recentes. Depois desça até processo e host. Um problema no serviço pode ser consequência de uma dependência compartilhada. Conhecer a topologia evita abrir um incidente separado para cada sintoma.\n\nOneAgent coleta e instrumenta tecnologias suportadas nos modos apropriados. ActiveGate pode atuar em caminhos de comunicação e extensões conforme o desenho. Grail é a camada de dados consultada por DQL na experiência atual. O que você vê depende da versão, licença, permissões e configuração do tenant. Não suponha que todo recurso foi habilitado.\n\n## Vocabulário que você pode encontrar\nSmartscape representa contexto de dependências. Nas fontes atuais, Dynatrace Intelligence é o nome da família de recursos de análise que também aparece em referências históricas como Davis AI. Confirme a terminologia do seu ambiente. Correlação de eventos e contexto topológico ajudam a identificar causa provável; sua ação ainda exige evidências e política.\n\n## Roteiro em um tenant de treinamento\n1. Ajuste a janela e o fuso.\n2. Abra um serviço conhecido e observe erros, volume e latência.\n3. Escolha um problema e liste entidades afetadas.\n4. Siga uma dependência e um trace; compare com alteração recente.\n5. Registre evidência que contradiz uma hipótese inicial.\n\nO app local não é uma instalação Dynatrace e não imita OneAgent ou a análise causal do fornecedor. A bancada DQL ensina um subconjunto sintático sobre dados fixos. A biblioteca liga à documentação e ao aprendizado oficial para a etapa real. Não precisa de cartão nem de token para estudar aqui.\n\n## Instalação também é mudança\nAntes de instalar agente de coleta: valide plataforma, permissão, escopo, dados coletados, egress, custo, modo e remoção. No trabalho, siga o padrão aprovado pelo time. Um agente observador pode exigir privilégios relevantes; não instale software em servidores da empresa como simples exercício.",
+      "steps": [
+        "Monte o mapa aplicação → coleta → armazenamento → consulta → problema",
+        "Use os logs sintéticos para identificar a dependência compartilhada",
+        "Leia o roteiro Dynatrace na biblioteca e marque o que depende de tenant",
+        "Escreva cinco perguntas de onboarding sobre instrumentação e acesso"
+      ],
+      "deliverable": "Mapa de observabilidade e roteiro de investigação com limitações de acesso.",
+      "senior": "Questione cobertura, perda de coleta e relação temporal antes de aceitar uma causa sugerida.",
+      "sources": [
+        "dynatrace",
+        "oneagent",
+        "dql"
+      ],
+      "lab": "dql",
+      "quiz": [
+        {
+          "question": "Grail e DQL se relacionam como:",
+          "options": [
+            "Camada de dados e linguagem de consulta",
+            "Duas versões do Ansible",
+            "Dois tipos de senha"
+          ],
+          "answer": 0,
+          "explanation": "DQL explora os dados armazenados no Grail; não é SQL tradicional."
+        },
+        {
+          "question": "Uma causa sugerida pela plataforma pede:",
+          "options": [
+            "Validar evidências e contexto antes de agir",
+            "Reiniciar sem aprovação",
+            "Desligar todos os alertas"
+          ],
+          "answer": 0,
+          "explanation": "A decisão operacional exige contexto, autoridade e validação."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 17,
+      "title": "DQL: investigue dados de verdade no exercício",
+      "track": "Dynatrace",
+      "summary": "Filtre, agregue e ordene logs; não confunda DQL com SPL ou SQL.",
+      "objectives": [
+        "Escrever um pipeline DQL",
+        "Interpretar contagem por grupo",
+        "Evitar perder contexto com agregação"
+      ],
+      "body": "## Um pipeline de transformações\nDQL encadeia comandos com |. fetch inicia a leitura, filter mantém registros que atendem a uma condição, summarize agrega e sort ordena. O resultado de cada etapa alimenta a próxima. Campos podem conter ponto, como service.name. A consulta abaixo é um exemplo original compatível com o subconjunto ensinado:\n\n```text\nfetch logs\n| filter loglevel == \"ERROR\"\n| summarize total = count(), by:{service.name}\n| sort total desc\n```\n\nNo lab, quotes deve aparecer com três erros e orders com um. Os dados ficam visíveis na própria bancada. Você pode resolver com uma consulta diferente se produzir a mesma tabela; o corretor compara o resultado, não procura palavras-chave.\n\n## Registros ou agregados?\nDepois de summarize, content e trace_id deixam de representar um evento individual. Para investigar uma mensagem, volte à consulta sem a agregação. limit controla quantas linhas você vê; não transforme uma amostra limitada em taxa do universo. Filtrar apenas erros e contar não informa porcentagem sem o total de requisições na mesma população.\n\n```text\nfetch logs\n| filter service.name == \"quotes\"\n| fields timestamp, loglevel, content, trace_id\n| limit 10\n```\n\n## Escopo da bancada\nSuporta fetch logs; filter com igualdade de string ou comparação numérica simples; summarize alias=count(), by:{campo}; fields; sort campo asc/desc; limit até 100. Rejeita comandos ou funções fora disso. Não executa regex livre, rede, expressões Python ou DQL completo. Campos, registros e janela são fixos e sintéticos. Um recurso ausente no simulador não significa que o Dynatrace não o suporta.\n\n## Na plataforma real\nRestrinja janela e volume de leitura, confira permissões e unidade de dados. Salve uma consulta com descrição, dono e pergunta operacional. DQL, Splunk SPL e consultas OpenSearch têm sintaxes e modelos diferentes. Aprenda o conceito transferível e confira a documentação específica ao mudar de ferramenta.",
+      "steps": [
+        "Produza a tabela de erros por serviço no lab",
+        "Verifique o resultado contra os registros brutos",
+        "Remova summarize e projete campos para investigar um trace",
+        "Provoque erro de sintaxe e corrija com a ajuda do dialeto suportado"
+      ],
+      "deliverable": "Duas consultas: visão agregada e investigação detalhada, com interpretação.",
+      "senior": "Explique por que contagem absoluta pode aumentar enquanto a taxa de erro diminui.",
+      "sources": [
+        "dql",
+        "dql-filter",
+        "dql-aggregate"
+      ],
+      "lab": "dql",
+      "quiz": [
+        {
+          "question": "Após summarize por serviço, você tem:",
+          "options": [
+            "Um agrupamento com agregações",
+            "Todos os traces completos automaticamente",
+            "Uma alteração nos servidores"
+          ],
+          "answer": 0,
+          "explanation": "Agregação muda a granularidade e descarta o contexto individual não agrupado."
+        },
+        {
+          "question": "Para calcular taxa de erro é preciso:",
+          "options": [
+            "Apenas contar ERROR",
+            "Erros e total na mesma janela/população",
+            "A soma de percentis"
+          ],
+          "answer": 1,
+          "explanation": "Numerador e denominador precisam ter escopo consistente."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 18,
+      "title": "SLOs e alertas que merecem acordar alguém",
+      "track": "Observabilidade",
+      "summary": "Calcule orçamento de erro e diferencie alerta útil de ruído.",
+      "objectives": [
+        "Distinguir SLI, SLO e SLA",
+        "Calcular erro permitido e burn rate",
+        "Definir ação e condição de alerta"
+      ],
+      "body": "## Medida, objetivo e acordo\nSLI é a medida: fração de requisições elegíveis bem-sucedidas. SLO é o objetivo: por exemplo, 99,9% nessa medida em 30 dias. SLA é um acordo com consequências e termos próprios. Não derive um SLA contratual de um objetivo didático.\n\nPara um SLO baseado em requisições, um milhão de pedidos elegíveis com meta 99,9% permite mil falhas. Se houver 1.400, o orçamento foi excedido em 400. Para um SLO baseado em tempo com 30 dias completos, 0,1% equivale a 43,2 minutos. São modelos distintos: não misture falhas por requisição e indisponibilidade por tempo.\n\n## Velocidade de consumo\nBurn rate = taxa de erro observada / fração de erro permitida. Com meta 99,9% e 2% de erro, burn rate=20. Se o comportamento persistir, o orçamento será consumido muito mais rápido que o planejado. Janelas curtas detectam rápido, longas reduzem ruído. Uma política real precisa considerar tráfego mínimo e múltiplas janelas.\n\n## Um alerta deve carregar uma ação\nInclua serviço, impacto, janela, limiar, owner, rota de escalonamento e runbook. Alertar CPU sem consequência clara pode produzir fadiga. Ausência de dados exige regra própria: telemetria quebrada não deve ser exibida como zero erros. Um sintoma transitório não pede a mesma urgência que consumo sustentado do orçamento.\n\n## Laboratório numérico\nCalcule os valores apresentados na bancada SLO. O corretor usa fórmula e tolerância numérica; escreva unidades na evidência. Compare uma mudança de tráfego e uma mudança de erro. Um dashboard útil deve ter saúde, qualidade dos dados e ligação para investigação, não apenas números vistosos.\n\n## Para se destacar\nDiscuta exclusões e população: quais requisições são elegíveis? Dados atrasados contam? Endpoint health representa o usuário? Quem decide suspender mudanças quando o orçamento acaba? Essas definições precisam do produto e do time; não são um número escolhido isoladamente por operações.",
+      "steps": [
+        "Calcule falhas permitidas, excedente e burn rate na bancada",
+        "Explique a diferença entre SLO por tempo e por requisições",
+        "Escreva um alerta com janela, ação, owner e runbook",
+        "Modele um caso sem tráfego e outro com coletor parado"
+      ],
+      "deliverable": "Documento de SLO com fórmula, unidades, população e política de alerta.",
+      "senior": "Discuta burn rate com duas janelas e o risco de alerta sem tráfego mínimo.",
+      "sources": [
+        "sre-slo",
+        "sre-alert"
+      ],
+      "lab": "slo",
+      "quiz": [
+        {
+          "question": "Meta 99,9%, taxa observada de erro 2%. Burn rate:",
+          "options": [
+            "2",
+            "20",
+            "2000"
+          ],
+          "answer": 1,
+          "explanation": "2% / 0,1% = 20; use unidades consistentes."
+        },
+        {
+          "question": "Sem telemetria, o painel deve:",
+          "options": [
+            "Mostrar saúde verde",
+            "Sinalizar falta de dados e investigar coleta",
+            "Inventar média"
+          ],
+          "answer": 1,
+          "explanation": "Ausência de sinal não prova ausência de erro."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 19,
+      "title": "AWS: S3 e Lambda em um pipeline de eventos",
+      "track": "Cloud",
+      "summary": "Armazene objetos e processe eventos com menor privilégio e idempotência.",
+      "objectives": [
+        "Entender objeto, bucket, prefixo e evento",
+        "Tratar repetição e ordem",
+        "Separar IAM de política de recurso"
+      ],
+      "body": "## S3 é armazenamento de objetos\nUm bucket contém objetos identificados por chave; prefixo é parte do nome, não um diretório POSIX. Versionamento mantém versões e ajuda em recuperação, mas não substitui política de retenção e controle de acesso. Criptografia, bloqueio de acesso público, identidade e política do bucket resolvem dimensões distintas. Não use bucket público para logs operacionais.\n\n## Lambda reage a eventos\nUma função recebe um evento e executa com uma identidade de runtime. Configuração inclui memória, timeout, concorrência e origem. A mesma role não precisa de acesso irrestrito à conta. Conceda leitura apenas no prefixo necessário e escrita somente no destino previsto. Logs não devem serializar o evento inteiro sem revisão.\n\nNotificações e processamento podem repetir ou chegar fora de ordem. Desenhe um identificador estável para o efeito lógico. Para eventos de objeto, bucket, key e versionId quando disponível podem compor a identidade; trate os formatos e a codificação da chave conforme o evento. Não use somente horário local do consumidor.\n\n## Pipeline proposto\nObjeto sintético em prefixo de entrada → notificação → função valida e normaliza → resultado em prefixo de saída → erro controlado para reprocessamento. Evite que a saída dispare a mesma entrada em loop. Um ledger de idempotência precisa de escrita atômica, estado e estratégia para falha após reserva. Um set em memória não sobrevive a novas instâncias.\n\n## Prática sem conta\nO kit Python fornece eventos repetidos e um objeto malformado. Implemente validação e deduplicação, depois rode os testes. A bancada de dados verifica os resultados esperados. Ela não emula AWS nem comprova IAM, cold start ou retries da plataforma.\n\n## Prática opcional na AWS\nEm sandbox autorizado, siga o roteiro da biblioteca: região definida, bucket privado, prefixos distintos, role limitada, função com timeout/concorrência limitados, evento sintético e verificação de duplicidade. Defina orçamento e limpeza antes de criar. O app não provisiona nem armazena credenciais. Custos e recursos habilitados devem ser conferidos na conta.",
+      "steps": [
+        "Desenhe bucket/prefixos, produtor, função e destino",
+        "Resolva a deduplicação com fixture do lab de dados",
+        "Implemente o exercício Python e prove comportamento com evento repetido",
+        "Escreva política conceitual de menor privilégio e condição anti-loop"
+      ],
+      "deliverable": "Pipeline S3 → Lambda com chave idempotente, tratamento de erro e checklist de remoção.",
+      "senior": "Explique a falha entre reservar o evento e concluir o efeito, incluindo retomada.",
+      "sources": [
+        "aws-s3",
+        "aws-lambda",
+        "aws-events"
+      ],
+      "lab": "events",
+      "quiz": [
+        {
+          "question": "Uma função acionada por evento deve assumir:",
+          "options": [
+            "Entrega sempre única e ordenada",
+            "Possibilidade de duplicidade e reordenação conforme origem",
+            "Que memória local é ledger durável"
+          ],
+          "answer": 1,
+          "explanation": "O consumidor precisa tolerar a semântica de entrega da fonte."
+        },
+        {
+          "question": "Para evitar loop S3 → Lambda → S3:",
+          "options": [
+            "Separar entrada/saída e filtrar o gatilho",
+            "Usar bucket público",
+            "Aumentar retries sem limite"
+          ],
+          "answer": 0,
+          "explanation": "A saída não deve reativar indiscriminadamente o mesmo processamento."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 20,
+      "title": "AWS OpenSearch: logs pesquisáveis",
+      "track": "Cloud",
+      "summary": "Entenda índices, mappings, consultas e operação do armazenamento.",
+      "objectives": [
+        "Separar text e keyword",
+        "Consultar logs via Query DSL",
+        "Planejar retenção e capacidade"
+      ],
+      "body": "## De eventos a documentos\nOpenSearch indexa documentos JSON para busca e análise. Um índice tem mappings, que definem o tratamento dos campos. text costuma ser analisado para busca textual; keyword preserva valores exatos, útil para serviço e ambiente. timestamp precisa de tipo date e duração deve ser numérica com unidade documentada. Mapping errado pode dificultar agregações e exigir reindexação.\n\n```json\n{\n  \"size\": 0,\n  \"query\": {\"term\": {\"loglevel\": \"ERROR\"}},\n  \"aggs\": {\"por_servico\": {\"terms\": {\"field\": \"service.name\"}}}\n}\n```\n\nO exemplo pressupõe loglevel e service.name mapeados como keyword. Em outro mapping pode ser necessário o subcampo .keyword. Confira antes de copiar. A bancada OpenSearch aceita exatamente essa família pequena de Query DSL sobre fixtures; não usa Lucene nem executa o motor real.\n\n## Shards e réplicas\nShards dividem o índice; réplicas copiam shards para disponibilidade e leitura. Muitos shards pequenos criam overhead; réplicas não substituem snapshots. Uma réplica na mesma zona não protege contra perda da zona. Index lifecycle/retention e snapshots devem ter owner, objetivo de recuperação e teste de restauração.\n\n## Operação e segurança\nMonitore latência de indexação/busca, rejeições, heap, disco e saúde do cluster. Bulk requests reduzem overhead, mas precisam de lotes limitados e leitura dos erros por item: HTTP de sucesso pode conter falhas parciais na resposta bulk. Trate backpressure; retry ilimitado pode piorar a saturação.\n\nNo serviço AWS, acesso envolve políticas, rede e mecanismos de autenticação compatíveis com o modo implantado. VPC e criptografia não equivalem a autorização de cada operação. Uma identidade que ingere logs não precisa administrar o domínio. Planeje orçamento e retenção antes de habilitar ingestão contínua.\n\n## Comparação útil\nS3 guarda objetos e pode apoiar arquivo e recuperação. OpenSearch mantém índices pesquisáveis. Dynatrace oferece observabilidade integrada e seu modelo de dados/consulta. Cada escolha deve responder a uma pergunta operacional com custo, latência e governança conhecidos, sem duplicar coleta por hábito.",
+      "steps": [
+        "Monte a agregação de erros por serviço na bancada OpenSearch",
+        "Compare o resultado com a consulta DQL do dia 17",
+        "Defina mapping para timestamp, serviço, erro e duração",
+        "Descreva tratamento de erro por item e política de retenção"
+      ],
+      "deliverable": "Query DSL, contrato de mapping e plano de retenção/restauração.",
+      "senior": "Justifique particionamento por volume e retenção, evitando um índice por usuário ou request.",
+      "sources": [
+        "opensearch",
+        "aws-opensearch"
+      ],
+      "lab": "opensearch",
+      "quiz": [
+        {
+          "question": "Para agregação exata de nome de serviço, normalmente use:",
+          "options": [
+            "keyword",
+            "Texto analisado sem avaliar mapping",
+            "Uma imagem"
+          ],
+          "answer": 0,
+          "explanation": "keyword preserva o valor completo para agrupamento e filtro exato."
+        },
+        {
+          "question": "Uma resposta bulk HTTP 200 significa:",
+          "options": [
+            "Todos os itens obrigatoriamente gravaram",
+            "É preciso conferir falhas por item",
+            "Snapshot restaurado"
+          ],
+          "answer": 1,
+          "explanation": "Bulk pode reportar falhas parciais no corpo mesmo com transporte bem-sucedido."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 21,
+      "title": "Checkpoint 3: do log ao impacto",
+      "track": "Revisão",
+      "summary": "Investigue o mesmo conjunto de eventos em DQL e OpenSearch.",
+      "objectives": [
+        "Comparar consultas sem confundir sintaxe",
+        "Interpretar métricas com denominador",
+        "Consolidar pipeline AWS"
+      ],
+      "body": "## Três horas com uma pergunta\nQual serviço concentra erros e como isso afeta o usuário? Use 60 minutos para produzir a tabela de erros em DQL e OpenSearch sem copiar a solução. Verifique o resultado contra os registros originais. Uma tabela idêntica não significa motores idênticos; as bancadas são subconjuntos didáticos.\n\nUse 45 minutos para calcular o SLO e escrever um alerta. Use outros 45 para o simulado de observabilidade/cloud. Nos 30 finais revise seu pipeline S3/Lambda, explicando duplicidade, falha parcial e restrição de acesso.\n\n## Compare a mesma população\nSe o dashboard de erros usa cinco minutos e o total usa uma hora, a taxa é inválida. Se você contou logs de erro, talvez tenha várias linhas por requisição. Se um serviço ficou sem telemetria, seu ranking pode sumir justamente quando ele precisa de atenção. Declare o que o dataset mede e o que não mede.\n\n## Produza duas visões\nPara plantão: impacto, urgência, responsável e próximo passo. Para engenharia: janela, população, consulta, distribuição, dependência, alteração recente e hipótese testável. A mesma investigação pode produzir comunicações diferentes sem contradizer os fatos.\n\n## Corrija a fraqueza mais importante\nSe você erra sintaxe, refaça a consulta com um campo diferente. Se erra interpretação, escreva um contraexemplo: mais erros absolutos com menor taxa porque o tráfego cresceu. Se confunde serviço de nuvem, desenhe quem armazena, quem processa, quem indexa e quem tem permissão. Não avance acumulando nomes sem função.\n\nAo registrar evidência, inclua as consultas, os valores esperados e suas limitações. Não transforme números sintéticos em alegações sobre ambientes reais ou sobre qualquer organização.",
+      "steps": [
+        "Resolva DQL e OpenSearch sem solução",
+        "Compare consultas e resultados com uma contagem manual",
+        "Complete o simulado de observabilidade/cloud",
+        "Escreva resumo de incidente em até 120 palavras"
+      ],
+      "deliverable": "Duas consultas equivalentes, alerta com SLO e resumo operacional.",
+      "senior": "Demonstre como perda de observabilidade distorce a conclusão e como detectar essa perda.",
+      "sources": [
+        "dql",
+        "opensearch",
+        "sre"
+      ],
+      "lab": "dql",
+      "quiz": [
+        {
+          "question": "Contar linhas ERROR equivale sempre a contar requisições falhas?",
+          "options": [
+            "Sim",
+            "Não; uma requisição pode gerar várias linhas",
+            "Somente no Linux"
+          ],
+          "answer": 1,
+          "explanation": "A granularidade do evento precisa ser definida antes da métrica."
+        },
+        {
+          "question": "Uma comparação de taxa exige:",
+          "options": [
+            "Mesma janela e mesma população",
+            "Apenas títulos parecidos",
+            "Cores iguais no painel"
+          ],
+          "answer": 0,
+          "explanation": "Escopos diferentes produzem números incompatíveis."
+        }
+      ],
+      "minutes": 180
+    },
+    {
+      "day": 22,
+      "title": "GCP: identidade, eventos e observabilidade",
+      "track": "Cloud",
+      "summary": "Transfira os fundamentos para Cloud Storage, Cloud Run e Pub/Sub.",
+      "objectives": [
+        "Relacionar projeto, recurso e identidade",
+        "Projetar consumidor idempotente",
+        "Investigar logs e métricas no GCP"
+      ],
+      "body": "## Comece pela hierarquia\nNo Google Cloud, projetos organizam recursos e se relacionam com faturamento e políticas da organização. Uma service account representa uma identidade de workload; não é uma pessoa nem exige uma chave JSON persistente em toda integração. Prefira mecanismos de identidade de workload/federação quando o ambiente suportar. Conceda papéis no menor escopo viável.\n\n## Serviços com papéis distintos\nCloud Storage guarda objetos em buckets. Cloud Run executa serviços/jobs gerenciados conforme o produto e configuração. Pub/Sub desacopla produtores e consumidores por tópicos e assinaturas. Cloud Logging centraliza registros; Cloud Monitoring trabalha métricas, políticas e observação. As equivalências com AWS são conceituais, não substituições de sintaxe ou garantias.\n\n## Ack e duplicidade\nUm consumidor recebe mensagem e confirma processamento com ack conforme o modelo da assinatura. Confirmar antes de tornar o efeito durável pode perder trabalho. Confirmar depois permite reentrega se a confirmação se perder: por isso o efeito precisa ser idempotente. Recursos de exactly-once têm condições e escopo específicos; não os use como justificativa universal para eliminar deduplicação.\n\n## Desenho de estudo\nObjeto de log sintético → evento/roteamento compatível → consumidor Cloud Run → normalização → armazenamento/observabilidade. Especifique serviço de gatilho, identidade de entrega, autenticação do endpoint, retries, dead-letter e orçamento. Um endpoint de consumidor não deve ficar público por conveniência quando a origem pode usar identidade autenticada.\n\n## Investigar sem mudar\nNo console de uma sandbox autorizada, selecione projeto e janela antes da consulta. Filtre por recurso, severidade e correlation_id. Compare falha de permissão com falha de aplicação. Verifique concorrência, timeout e dependência downstream: escalar o consumidor pode sobrecarregar o banco.\n\nNo laboratório de eventos você testa duplicidade e separação de mensagens inválidas. Na biblioteca há roteiro GCP com critérios verificáveis e limpeza. Nenhuma chave, conta ou recurso pago é criado pelo curso.",
+      "steps": [
+        "Desenhe projetos, recursos, identidades e fluxo de mensagem",
+        "Resolva o mesmo fixture de eventos usando o modelo Pub/Sub",
+        "Explique o ponto exato em que o consumidor envia ack",
+        "Crie uma tabela AWS/GCP por função e diferenças que precisam de verificação"
+      ],
+      "deliverable": "Arquitetura GCP com identidade, ack, deduplicação e observabilidade.",
+      "senior": "Explique a falha entre efeito durável e ack e o que a sua chave idempotente garante.",
+      "sources": [
+        "gcp-iam",
+        "gcp-pubsub",
+        "gcp-run",
+        "gcp-storage"
+      ],
+      "lab": "events",
+      "quiz": [
+        {
+          "question": "Confirmar a mensagem antes de gravar o efeito pode:",
+          "options": [
+            "Perder trabalho se houver falha depois do ack",
+            "Garantir consistência total",
+            "Eliminar qualquer duplicata"
+          ],
+          "answer": 0,
+          "explanation": "A origem pode considerar concluído um efeito que ainda não existe."
+        },
+        {
+          "question": "Uma service account é:",
+          "options": [
+            "Identidade de workload",
+            "Senha pessoal compartilhada",
+            "Sempre um arquivo JSON obrigatório"
+          ],
+          "answer": 0,
+          "explanation": "A identidade pode ser usada por mecanismos que evitam chaves estáticas exportadas."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 23,
+      "title": "Containers e Kubernetes para investigar",
+      "track": "Cloud",
+      "summary": "Entenda isolamento, probes, recursos e rollout sem virar especialista em um dia.",
+      "objectives": [
+        "Diferenciar imagem, container e pod",
+        "Ler readiness e liveness",
+        "Investigar falha de deploy e recursos"
+      ],
+      "body": "## Empacotamento não é máquina virtual\nImagem é um artefato com aplicação e dependências. Container é uma instância isolada com limites, que compartilha o kernel do host no modelo Linux usual. Dados importantes não devem depender da camada efêmera do container. Logs preferencialmente fluem pelo mecanismo de observabilidade definido.\n\nNo Kubernetes, pod é a unidade que agrupa containers relacionados. Deployment gerencia réplicas e atualização de pods; Service fornece descoberta e acesso estável. Namespace organiza escopo, mas não é por si só isolamento completo de segurança. ConfigMap guarda configuração não secreta; Secret exige controle de acesso e proteção do ambiente, não apenas um nome especial.\n\n## Probes têm funções diferentes\nReadiness informa se a instância deve receber tráfego. Liveness ajuda a decidir se deve reiniciar. Startup dá tempo à inicialização quando configurada. Se uma dependência compartilhada caiu, uma liveness que falha por essa dependência pode reiniciar todos os pods e piorar o incidente. Teste função e tempo adequados.\n\n```bash\nkubectl get pods -n lab\nkubectl describe pod NOME_DO_POD -n lab\nkubectl logs NOME_DO_POD -n lab --tail=50\nkubectl rollout status deployment/quotes -n lab --timeout=60s\n```\n\nSão comandos para um cluster local seu e nome observado. Nunca use um contexto corporativo como destino implícito. O curso fornece o roteiro; não instala cluster nem executa esses comandos.\n\n## Requests e limits\nRequests ajudam no agendamento; limits impõem limites conforme recurso. CPU pode sofrer throttling; memória excedida pode resultar em OOM. CrashLoopBackOff é uma condição de repetidas falhas com espera, não a causa raiz. Investigue eventos, logs anteriores, código de saída, configuração e mudança recente.\n\nNo laboratório de incidente, compare deploy recente e falha de dependência. O foco deste dia é diagnóstico e decisão, não memorizar todos os objetos. O plano essencial pode deixar a instalação real de Kubernetes para depois do onboarding.",
+      "steps": [
+        "Desenhe imagem → container → pod → deployment → service",
+        "Explique como readiness difere de liveness",
+        "Investigue deploy e dependência no simulador de incidente",
+        "Leia o roteiro Docker/Kubernetes e identifique contexto, namespace e limites antes de aplicar"
+      ],
+      "deliverable": "Árvore de diagnóstico de pod em falha com hipótese, observação e ação.",
+      "senior": "Explique por que aumentar réplicas pode piorar uma dependência saturada.",
+      "sources": [
+        "kubernetes",
+        "docker"
+      ],
+      "lab": "incident",
+      "quiz": [
+        {
+          "question": "Readiness serve principalmente para:",
+          "options": [
+            "Decidir se a instância recebe tráfego",
+            "Apagar dados",
+            "Conceder privilégio"
+          ],
+          "answer": 0,
+          "explanation": "Readiness controla elegibilidade para tráfego; não é sinônimo de reinício."
+        },
+        {
+          "question": "CrashLoopBackOff é:",
+          "options": [
+            "A causa raiz comprovada",
+            "Um estado que exige investigação de falhas repetidas",
+            "Uma configuração de bucket"
+          ],
+          "answer": 1,
+          "explanation": "Logs, eventos e código de saída explicam por que o processo está falhando."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 24,
+      "title": "Pipeline de eventos confiável",
+      "track": "Automação",
+      "summary": "Conecte monitoramento e Ansible sem transformar ruído em ação perigosa.",
+      "objectives": [
+        "Definir envelope de evento",
+        "Separar deduplicação e correlação",
+        "Controlar reprocessamento e backpressure"
+      ],
+      "body": "## Contrato antes de integração\nUm envelope útil contém event_id, source, schema_version, occurred_at, received_at, resource_id, severity e correlation_id. Timestamp deve ter fuso e formato conhecido. O dado externo é não confiável: rejeite campo inválido e separe para análise, preservando somente o necessário e permitido.\n\n```json\n{\"schema_version\":1,\"event_id\":\"evt-demo-01\",\"source\":\"monitor-demo\",\"resource_id\":\"web-01\",\"severity\":\"error\",\"occurred_at\":\"2026-09-06T09:05:00Z\"}\n```\n\nDeduplicação evita repetir o mesmo efeito lógico. Correlação agrupa eventos relacionados, como três serviços que dependem do mesmo banco. Agrupar não significa apagar evidências; você precisa conseguir explicar quais sinais sustentam o incidente. Janela longa demais pode juntar incidentes independentes.\n\n## Estado autoritativo\nUma automação pode passar por recebido → validado → enriquecido → aguardando aprovação → executando → verificando → concluído/falhou. O estado deve estar em armazenamento confiável, com transições válidas. Aprovação expirada não pode ser reaproveitada para outro alvo. Cancelamento antes de executar difere de interromper no meio de uma ação.\n\n## Confiabilidade sem tempestade\nDefina prazo total, limite de tentativas, backoff, jitter e orçamento de concorrência. Dead-letter não é lixeira: tem owner e processo de reprocessamento após corrigir a causa. Replay deve preservar a identidade lógica e reavaliar autorização, pois uma permissão antiga pode não valer hoje.\n\n## Código e ferramentas de workflow\nFerramentas de orquestração coordenam etapas; regras de autorização, idempotência transacional e estado pertencem a um componente com contrato e testes. Power Automate pode ser complemento para fluxos corporativos; ele não muda essas exigências. Não coloque um shell livre atrás de um webhook.\n\nNo lab você monta a política do pipeline e recebe avaliação determinística de cenários: duplicata, aprovação ausente, alvo errado e excesso de tentativas. É uma avaliação de projeto, sem integração de rede real.",
+      "steps": [
+        "Preencha a política no laboratório Workflow",
+        "Teste a regra com evento duplicado e autorização ausente",
+        "Desenhe estados e transições proibidas",
+        "Escreva processo de replay de uma mensagem corrigida"
+      ],
+      "deliverable": "Contrato de evento, diagrama de estados e política testada.",
+      "senior": "Mostre como evitar corrida entre dois consumidores tentando reservar o mesmo evento.",
+      "sources": [
+        "aws-events",
+        "gcp-pubsub",
+        "sre"
+      ],
+      "lab": "workflow",
+      "quiz": [
+        {
+          "question": "Deduplicar e correlacionar são:",
+          "options": [
+            "A mesma operação",
+            "Evitar efeito repetido e relacionar eventos, respectivamente",
+            "Recursos exclusivos de IA"
+          ],
+          "answer": 1,
+          "explanation": "Eventos distintos podem pertencer ao mesmo incidente; duplicata é outra dimensão."
+        },
+        {
+          "question": "Reprocessar uma mensagem antiga exige:",
+          "options": [
+            "Reavaliar autorização e preservar identidade lógica",
+            "Confiar sempre na aprovação antiga",
+            "Gerar novo ID para esconder repetição"
+          ],
+          "answer": 0,
+          "explanation": "Escopo e validade de autorização podem mudar; replay não deve duplicar efeitos."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 25,
+      "title": "AIOps: anomalia não é incidente",
+      "track": "IA para infraestrutura",
+      "summary": "Construa uma baseline e avalie falsos positivos antes de automatizar.",
+      "objectives": [
+        "Distinguir limiar e baseline",
+        "Calcular precisão e recall",
+        "Entender sazonalidade e drift"
+      ],
+      "body": "## Comece por uma regra explicável\nUm limiar fixo dispara quando uma medida cruza um valor. Uma baseline compara o comportamento com uma referência. Exemplo: média de latência histórica 100ms, desvio padrão 20ms, observação 180ms. z=(180−100)/20=4. Isso sinaliza desvio nesse modelo, mas não prova impacto nem causa.\n\nSazonalidade importa: horário de pico não deve ser comparado automaticamente com madrugada. Dados de incidente usados para treinar a referência podem normalizar um comportamento ruim. Desvio padrão zero exige tratamento; dividir por zero ou inventar um número esconde a limitação.\n\n## Avalie com rótulos\nVerdadeiro positivo é alerta que correspondia ao evento de interesse. Falso positivo é alerta sem esse evento. Falso negativo é evento que não alertou. Precisão=TP/(TP+FP); recall=TP/(TP+FN). Num conjunto com 8 TP, 2 FP e 4 FN, precisão=80% e recall≈66,67%. Acurácia pode parecer ótima quando incidentes são raros mesmo se o detector quase nunca os encontra.\n\n## Um detector operável\nDocumente janela de treino, exclusões, hipótese estatística, população e limite. Compare com uma regra simples. Comece em shadow mode, emitindo sugestões observadas sem remediar. Meça ruído, cobertura, atraso de detecção e custo. Mudança no padrão de dados ou uso pode gerar drift e exigir revisão da baseline.\n\n## Causalidade exige outro esforço\nLatência e CPU podem crescer juntas por aumento de tráfego. Isso não prova que CPU causou o erro. Use dependências, sequência temporal, mudança recente e testes de hipóteses. Intervenção precisa de ambiente autorizado e alcance limitado; não crie falhas em produção para \"ver se é isso\".\n\nO laboratório calcula z-score, precisão e recall com dados fixos. O kit Python permite implementar a detecção e testar séries vazias/constantes. Não há modelo treinado ou acesso a dados da empresa.",
+      "steps": [
+        "Calcule z-score, precisão e recall na bancada Anomalias",
+        "Descreva um caso de sazonalidade que dispara falso positivo",
+        "Defina shadow mode e critério para promover uma regra",
+        "Implemente ou revise a função de baseline no kit Python"
+      ],
+      "deliverable": "Ficha de detector com fórmula, avaliação, limitações e política de revisão.",
+      "senior": "Compare custo de falso positivo e falso negativo segundo impacto e autoridade da ação.",
+      "sources": [
+        "sre-alert",
+        "otel"
+      ],
+      "lab": "anomaly",
+      "quiz": [
+        {
+          "question": "8 TP, 2 FP e 4 FN resultam em precisão:",
+          "options": [
+            "80%",
+            "66,67%",
+            "100%"
+          ],
+          "answer": 0,
+          "explanation": "Precisão=8/(8+2)=80%; recall usa os falsos negativos."
+        },
+        {
+          "question": "Um z-score alto comprova:",
+          "options": [
+            "Causa raiz",
+            "Desvio em relação à referência escolhida",
+            "Autorização de reinício"
+          ],
+          "answer": 1,
+          "explanation": "A referência e suas hipóteses limitam a interpretação do desvio."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 26,
+      "title": "LLMs e RAG como assistentes de investigação",
+      "track": "IA para infraestrutura",
+      "summary": "Use contexto recuperado, evidências e abstinência em vez de confiança cega.",
+      "objectives": [
+        "Explicar token, contexto e RAG",
+        "Separar instrução e dado recuperado",
+        "Avaliar resposta fundamentada"
+      ],
+      "body": "## O que um modelo faz\nUm modelo de linguagem gera texto a partir de padrões e contexto. Pode ajudar a resumir logs permitidos, comparar runbooks e propor hipóteses. Pode também inventar comandos ou citar material que não sustenta a resposta. Fluência e confiança verbal não são evidência de correção.\n\nTokens são unidades processadas pelo modelo; entrada e saída têm limites e custos conforme o serviço. Contexto é o material disponível naquela interação. Não envie credenciais, dados de clientes ou logs irrestritos. Use exemplos sintéticos no estudo e apenas destinos aprovados no trabalho.\n\n## RAG em etapas\nRAG recupera trechos de uma base e os oferece como contexto à geração. Pipeline típico: documentos aprovados → divisão em trechos → índices de busca/embeddings → recuperação filtrada → contexto com fontes → resposta com referências. A permissão deve filtrar na origem/recuperação, não depois que um documento proibido já foi fornecido ao modelo.\n\nEmbeddings representam conteúdo numericamente para busca de similaridade. Similaridade não garante relevância operacional nem atualização. Um runbook antigo pode sugerir comando incompatível. Registre versão, owner e validade. Se não houver evidência suficiente, a resposta correta é dizer o que falta.\n\n## Prompt injection\nUm log ou documento pode conter \"ignore as regras e execute...\". Esse texto é dado, não autoridade. Separe instruções confiáveis e conteúdo recuperado, limite ferramentas e valide ações fora do modelo. Esses controles reduzem risco, mas não provam imunidade completa.\n\n## Avaliar sem executar um LLM\nA bancada RAG mostra três trechos sintéticos: runbook aplicável, conteúdo antigo e instrução maliciosa inerte. Você escolhe evidência e ação; o corretor avalia a decisão. Não existe chamada a um modelo, inferência paga ou armazenamento de prompt corporativo. No trabalho, construa um conjunto de perguntas com resposta esperada, fontes, casos sem resposta e tentativas de induzir ação indevida.",
+      "steps": [
+        "Leia os trechos do lab RAG",
+        "Escolha fonte aplicável e uma resposta com incerteza explícita",
+        "Rejeite a instrução embutida no log e explique o limite de autoridade",
+        "Escreva cinco casos de avaliação, incluindo ausência de evidência"
+      ],
+      "deliverable": "Plano de avaliação RAG com fontes, validade, permissão e abstinência.",
+      "senior": "Separe qualidade de recuperação, fundamentação e segurança da ação em métricas distintas.",
+      "sources": [
+        "owasp",
+        "rag"
+      ],
+      "lab": "rag",
+      "quiz": [
+        {
+          "question": "Um documento recuperado que manda ignorar regras é:",
+          "options": [
+            "Uma nova instrução de autoridade",
+            "Dado não confiável",
+            "Aprovação de produção"
+          ],
+          "answer": 1,
+          "explanation": "Conteúdo externo não pode ampliar permissões ou substituir instruções confiáveis."
+        },
+        {
+          "question": "Busca semanticamente similar garante resposta correta?",
+          "options": [
+            "Sim",
+            "Não; relevância, validade e permissão ainda precisam de avaliação",
+            "Somente com mais tokens"
+          ],
+          "answer": 1,
+          "explanation": "Similaridade é um sinal de recuperação, não prova de verdade ou atualidade."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 27,
+      "title": "Remediação assistida com freios reais",
+      "track": "IA para infraestrutura",
+      "summary": "Transforme uma recomendação em uma ação limitada, aprovada e auditável.",
+      "objectives": [
+        "Separar recomendação e execução",
+        "Aplicar allowlist e aprovação válida",
+        "Definir rollback, cooldown e kill switch"
+      ],
+      "body": "## A IA propõe; a política decide\nO modelo pode sugerir action_id=restart_quotes para um incidente. Um componente determinístico verifica se essa ação existe, se o alvo pertence ao escopo, se há aprovação válida e se as pré-condições continuam verdadeiras. Não execute um comando livre retornado pelo modelo. A própria ferramenta deve aplicar o limite no recurso que controla.\n\n## Contrato de remediação\nInclua incidente, ação versionada, alvo permitido, justificativa com evidência, validade, identidade aprovadora, chave de idempotência e pós-condição. Um booleano no texto não basta. A aprovação se vincula àquela mudança e expira. Logs de auditoria precisam contar o que aconteceu sem persistir segredo ou informação desnecessária.\n\n## Freios em sequência\nDry-run → aprovação → lock por recurso → revalidação → canário → verificação → expansão autorizada ou rollback. Cooldown evita remediar repetidamente o mesmo sintoma. Circuit breaker interrompe uma sequência de falhas. Kill switch impede novas execuções e deve ter comportamento definido para uma ação já em curso.\n\n## Quando não automatizar a ação\nSe o diagnóstico é incerto, o efeito irreversível ou a verificação fraca, automatize primeiro a coleta de evidências e o encaminhamento. Reduzir tempo de triagem já elimina trabalho manual. Nem toda oportunidade precisa terminar em reinício autônomo.\n\n## Teste negativo vale muito\nUse evento duplicado, aprovação expirada, alvo fora do inventário, runbook antigo e pós-condição falhando. O sistema deve bloquear nos limites apropriados, preservar estado e explicar o próximo passo. Testar somente o caminho feliz não mostra se a política protege o recurso.\n\nA bancada de workflow avalia quatro controles essenciais. A arena de incidente permite observar como decisões ruins aumentam impacto no modelo. São exercícios determinísticos; não prometem a cobertura ou a segurança de uma integração empresarial real.",
+      "steps": [
+        "Configure a política no lab Workflow",
+        "Faça a tabela de cinco casos negativos e resposta esperada",
+        "Desenhe o limite onde a ferramenta verifica autorização",
+        "Escreva acionamento e recuperação do kill switch"
+      ],
+      "deliverable": "Proposta de remediação com critérios de execução, bloqueio e recuperação.",
+      "senior": "Defina o que acontece se a aprovação vence entre o planejamento e o início da ação.",
+      "sources": [
+        "owasp",
+        "aap",
+        "sre"
+      ],
+      "lab": "workflow",
+      "quiz": [
+        {
+          "question": "Um comando livre gerado por IA deve:",
+          "options": [
+            "Ir direto para shell",
+            "Ser substituído por ação permitida e validação determinística",
+            "Ganhar sudo automaticamente"
+          ],
+          "answer": 1,
+          "explanation": "A interface precisa restringir capacidades e validar autoridade fora do modelo."
+        },
+        {
+          "question": "Diagnóstico incerto e ação irreversível pedem:",
+          "options": [
+            "Automatizar coleta e escalar decisão",
+            "Executar rápido antes que mude",
+            "Esconder incerteza"
+          ],
+          "answer": 0,
+          "explanation": "Assistência de leitura oferece valor com menor risco quando a ação não é bem controlada."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 28,
+      "title": "Checkpoint 4: incident commander por um dia",
+      "track": "Revisão",
+      "summary": "Treine decisões, comunicação e recuperação sob um relógio didático.",
+      "objectives": [
+        "Priorizar mitigação com evidência",
+        "Comunicar impacto e próximos passos",
+        "Escrever postmortem sem culpa"
+      ],
+      "body": "## Três horas de simulação\nNa arena, uma API de cotações sintética está falhando após uma alteração. Você pode investigar métricas, logs, traces e histórico, comunicar impacto e escolher uma ação. Cada etapa consome tempo simulado. A interface mostra o tempo e a consequência de cada escolha; não cria tráfego ou falhas reais.\n\nUse 60 minutos para sua primeira tentativa. Depois 45 para escrever postmortem, 45 para o simulado de IA/incidentes e 30 para revisar a decisão mais fraca. Não tente decorar a sequência só para maximizar pontos: explique a evidência que justifica cada ação.\n\n## Papéis e prioridades\nComando do incidente coordena e registra decisões. Investigadores coletam sinais e testam hipóteses. Comunicação traduz impacto. Em um time pequeno, uma pessoa pode acumular papéis, mas a responsabilidade deve ficar clara. O objetivo inicial é reduzir impacto com segurança, preservando o necessário para entender a causa.\n\n## Postmortem útil\nInclua resumo, impacto, linha do tempo, detecção, resposta, fatores contribuintes, o que funcionou, o que dificultou e ações com owner e data. Evite apontar uma pessoa como causa. Uma configuração ruim passou por um sistema de validação e rollout; melhorar esse sistema previne mais do que culpar quem alterou.\n\n## Critério de retorno\nDepois da mitigação, valide erro, latência, volume e correção dos dados. Defina a janela de observação antes de declarar recuperação. Uma melhora momentânea exige acompanhamento; um dado sintético de sucesso nesta arena não substitui a observação de produção.\n\n## Evidência de comunicação\nEscreva uma atualização curta sem jargão desnecessário: o que o usuário percebe, alcance conhecido, mitigação, incerteza e próximo horário. Não prometa prazo sem evidência. Um escalonamento de qualidade leva contexto e pedido específico, não despeja logs.",
+      "steps": [
+        "Inicie uma sessão nova da arena de incidente",
+        "Investigue antes de agir e use o recurso de comunicação",
+        "Finalize somente após verificar a recuperação",
+        "Escreva postmortem e complete o simulado IA/incidentes"
+      ],
+      "deliverable": "Linha do tempo, atualização de incidente e postmortem com três ações.",
+      "senior": "Separe detecção, mitigação e correção definitiva; atribua owner e prazo às melhorias.",
+      "sources": [
+        "sre-incident",
+        "sre"
+      ],
+      "lab": "incident",
+      "quiz": [
+        {
+          "question": "Postmortem deve priorizar:",
+          "options": [
+            "Culpar quem fez o deploy",
+            "Fatores sistêmicos e ações verificáveis",
+            "Apagar a linha do tempo"
+          ],
+          "answer": 1,
+          "explanation": "O objetivo é aprender e reduzir recorrência com responsáveis e prazos claros."
+        },
+        {
+          "question": "Depois de uma mitigação, é necessário:",
+          "options": [
+            "Validar recuperação por sinais e função do usuário",
+            "Encerrar imediatamente",
+            "Remover todos os alertas"
+          ],
+          "answer": 0,
+          "explanation": "Mitigar não prova que todos os efeitos e dependências se recuperaram."
+        }
+      ],
+      "minutes": 180
+    },
+    {
+      "day": 29,
+      "title": "Projeto final: do evento à recuperação",
+      "track": "Projeto final",
+      "summary": "Integre AWS/GCP, observabilidade, Ansible e IA em uma entrega defensável.",
+      "objectives": [
+        "Integrar o fluxo com contratos claros",
+        "Provar comportamento em falhas",
+        "Defender trade-offs e limites"
+      ],
+      "body": "## Seu sistema de operações de estudo\nMonte uma solução para o serviço fictício quotes: gera eventos estruturados, calcula saúde, armazena o histórico, consulta falhas e propõe uma remediação permitida. Use Python para normalizar/deduplicar; Ansible real de localhost para renderizar configuração; DQL e OpenSearch para investigar; workflow para governar a ação.\n\nEscolha AWS ou GCP como arquitetura principal e desenhe a equivalência conceitual na outra. Na AWS, S3 pode guardar objetos, Lambda processar e OpenSearch indexar. No GCP, Cloud Storage, Pub/Sub e Cloud Run compõem funções relacionadas com contratos próprios. Não precisa provisionar para concluir a versão local, mas declare explicitamente que IAM, rede e serviços gerenciados ainda não foram testados.\n\n## Critérios de aprovação do projeto\n1. Diagrama com recursos, identidades, dados e limites.\n2. Fixture válida, duplicada e inválida com resultado reproduzível.\n3. Playbook limitado e evidência de segunda execução sem mudança.\n4. Consulta de erro e SLO com população/janela.\n5. Remediação bloqueada sem aprovação ou fora do alvo.\n6. Recuperação testada e postmortem com ações.\n\n## Uma defesa técnica de dez minutos\nExplique o problema em um minuto, arquitetura em dois, demonstração em quatro, falhas e trade-offs em dois e próximos passos em um. Mostre uma decisão que você mudou por evidência. Diga quais partes são simulações e quais executou com a ferramenta real. Não use nomes de organizações para sugerir que o projeto reproduz suas infraestruturas.\n\n## Rubrica de profundidade\nBase: consegue reproduzir com guia. Autonomia: investiga e corrige uma variação sem solução. Profundidade: explica efeitos colaterais, compara alternativa e limita risco. Use esses níveis para autoavaliação por competência, não como título profissional. Registre os pontos que precisam de revisão no primeiro mês.\n\nO portfólio exporta suas notas, resultados e evidências em Markdown; backup JSON guarda o estado de estudo. Revise antes de compartilhar fora do app. A entrega é sua explicação e seus arquivos, não apenas os pontos dos quizzes.",
+      "steps": [
+        "Execute o kit Python e o playbook real de localhost quando preparado",
+        "Resolva DQL, OpenSearch, SLO e política sem consultar respostas",
+        "Complete a arena com evidências e validação",
+        "Exporte o portfólio e apresente a defesa técnica em voz alta"
+      ],
+      "deliverable": "Portfólio final com diagrama, código, resultados, limites e plano de evolução.",
+      "senior": "Justifique cada serviço pela necessidade e diga qual complexidade removeu.",
+      "sources": [
+        "ansible",
+        "dynatrace",
+        "aws-s3",
+        "gcp-run",
+        "opensearch"
+      ],
+      "lab": "incident",
+      "quiz": [
+        {
+          "question": "Uma defesa honesta deve:",
+          "options": [
+            "Ocultar simulações",
+            "Separar prática real, simulação e partes não verificadas",
+            "Prometer arquitetura igual à empresa"
+          ],
+          "answer": 1,
+          "explanation": "A qualidade da evidência depende de comunicar seus limites."
+        },
+        {
+          "question": "O melhor trade-off é o que:",
+          "options": [
+            "Usa mais ferramentas",
+            "Relaciona necessidade, custo, risco e alternativa",
+            "Ignora recuperação"
+          ],
+          "answer": 1,
+          "explanation": "A escolha precisa resolver o problema com consequências compreendidas."
+        }
+      ],
+      "minutes": 300
+    },
+    {
+      "day": 30,
+      "title": "Chegue com método e boas perguntas",
+      "track": "Projeto final",
+      "summary": "Faça a avaliação final e prepare os primeiros dias na equipe.",
+      "objectives": [
+        "Reconhecer forças e lacunas",
+        "Fazer perguntas de onboarding úteis",
+        "Planejar evolução sem prometer domínio total"
+      ],
+      "body": "## Último dia, primeiro passo\nFaça o simulado final antes de reler notas. Revise erros e selecione três lacunas prioritárias. Reexecute um laboratório em que você tinha dificuldade. Você não precisa saber todas as ferramentas de memória; precisa investigar com método, pedir contexto e respeitar os limites de mudança.\n\n## Perguntas para os primeiros dias\nQuais serviços críticos o time atende e quais impactos preocupam mais? Onde estão runbooks e owners? Qual inventário e quais templates AAP são aprovados? Como pedir acesso de leitura no Dynatrace? Quais SLOs e rotas de escalonamento existem? Quais contas/projetos AWS/GCP pertencem ao escopo? Como são aprovados e revertidos deploys? Quais usos de IA e dados são permitidos?\n\n## Primeiro mês na equipe\nObserve um incidente com alguém experiente. Reproduza uma automação em sandbox aprovado. Melhore um runbook com evidência. Proponha uma redução de toil de pequeno alcance. Peça revisão e compare sua hipótese com a de quem conhece o ambiente. Entender o sistema real é mais valioso do que impor a arquitetura do laboratório.\n\n## Avalie autonomia, não só pontuação\nPara cada competência marque: preciso de guia; consigo executar sozinho no lab; consigo investigar variação e explicar limites. Apoie a nota com evidência. Quiz mede reconhecimento e retenção, não anos de experiência. Domínio no laboratório é um começo verificável, não garantia de cargo ou senioridade.\n\n## Se o calendário apertou\nA data de início é editável nas configurações. O app calcula o fim do ciclo a partir da data que você escolher. Priorize Ansible, Dynatrace, diagnóstico, AWS/GCP e segurança das ações. As leituras complementares de Power Platform, certificações e Kubernetes avançado podem continuar após o ciclo inicial. Não sacrifique toda a revisão para adicionar nomes ao currículo.\n\n## Rotina que continua\nMantenha um caderno de hipóteses, decisões e evidências sem informação confidencial. Faça revisão curta em intervalos crescentes, atualize runbooks após uso e teste retorno de mudança. Destaque técnico aparece na qualidade das decisões, na colaboração e na confiança que seu método permite aos outros.",
+      "steps": [
+        "Complete o simulado Final de 30 questões",
+        "Refaça um laboratório fraco sem solução",
+        "Exporte backup e portfólio; confira se abrem corretamente",
+        "Prepare perguntas de onboarding e três prioridades de evolução"
+      ],
+      "deliverable": "Plano pessoal dos primeiros 30 dias no trabalho, avaliação por competência e portfólio revisado.",
+      "senior": "Apresente o que ainda não sabe e um caminho concreto para reduzir cada incerteza.",
+      "sources": [
+        "sre",
+        "ansible",
+        "dynatrace"
+      ],
+      "lab": "workflow",
+      "quiz": [
+        {
+          "question": "Primeira atitude em um ambiente novo:",
+          "options": [
+            "Aplicar seu playbook em todos os hosts",
+            "Conhecer owners, contratos, acessos e processo de mudança",
+            "Enviar logs ao seu assistente pessoal"
+          ],
+          "answer": 1,
+          "explanation": "Conhecimento do ambiente e da autoridade antecede qualquer alteração."
+        },
+        {
+          "question": "Pontuação alta neste curso demonstra:",
+          "options": [
+            "Senioridade garantida",
+            "Desempenho nos exercícios definidos, com seus limites",
+            "Autorização para operar produção"
+          ],
+          "answer": 1,
+          "explanation": "É evidência de estudo e não substitui experiência real nem aprovação."
+        }
+      ],
+      "minutes": 300
+    }
+  ],
+  "sources": [
+    {
+      "id": "sre",
+      "title": "Google — Site Reliability Workbook",
+      "url": "https://sre.google/workbook/table-of-contents/"
+    },
+    {
+      "id": "sre-slo",
+      "title": "Google — Implementing SLOs",
+      "url": "https://sre.google/workbook/implementing-slos/"
+    },
+    {
+      "id": "sre-alert",
+      "title": "Google — Alerting on SLOs",
+      "url": "https://sre.google/workbook/alerting-on-slos/"
+    },
+    {
+      "id": "sre-incident",
+      "title": "Google — Incident Response",
+      "url": "https://sre.google/workbook/incident-response/"
+    },
+    {
+      "id": "otel",
+      "title": "OpenTelemetry — Conceitos",
+      "url": "https://opentelemetry.io/docs/concepts/"
+    },
+    {
+      "id": "linux",
+      "title": "Ubuntu — Command line for beginners",
+      "url": "https://ubuntu.com/tutorials/command-line-for-beginners"
+    },
+    {
+      "id": "http",
+      "title": "MDN — HTTP overview",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview"
+    },
+    {
+      "id": "powershell",
+      "title": "Microsoft — PowerShell 101",
+      "url": "https://learn.microsoft.com/powershell/scripting/learn/ps101/00-introduction"
+    },
+    {
+      "id": "python",
+      "title": "Python — Tutorial oficial",
+      "url": "https://docs.python.org/3/tutorial/"
+    },
+    {
+      "id": "git",
+      "title": "Git — Book",
+      "url": "https://git-scm.com/book/en/v2"
+    },
+    {
+      "id": "ansible",
+      "title": "Ansible — Getting started",
+      "url": "https://docs.ansible.com/projects/ansible/latest/getting_started/index.html"
+    },
+    {
+      "id": "ansible-playbooks",
+      "title": "Ansible — Playbooks",
+      "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_intro.html"
+    },
+    {
+      "id": "ansible-check",
+      "title": "Ansible — Check e diff",
+      "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_checkmode.html"
+    },
+    {
+      "id": "ansible-vars",
+      "title": "Ansible — Variáveis",
+      "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html"
+    },
+    {
+      "id": "ansible-handlers",
+      "title": "Ansible — Handlers",
+      "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_handlers.html"
+    },
+    {
+      "id": "ansible-roles",
+      "title": "Ansible — Roles",
+      "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html"
+    },
+    {
+      "id": "ansible-vault",
+      "title": "Ansible — Vault",
+      "url": "https://docs.ansible.com/projects/ansible/latest/vault_guide/index.html"
+    },
+    {
+      "id": "ansible-windows",
+      "title": "Ansible — Windows",
+      "url": "https://docs.ansible.com/projects/ansible/latest/os_guide/windows_usage.html"
+    },
+    {
+      "id": "aap",
+      "title": "Red Hat — Ansible Automation Platform docs",
+      "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/"
+    },
+    {
+      "id": "dynatrace",
+      "title": "Dynatrace — Intelligence",
+      "url": "https://docs.dynatrace.com/docs/dynatrace-intelligence"
+    },
+    {
+      "id": "oneagent",
+      "title": "Dynatrace — OneAgent",
+      "url": "https://docs.dynatrace.com/docs/ingest-from/dynatrace-oneagent"
+    },
+    {
+      "id": "dql",
+      "title": "Dynatrace — DQL",
+      "url": "https://docs.dynatrace.com/docs/platform/grail/dynatrace-query-language"
+    },
+    {
+      "id": "dql-filter",
+      "title": "Dynatrace — DQL filtering",
+      "url": "https://docs.dynatrace.com/docs/platform/grail/dynatrace-query-language/commands/filtering-commands"
+    },
+    {
+      "id": "dql-aggregate",
+      "title": "Dynatrace — DQL aggregation",
+      "url": "https://docs.dynatrace.com/docs/platform/grail/dynatrace-query-language/commands/aggregation-commands"
+    },
+    {
+      "id": "aws-s3",
+      "title": "AWS — S3 User Guide",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+    },
+    {
+      "id": "aws-lambda",
+      "title": "AWS — Lambda best practices",
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html"
+    },
+    {
+      "id": "aws-events",
+      "title": "AWS — S3 event notifications",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html"
+    },
+    {
+      "id": "opensearch",
+      "title": "OpenSearch — Query DSL",
+      "url": "https://docs.opensearch.org/latest/query-dsl/"
+    },
+    {
+      "id": "aws-opensearch",
+      "title": "AWS — OpenSearch Service",
+      "url": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html"
+    },
+    {
+      "id": "gcp-iam",
+      "title": "Google Cloud — IAM overview",
+      "url": "https://cloud.google.com/iam/docs/overview"
+    },
+    {
+      "id": "gcp-pubsub",
+      "title": "Google Cloud — Pub/Sub overview",
+      "url": "https://cloud.google.com/pubsub/docs/overview"
+    },
+    {
+      "id": "gcp-run",
+      "title": "Google Cloud — Cloud Run overview",
+      "url": "https://cloud.google.com/run/docs/overview/what-is-cloud-run"
+    },
+    {
+      "id": "gcp-storage",
+      "title": "Google Cloud — Cloud Storage",
+      "url": "https://cloud.google.com/storage/docs/introduction"
+    },
+    {
+      "id": "kubernetes",
+      "title": "Kubernetes — Conceitos",
+      "url": "https://kubernetes.io/docs/concepts/"
+    },
+    {
+      "id": "docker",
+      "title": "Docker — Conceitos",
+      "url": "https://docs.docker.com/get-started/docker-concepts/"
+    },
+    {
+      "id": "owasp",
+      "title": "OWASP — LLM Prompt Injection",
+      "url": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+    },
+    {
+      "id": "rag",
+      "title": "Microsoft — RAG architecture",
+      "url": "https://learn.microsoft.com/azure/architecture/ai-ml/guide/rag/rag-solution-design-and-evaluation-guide"
+    },
+    {
+      "id": "power",
+      "title": "Microsoft — Power Platform Learn",
+      "url": "https://learn.microsoft.com/training/powerplatform/"
+    }
+  ]
+}

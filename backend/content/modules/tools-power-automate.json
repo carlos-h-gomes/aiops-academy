@@ -1,0 +1,23 @@
+{
+  "id": "tools-power-automate",
+  "title": "Power Automate: nuvem, desktop e aprovações",
+  "summary": "Escolha entre API e RPA e projete uma aprovação sem repetição de efeitos.",
+  "minutes": 45,
+  "recommended_after": 6,
+  "body": "## Duas superfícies, problemas diferentes\nFluxos de nuvem podem reagir a eventos, comandos ou horários e integrar serviços por conectores. Fluxos de desktop automatizam tarefas na interface de aplicações. RPA é útil quando uma integração por API não está disponível, mas depende de elementos de tela, sessão e condições da aplicação.\n\nRevisão documental: 07/09/2026. Contas, conectores, execução assistida/não assistida e ambientes possuem requisitos e licenças distintos. Não presuma que todos os recursos são gratuitos por existir Power Automate no Windows. O exercício abaixo não exige conta Microsoft nem trial.\n\n## Antes de automatizar\nIdentifique o dono do processo, a fonte do dado e a autorização de cada etapa. Um conector usa uma identidade: permissões excessivas podem ampliar o alcance de um erro. Ambientes e políticas de dados ajudam a separar fluxos e controlar combinações de conectores; não substituem autorização na origem.\n\nSe uma API oferece contrato estável e controles adequados, avalie essa integração antes de usar cliques. Quando só há interface, considere janela inesperada, elemento movido, sessão expirada e ação já executada antes de uma falha.\n\n## Caso: solicitação fictícia de material\nUma equipe recebe um formulário com request_id, área e valor em centavos. O fluxo prepara uma solicitação, aguarda aprovação e registra a decisão. Não há pagamento, email enviado nem integração corporativa neste exercício.\n\n```json\n{\"request_id\":\"req-42\",\"area\":\"lab\",\"amount_cents\":12500}\n```\n\nAs transições permitidas são recebida → pendente → aprovada ou recusada. Uma solicitação expirada não pode ser aprovada sem nova revisão. O sistema de registro impõe os estados e o vínculo entre solicitação e decisão.\n\n## Prática — desenhe e teste no papel\n1. Escolha cloud flow para o formulário integrado por API. Descreva quando um desktop flow seria necessário.\n2. Valide request_id, área e centavos inteiros não negativos antes de registrar.\n3. Descreva o que acontece se o gatilho entregar req-42 duas vezes.\n4. Defina revisão recusada, expirada e indisponível. Não transforme silêncio em aprovação.\n5. Imagine uma janela diferente da esperada no desktop. Defina uma checagem antes do clique e uma parada segura.\n6. Registre quais evidências podem ser guardadas sem copiar dados pessoais para o histórico do fluxo.\n\n## Solução comentada\nUm gatilho duplicado deve apontar para a mesma solicitação. O sistema autoritativo impõe unicidade e transição válida. Recusa é estado final sem execução; expiração exige revisão renovada. Indisponibilidade exige retomada limitada e visível. O valor deve permanecer 12500 centavos, sem o modelo de IA recalcular ou autorizar despesas.\n\nNo desktop, confirmar aplicação e elemento esperado evita alguns erros, mas não todos. Após timeout, consultar o estado do processo é mais seguro do que repetir cegamente um clique que pode ter produzido efeito. API e RPA precisam de verificação da pós-condição.\n\n## Critério de conclusão\nEntregue duas opções de solução, o motivo da escolha e resultados de duplicação, recusa, expiração e janela inesperada. Explique qual identidade executa cada ação. Diferencie roteiro didático de validação real em um tenant.\n\n## Caminho para prática real\nNo futuro lab, o aluno verificará sua modalidade de conta/licença antes de abrir um ambiente de teste. As ações usarão recursos fictícios dedicados e limpeza explícita. Se o requisito não estiver disponível gratuitamente, a Academy manterá o exercício equivalente sem assinatura.",
+  "sources": [
+    {
+      "title": "Power Automate — tipos de fluxo",
+      "url": "https://learn.microsoft.com/en-us/power-automate/flow-types"
+    },
+    {
+      "title": "Power Automate — desktop",
+      "url": "https://learn.microsoft.com/en-us/power-automate/desktop-flows/introduction"
+    },
+    {
+      "title": "Power Automate — licenças",
+      "url": "https://learn.microsoft.com/en-us/power-platform/admin/power-automate-licensing/types"
+    }
+  ],
+  "category": "tooling"
+}

@@ -1,0 +1,27 @@
+.venv/
+frontend/node_modules/
+/data/
+artifacts/qa.sqlite3
+artifacts/*.sqlite3
+__pycache__/
+*.pyc
+labs/real/ansible/workspace/
+labs/real/ansible/.venv/
+# Local state, generated output and private working evidence
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.sqlite*
+*.db
+*.log
+artifacts/
+frontend/dist/
+frontend/*.tsbuildinfo
+docs/ai/
+.coverage
+.pytest_cache/
+.DS_Store
+Thumbs.db

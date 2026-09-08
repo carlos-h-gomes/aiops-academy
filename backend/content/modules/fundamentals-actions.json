@@ -1,0 +1,23 @@
+{
+  "id": "fundamentals-actions",
+  "title": "GitHub Actions: lendo e construindo pipelines",
+  "summary": "Conecte evento, workflow, job, runner e step; trate falhas, permissões e artefatos.",
+  "minutes": 60,
+  "body": "## De um evento a uma execução\nGitHub Actions executa workflows em resposta a eventos. Um workflow contém jobs; um job roda em um runner e contém steps. Steps podem executar comandos ou usar actions. Jobs podem ter dependências explícitas; não suponha que a ordem no arquivo YAML impõe a ordem entre jobs. Revisão documental: 07/09/2026.\n\nUm runner executa código e precisa de isolamento, limites e identidade apropriados. O notebook pessoal não deve virar runner permanente de contribuições públicas. A Academy não oferece runners aos alunos e este módulo não dispara execução no GitHub.\n\n## Leia um pipeline antes de copiar\nObserve gatilhos, permissões, ambiente, timeout, código executado e condições de falha. Pergunte se um pull request externo consegue alcançar credenciais. Inputs, nomes de branch e títulos de PR são dados não confiáveis: não os transforme diretamente em comandos.\n\nDependências e actions precisam de revisão e versões rastreáveis. Segredos devem ter menor privilégio e ficar fora do YAML e logs. Credenciais curtas por federação podem ser apropriadas para uma futura integração cloud, com relação de confiança restrita. Não há credencial cloud neste lab.\n\n## Prática local no kit\nBaixe o kit e abra delivery. O arquivo ci-example.yml é um workflow didático inativo: está no kit, não na pasta ativa .github/workflows do seu projeto. Ele descreve execução manual, permissão de leitura, limite de cinco minutos e testes de uma política sintética.\n\nLeia cada seção. Identifique onde o código é obtido, qual diretório é testado e o que faz o job falhar. Não é necessário publicar o arquivo para praticar a lógica: execute na pasta delivery:\n```text\npython check.py --solution\n```\n\nDepois implemente exercise.py e execute python check.py. O teste local verifica uma política de promoção; não emula o runner inteiro nem comprova execução hospedada.\n\n## Exercício de investigação\nConsidere três resultados: dependência não encontrada; teste falhou; credencial sem permissão. Para cada um, escreva a primeira evidência a consultar e quando repetir. Um retry não corrige teste determinístico errado. Um teste quebrado não deve ser ocultado com continue-on-error para permitir uma entrega.\n\nCache acelera trabalho repetível, enquanto artefato é um resultado que você quer transportar ou examinar. Não trate cache como a única cópia de uma entrega. Defina retenção, origem e conteúdo permitido; não arquive o diretório inteiro com arquivos de ambiente.\n\n## Solução comentada\nWorkflow descreve o processo; job delimita ambiente de execução; step produz uma operação observável. A dependência entre testar e promover deve ser explícita. Um job de testes não precisa escrever no repositório para rodar checks locais. Falha deve produzir diagnóstico suficiente sem despejar segredos.\n\nNa fixture, todos os testes da referência devem passar. A implementação incompleta do aluno deve falhar: isso indica trabalho a fazer, não que o curso está quebrado. Nenhum resultado deste exercício deve ser chamado de CI do GitHub executada até existir uma execução remota verificável.\n\n## Critério de conclusão\nDesenhe evento → job → steps, explique duas permissões desnecessárias e descreva como distinguir falha de infraestrutura de falha no código. Compare uma execução local com uma execução hospedada, indicando o que não foi validado. Aulas posteriores conectarão essa base a build, entrega e operação.",
+  "sources": [
+    {
+      "title": "GitHub Actions — conceitos iniciais",
+      "url": "https://docs.github.com/en/actions/get-started/understand-github-actions"
+    },
+    {
+      "title": "GitHub Actions — sintaxe",
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax"
+    },
+    {
+      "title": "GitHub Actions — uso seguro",
+      "url": "https://docs.github.com/en/actions/reference/security/secure-use"
+    }
+  ],
+  "category": "tooling",
+  "recommended_after": 6
+}

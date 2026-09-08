@@ -1,0 +1,2599 @@
+{
+  "schema_version": "1.0",
+  "version": "2026.09.07.1",
+  "metadata_reviewed_on": "2026-09-07",
+  "tracks": [
+    {
+      "id": "infra",
+      "title": "Infraestrutura e AIOps",
+      "summary": "Da investigação do primeiro incidente à automação e operação de IA.",
+      "outcome": "Investigar e recuperar um serviço com hipóteses, testes e evidências.",
+      "guides": [
+        {
+          "id": "start",
+          "title": "Como estudar aqui"
+        },
+        {
+          "id": "ansible",
+          "title": "Ansible real · localhost"
+        },
+        {
+          "id": "dynatrace",
+          "title": "Dynatrace real · roteiro"
+        },
+        {
+          "id": "event-correlation",
+          "title": "Correlação de eventos e redução de ruído"
+        },
+        {
+          "id": "fundamentals-github",
+          "title": "Git e GitHub: versionamento e colaboração"
+        },
+        {
+          "id": "fundamentals-actions",
+          "title": "GitHub Actions: lendo e construindo pipelines"
+        },
+        {
+          "id": "fundamentals-cicd",
+          "title": "CI/CD: do teste à entrega e ao rollback"
+        }
+      ]
+    },
+    {
+      "id": "data",
+      "title": "Dados, SQL e RAG",
+      "summary": "Entender dados, consultar com eficiência e sustentar respostas com fontes.",
+      "outcome": "Recuperar um banco e explicar se uma resposta está sustentada pelos dados.",
+      "guides": [
+        {
+          "id": "python",
+          "title": "Python real · eventos"
+        },
+        {
+          "id": "search",
+          "title": "OpenSearch real · ingestão"
+        },
+        {
+          "id": "tools-nifi",
+          "title": "Apache NiFi: dados, filas e proveniência"
+        },
+        {
+          "id": "mlops-drift",
+          "title": "MLOps e degradação de modelos"
+        }
+      ]
+    },
+    {
+      "id": "security",
+      "title": "Segurança operacional",
+      "summary": "Limitar permissões, proteger dados e praticar resposta e recuperação.",
+      "outcome": "Corrigir uma configuração vulnerável e demonstrar recuperação em ambiente isolado.",
+      "guides": [
+        {
+          "id": "setup",
+          "title": "Preparação e recuperação"
+        },
+        {
+          "id": "templates",
+          "title": "Runbooks e comunicação"
+        },
+        {
+          "id": "fundamentals-cicd",
+          "title": "CI/CD: do teste à entrega e ao rollback"
+        },
+        {
+          "id": "resilience-canary",
+          "title": "Resiliência, game days e canários"
+        }
+      ]
+    },
+    {
+      "id": "agents",
+      "title": "Agentes e processos",
+      "summary": "Escolher onde usar IA e manter regras, aprovação e estado sob controle.",
+      "outcome": "Automatizar etapas de um processo sintético com testes, rastreabilidade e revisão.",
+      "guides": [
+        {
+          "id": "tools-map",
+          "title": "Ferramentas de automação e Ops: como escolher"
+        },
+        {
+          "id": "llmops-agents",
+          "title": "LLMOps e operação de agentes"
+        },
+        {
+          "id": "tools-n8n",
+          "title": "n8n: integrar processos com controle"
+        },
+        {
+          "id": "tools-power-automate",
+          "title": "Power Automate: nuvem, desktop e aprovações"
+        }
+      ]
+    }
+  ],
+  "units": [
+    {
+      "id": "infra-01",
+      "track_id": "infra",
+      "order": 1,
+      "title": "Seu primeiro plantão começa aqui",
+      "summary": "Entenda o caminho de uma requisição e investigue seu primeiro incidente.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 1,
+      "competencies": [
+        "Diferenciar serviço, processo e servidor",
+        "Separar sintoma, hipótese e evidência",
+        "Priorizar impacto no usuário"
+      ],
+      "prerequisites": [],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "linux",
+        "title": "Plantão Linux",
+        "limitations": "Console com comandos enumerados. Não é shell Linux; não executa processos nem acessa o disco real."
+      },
+      "sources": [
+        {
+          "title": "Google — Site Reliability Workbook",
+          "url": "https://sre.google/workbook/table-of-contents/"
+        },
+        {
+          "title": "OpenTelemetry — Conceitos",
+          "url": "https://opentelemetry.io/docs/concepts/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-02",
+      "track_id": "infra",
+      "order": 2,
+      "title": "Linux: enxergue o que está acontecendo",
+      "summary": "Arquivos, permissões, processos, memória e disco com um roteiro de diagnóstico.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 2,
+      "competencies": [
+        "Ler permissões e caminhos",
+        "Diagnosticar recurso saturado",
+        "Investigar antes de reiniciar"
+      ],
+      "prerequisites": [
+        "infra-01"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "linux",
+        "title": "Plantão Linux",
+        "limitations": "Console com comandos enumerados. Não é shell Linux; não executa processos nem acessa o disco real."
+      },
+      "sources": [
+        {
+          "title": "Ubuntu — Command line for beginners",
+          "url": "https://ubuntu.com/tutorials/command-line-for-beginners"
+        },
+        {
+          "title": "Google — Site Reliability Workbook",
+          "url": "https://sre.google/workbook/table-of-contents/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-03",
+      "track_id": "infra",
+      "order": 3,
+      "title": "Redes, DNS e HTTP na prática",
+      "summary": "Separe falha de resolução, conexão, TLS e aplicação.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 3,
+      "competencies": [
+        "Explicar DNS, TCP, TLS e HTTP",
+        "Interpretar códigos HTTP",
+        "Evitar retries que amplificam incidentes"
+      ],
+      "prerequisites": [
+        "infra-02"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "linux",
+        "title": "Plantão Linux",
+        "limitations": "Console com comandos enumerados. Não é shell Linux; não executa processos nem acessa o disco real."
+      },
+      "sources": [
+        {
+          "title": "MDN — HTTP overview",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview"
+        },
+        {
+          "title": "Google — Site Reliability Workbook",
+          "url": "https://sre.google/workbook/table-of-contents/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-04",
+      "track_id": "infra",
+      "order": 4,
+      "title": "Windows e PowerShell para operações",
+      "summary": "Observe serviços e eventos e entenda o gerenciamento com Ansible.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 4,
+      "competencies": [
+        "Ler objetos no PowerShell",
+        "Consultar serviço e evento",
+        "Entender WinRM e privilégios"
+      ],
+      "prerequisites": [
+        "infra-03"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "ansible-windows",
+        "title": "Ansible · Windows",
+        "limitations": "Estado sintético com serviço previamente existente. Sem instalação IIS, WinRM, autenticação ou módulos reais."
+      },
+      "sources": [
+        {
+          "title": "Microsoft — PowerShell 101",
+          "url": "https://learn.microsoft.com/powershell/scripting/learn/ps101/00-introduction"
+        },
+        {
+          "title": "Ansible — Windows",
+          "url": "https://docs.ansible.com/projects/ansible/latest/os_guide/windows_usage.html"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-05",
+      "track_id": "infra",
+      "order": 5,
+      "title": "Python do zero: dados viram decisões",
+      "summary": "Leia JSON, agrupe eventos e trate erros de maneira previsível.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 5,
+      "competencies": [
+        "Usar listas, dicionários e funções",
+        "Distinguir parsing e validação",
+        "Construir classificação determinística"
+      ],
+      "prerequisites": [
+        "infra-04"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "events",
+        "title": "Eventos · AWS e GCP",
+        "limitations": "Resultado de processamento de fixtures. Para executar Python real, edite e teste labs/real/python. Não emula entrega AWS/GCP."
+      },
+      "sources": [
+        {
+          "title": "Python — Tutorial oficial",
+          "url": "https://docs.python.org/3/tutorial/"
+        },
+        {
+          "title": "AWS — Lambda best practices",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-06",
+      "track_id": "infra",
+      "order": 6,
+      "title": "Git, APIs e mudanças revisáveis",
+      "summary": "Transforme uma correção local em algo que outra pessoa consegue revisar.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 6,
+      "competencies": [
+        "Entender working tree, stage e commit",
+        "Revisar diff sem segredos",
+        "Definir contrato HTTP"
+      ],
+      "prerequisites": [
+        "infra-05"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "workflow",
+        "title": "Remediação com aprovação",
+        "limitations": "Avaliação determinística de política; não integra AAP, webhooks ou contas."
+      },
+      "sources": [
+        {
+          "title": "Git — Book",
+          "url": "https://git-scm.com/book/en/v2"
+        },
+        {
+          "title": "MDN — HTTP overview",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-07",
+      "track_id": "infra",
+      "order": 7,
+      "title": "Checkpoint 1: diagnosticar sem adivinhar",
+      "summary": "Consolide a base com um incidente e recupere os pontos que faltaram.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 7,
+      "competencies": [
+        "Investigar sem consultar solução",
+        "Revisar fundamentos por recuperação ativa",
+        "Escrever um handoff claro"
+      ],
+      "prerequisites": [
+        "infra-06"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 180
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "linux",
+        "title": "Plantão Linux",
+        "limitations": "Console com comandos enumerados. Não é shell Linux; não executa processos nem acessa o disco real."
+      },
+      "sources": [
+        {
+          "title": "Google — Site Reliability Workbook",
+          "url": "https://sre.google/workbook/table-of-contents/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-08",
+      "track_id": "infra",
+      "order": 8,
+      "title": "Ansible: inventário e estado desejado",
+      "summary": "Faça sua primeira alteração declarativa em hosts sintéticos.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 8,
+      "competencies": [
+        "Separar nó de controle e alvos",
+        "Selecionar inventário limitado",
+        "Entender idempotência"
+      ],
+      "prerequisites": [
+        "infra-07"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "ansible",
+        "title": "Ansible · Linux",
+        "limitations": "Subset: package/apt Linux, service Linux, win_service Windows; name/state. Sem SSH, facts, vars, handlers, loops ou templates. Recursos não suportados são rejeitados; use o kit real para avançados."
+      },
+      "sources": [
+        {
+          "title": "Ansible — Getting started",
+          "url": "https://docs.ansible.com/projects/ansible/latest/getting_started/index.html"
+        },
+        {
+          "title": "Ansible — Playbooks",
+          "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_intro.html"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-09",
+      "track_id": "infra",
+      "order": 9,
+      "title": "Playbooks: observar, alterar, verificar",
+      "summary": "Escreva tarefas pequenas e interprete o recap.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 9,
+      "competencies": [
+        "Distinguir ok, changed, failed e unreachable",
+        "Usar check mode com consciência",
+        "Definir pós-condição"
+      ],
+      "prerequisites": [
+        "infra-08"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "ansible",
+        "title": "Ansible · Linux",
+        "limitations": "Subset: package/apt Linux, service Linux, win_service Windows; name/state. Sem SSH, facts, vars, handlers, loops ou templates. Recursos não suportados são rejeitados; use o kit real para avançados."
+      },
+      "sources": [
+        {
+          "title": "Ansible — Playbooks",
+          "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_intro.html"
+        },
+        {
+          "title": "Ansible — Check e diff",
+          "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_checkmode.html"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-10",
+      "track_id": "infra",
+      "order": 10,
+      "title": "Variáveis, templates e handlers",
+      "summary": "Separe dados da configuração e reinicie apenas quando necessário.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 10,
+      "competencies": [
+        "Entender variáveis e precedência",
+        "Relacionar mudança a handler",
+        "Ler template Jinja com segurança"
+      ],
+      "prerequisites": [
+        "infra-09"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "ansible",
+        "title": "Ansible · Linux",
+        "limitations": "Subset: package/apt Linux, service Linux, win_service Windows; name/state. Sem SSH, facts, vars, handlers, loops ou templates. Recursos não suportados são rejeitados; use o kit real para avançados."
+      },
+      "sources": [
+        {
+          "title": "Ansible — Variáveis",
+          "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html"
+        },
+        {
+          "title": "Ansible — Handlers",
+          "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_handlers.html"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-11",
+      "track_id": "infra",
+      "order": 11,
+      "title": "Roles, segredos e execução limitada",
+      "summary": "Organize automações sem esconder risco dentro de uma role.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 11,
+      "competencies": [
+        "Identificar responsabilidades de uma role",
+        "Entender Vault e no_log",
+        "Planejar canário e rollback"
+      ],
+      "prerequisites": [
+        "infra-10"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "workflow",
+        "title": "Remediação com aprovação",
+        "limitations": "Avaliação determinística de política; não integra AAP, webhooks ou contas."
+      },
+      "sources": [
+        {
+          "title": "Ansible — Roles",
+          "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html"
+        },
+        {
+          "title": "Ansible — Vault",
+          "url": "https://docs.ansible.com/projects/ansible/latest/vault_guide/index.html"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-12",
+      "track_id": "infra",
+      "order": 12,
+      "title": "AAP: automação como serviço interno",
+      "summary": "Entenda controller, execution environments e workflows corporativos.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 12,
+      "competencies": [
+        "Mapear objetos da AAP",
+        "Separar criar, aprovar e executar",
+        "Projetar rastreabilidade"
+      ],
+      "prerequisites": [
+        "infra-11"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "workflow",
+        "title": "Remediação com aprovação",
+        "limitations": "Avaliação determinística de política; não integra AAP, webhooks ou contas."
+      },
+      "sources": [
+        {
+          "title": "Red Hat — Ansible Automation Platform docs",
+          "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/"
+        },
+        {
+          "title": "Ansible — Getting started",
+          "url": "https://docs.ansible.com/projects/ansible/latest/getting_started/index.html"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-13",
+      "track_id": "infra",
+      "order": 13,
+      "title": "Remediação Ansible em Linux e Windows",
+      "summary": "Escolha a ação pela plataforma e valide o resultado.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 13,
+      "competencies": [
+        "Evitar módulo errado por plataforma",
+        "Definir pré e pós-condições",
+        "Investigar falha parcial"
+      ],
+      "prerequisites": [
+        "infra-12"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "ansible-windows",
+        "title": "Ansible · Windows",
+        "limitations": "Estado sintético com serviço previamente existente. Sem instalação IIS, WinRM, autenticação ou módulos reais."
+      },
+      "sources": [
+        {
+          "title": "Ansible — Windows",
+          "url": "https://docs.ansible.com/projects/ansible/latest/os_guide/windows_usage.html"
+        },
+        {
+          "title": "Ansible — Playbooks",
+          "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_intro.html"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-14",
+      "track_id": "infra",
+      "order": 14,
+      "title": "Checkpoint 2: automação que converge",
+      "summary": "Entregue um playbook repetível e explique seus limites.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 14,
+      "competencies": [
+        "Executar sem copiar solução",
+        "Demonstrar convergência",
+        "Revisar governança de automação"
+      ],
+      "prerequisites": [
+        "infra-13"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 180
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "ansible",
+        "title": "Ansible · Linux",
+        "limitations": "Subset: package/apt Linux, service Linux, win_service Windows; name/state. Sem SSH, facts, vars, handlers, loops ou templates. Recursos não suportados são rejeitados; use o kit real para avançados."
+      },
+      "sources": [
+        {
+          "title": "Ansible — Getting started",
+          "url": "https://docs.ansible.com/projects/ansible/latest/getting_started/index.html"
+        },
+        {
+          "title": "Red Hat — Ansible Automation Platform docs",
+          "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-15",
+      "track_id": "infra",
+      "order": 15,
+      "title": "Observabilidade: métricas, logs e traces",
+      "summary": "Escolha o sinal certo para responder uma pergunta concreta.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 15,
+      "competencies": [
+        "Diferenciar sinais e unidades",
+        "Entender cardinalidade",
+        "Correlacionar uma requisição"
+      ],
+      "prerequisites": [
+        "infra-14"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "dql",
+        "title": "Investigação DQL",
+        "limitations": "Subconjunto DQL: fetch logs; filter simples; summarize count por um campo; sort; fields; limit. Dados fixos, sem Grail, tenant, janela dinâmica ou Dynatrace real."
+      },
+      "sources": [
+        {
+          "title": "OpenTelemetry — Conceitos",
+          "url": "https://opentelemetry.io/docs/concepts/"
+        },
+        {
+          "title": "Google — Site Reliability Workbook",
+          "url": "https://sre.google/workbook/table-of-contents/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-16",
+      "track_id": "infra",
+      "order": 16,
+      "title": "Dynatrace: navegue do problema à evidência",
+      "summary": "Entenda OneAgent, ActiveGate, Grail e contexto de dependências.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 16,
+      "competencies": [
+        "Mapear coleta, armazenamento e análise",
+        "Investigar entidade e dependência",
+        "Tratar causa sugerida como hipótese verificável"
+      ],
+      "prerequisites": [
+        "infra-15"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "dql",
+        "title": "Investigação DQL",
+        "limitations": "Subconjunto DQL: fetch logs; filter simples; summarize count por um campo; sort; fields; limit. Dados fixos, sem Grail, tenant, janela dinâmica ou Dynatrace real."
+      },
+      "sources": [
+        {
+          "title": "Dynatrace — Intelligence",
+          "url": "https://docs.dynatrace.com/docs/dynatrace-intelligence"
+        },
+        {
+          "title": "Dynatrace — OneAgent",
+          "url": "https://docs.dynatrace.com/docs/ingest-from/dynatrace-oneagent"
+        },
+        {
+          "title": "Dynatrace — DQL",
+          "url": "https://docs.dynatrace.com/docs/platform/grail/dynatrace-query-language"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-17",
+      "track_id": "infra",
+      "order": 17,
+      "title": "DQL: investigue dados de verdade no exercício",
+      "summary": "Filtre, agregue e ordene logs; não confunda DQL com SPL ou SQL.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 17,
+      "competencies": [
+        "Escrever um pipeline DQL",
+        "Interpretar contagem por grupo",
+        "Evitar perder contexto com agregação"
+      ],
+      "prerequisites": [
+        "infra-16"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "dql",
+        "title": "Investigação DQL",
+        "limitations": "Subconjunto DQL: fetch logs; filter simples; summarize count por um campo; sort; fields; limit. Dados fixos, sem Grail, tenant, janela dinâmica ou Dynatrace real."
+      },
+      "sources": [
+        {
+          "title": "Dynatrace — DQL",
+          "url": "https://docs.dynatrace.com/docs/platform/grail/dynatrace-query-language"
+        },
+        {
+          "title": "Dynatrace — DQL filtering",
+          "url": "https://docs.dynatrace.com/docs/platform/grail/dynatrace-query-language/commands/filtering-commands"
+        },
+        {
+          "title": "Dynatrace — DQL aggregation",
+          "url": "https://docs.dynatrace.com/docs/platform/grail/dynatrace-query-language/commands/aggregation-commands"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-18",
+      "track_id": "infra",
+      "order": 18,
+      "title": "SLOs e alertas que merecem acordar alguém",
+      "summary": "Calcule orçamento de erro e diferencie alerta útil de ruído.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 18,
+      "competencies": [
+        "Distinguir SLI, SLO e SLA",
+        "Calcular erro permitido e burn rate",
+        "Definir ação e condição de alerta"
+      ],
+      "prerequisites": [
+        "infra-17"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "slo",
+        "title": "Orçamento de erro",
+        "limitations": "Calculadora de cenários fixos. Não mede SLO de um ambiente real."
+      },
+      "sources": [
+        {
+          "title": "Google — Implementing SLOs",
+          "url": "https://sre.google/workbook/implementing-slos/"
+        },
+        {
+          "title": "Google — Alerting on SLOs",
+          "url": "https://sre.google/workbook/alerting-on-slos/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-19",
+      "track_id": "infra",
+      "order": 19,
+      "title": "AWS: S3 e Lambda em um pipeline de eventos",
+      "summary": "Armazene objetos e processe eventos com menor privilégio e idempotência.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 19,
+      "competencies": [
+        "Entender objeto, bucket, prefixo e evento",
+        "Tratar repetição e ordem",
+        "Separar IAM de política de recurso"
+      ],
+      "prerequisites": [
+        "infra-18"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "events",
+        "title": "Eventos · AWS e GCP",
+        "limitations": "Resultado de processamento de fixtures. Para executar Python real, edite e teste labs/real/python. Não emula entrega AWS/GCP."
+      },
+      "sources": [
+        {
+          "title": "AWS — S3 User Guide",
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+        },
+        {
+          "title": "AWS — Lambda best practices",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html"
+        },
+        {
+          "title": "AWS — S3 event notifications",
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-20",
+      "track_id": "infra",
+      "order": 20,
+      "title": "AWS OpenSearch: logs pesquisáveis",
+      "summary": "Entenda índices, mappings, consultas e operação do armazenamento.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 20,
+      "competencies": [
+        "Separar text e keyword",
+        "Consultar logs via Query DSL",
+        "Planejar retenção e capacidade"
+      ],
+      "prerequisites": [
+        "infra-19"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "opensearch",
+        "title": "OpenSearch · Query DSL",
+        "limitations": "Apenas este subconjunto Query DSL sobre lista local, sem motor OpenSearch, shards, análise textual, IAM ou indexação real."
+      },
+      "sources": [
+        {
+          "title": "OpenSearch — Query DSL",
+          "url": "https://docs.opensearch.org/latest/query-dsl/"
+        },
+        {
+          "title": "AWS — OpenSearch Service",
+          "url": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-21",
+      "track_id": "infra",
+      "order": 21,
+      "title": "Checkpoint 3: do log ao impacto",
+      "summary": "Investigue o mesmo conjunto de eventos em DQL e OpenSearch.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 21,
+      "competencies": [
+        "Comparar consultas sem confundir sintaxe",
+        "Interpretar métricas com denominador",
+        "Consolidar pipeline AWS"
+      ],
+      "prerequisites": [
+        "infra-20"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 180
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "dql",
+        "title": "Investigação DQL",
+        "limitations": "Subconjunto DQL: fetch logs; filter simples; summarize count por um campo; sort; fields; limit. Dados fixos, sem Grail, tenant, janela dinâmica ou Dynatrace real."
+      },
+      "sources": [
+        {
+          "title": "Dynatrace — DQL",
+          "url": "https://docs.dynatrace.com/docs/platform/grail/dynatrace-query-language"
+        },
+        {
+          "title": "OpenSearch — Query DSL",
+          "url": "https://docs.opensearch.org/latest/query-dsl/"
+        },
+        {
+          "title": "Google — Site Reliability Workbook",
+          "url": "https://sre.google/workbook/table-of-contents/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-22",
+      "track_id": "infra",
+      "order": 22,
+      "title": "GCP: identidade, eventos e observabilidade",
+      "summary": "Transfira os fundamentos para Cloud Storage, Cloud Run e Pub/Sub.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 22,
+      "competencies": [
+        "Relacionar projeto, recurso e identidade",
+        "Projetar consumidor idempotente",
+        "Investigar logs e métricas no GCP"
+      ],
+      "prerequisites": [
+        "infra-21"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "events",
+        "title": "Eventos · AWS e GCP",
+        "limitations": "Resultado de processamento de fixtures. Para executar Python real, edite e teste labs/real/python. Não emula entrega AWS/GCP."
+      },
+      "sources": [
+        {
+          "title": "Google Cloud — IAM overview",
+          "url": "https://cloud.google.com/iam/docs/overview"
+        },
+        {
+          "title": "Google Cloud — Pub/Sub overview",
+          "url": "https://cloud.google.com/pubsub/docs/overview"
+        },
+        {
+          "title": "Google Cloud — Cloud Run overview",
+          "url": "https://cloud.google.com/run/docs/overview/what-is-cloud-run"
+        },
+        {
+          "title": "Google Cloud — Cloud Storage",
+          "url": "https://cloud.google.com/storage/docs/introduction"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-23",
+      "track_id": "infra",
+      "order": 23,
+      "title": "Containers e Kubernetes para investigar",
+      "summary": "Entenda isolamento, probes, recursos e rollout sem virar especialista em um dia.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 23,
+      "competencies": [
+        "Diferenciar imagem, container e pod",
+        "Ler readiness e liveness",
+        "Investigar falha de deploy e recursos"
+      ],
+      "prerequisites": [
+        "infra-22"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "incident",
+        "title": "Arena de incidentes",
+        "limitations": "Máquina de estados sintética. Cada ação consome tempo fictício; não representa tráfego ou mudanças reais."
+      },
+      "sources": [
+        {
+          "title": "Kubernetes — Conceitos",
+          "url": "https://kubernetes.io/docs/concepts/"
+        },
+        {
+          "title": "Docker — Conceitos",
+          "url": "https://docs.docker.com/get-started/docker-concepts/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-24",
+      "track_id": "infra",
+      "order": 24,
+      "title": "Pipeline de eventos confiável",
+      "summary": "Conecte monitoramento e Ansible sem transformar ruído em ação perigosa.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 24,
+      "competencies": [
+        "Definir envelope de evento",
+        "Separar deduplicação e correlação",
+        "Controlar reprocessamento e backpressure"
+      ],
+      "prerequisites": [
+        "infra-23"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "workflow",
+        "title": "Remediação com aprovação",
+        "limitations": "Avaliação determinística de política; não integra AAP, webhooks ou contas."
+      },
+      "sources": [
+        {
+          "title": "AWS — S3 event notifications",
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html"
+        },
+        {
+          "title": "Google Cloud — Pub/Sub overview",
+          "url": "https://cloud.google.com/pubsub/docs/overview"
+        },
+        {
+          "title": "Google — Site Reliability Workbook",
+          "url": "https://sre.google/workbook/table-of-contents/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-25",
+      "track_id": "infra",
+      "order": 25,
+      "title": "AIOps: anomalia não é incidente",
+      "summary": "Construa uma baseline e avalie falsos positivos antes de automatizar.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 25,
+      "competencies": [
+        "Distinguir limiar e baseline",
+        "Calcular precisão e recall",
+        "Entender sazonalidade e drift"
+      ],
+      "prerequisites": [
+        "infra-24"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "anomaly",
+        "title": "Anomalias e qualidade",
+        "limitations": "Métricas calculadas sobre fixture; não treina modelo nem detecta incidentes externos."
+      },
+      "sources": [
+        {
+          "title": "Google — Alerting on SLOs",
+          "url": "https://sre.google/workbook/alerting-on-slos/"
+        },
+        {
+          "title": "OpenTelemetry — Conceitos",
+          "url": "https://opentelemetry.io/docs/concepts/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-26",
+      "track_id": "infra",
+      "order": 26,
+      "title": "LLMs e RAG como assistentes de investigação",
+      "summary": "Use contexto recuperado, evidências e abstinência em vez de confiança cega.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 26,
+      "competencies": [
+        "Explicar token, contexto e RAG",
+        "Separar instrução e dado recuperado",
+        "Avaliar resposta fundamentada"
+      ],
+      "prerequisites": [
+        "infra-25"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "rag",
+        "title": "RAG · evidência e confiança",
+        "limitations": "Exercício determinístico de leitura e decisão. Nenhum modelo, embedding ou API de IA é executado."
+      },
+      "sources": [
+        {
+          "title": "OWASP — LLM Prompt Injection",
+          "url": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+        },
+        {
+          "title": "Microsoft — RAG architecture",
+          "url": "https://learn.microsoft.com/azure/architecture/ai-ml/guide/rag/rag-solution-design-and-evaluation-guide"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-27",
+      "track_id": "infra",
+      "order": 27,
+      "title": "Remediação assistida com freios reais",
+      "summary": "Transforme uma recomendação em uma ação limitada, aprovada e auditável.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 27,
+      "competencies": [
+        "Separar recomendação e execução",
+        "Aplicar allowlist e aprovação válida",
+        "Definir rollback, cooldown e kill switch"
+      ],
+      "prerequisites": [
+        "infra-26"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "workflow",
+        "title": "Remediação com aprovação",
+        "limitations": "Avaliação determinística de política; não integra AAP, webhooks ou contas."
+      },
+      "sources": [
+        {
+          "title": "OWASP — LLM Prompt Injection",
+          "url": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
+        },
+        {
+          "title": "Red Hat — Ansible Automation Platform docs",
+          "url": "https://docs.redhat.com/en/documentation/red_hat_ansible_automation_platform/"
+        },
+        {
+          "title": "Google — Site Reliability Workbook",
+          "url": "https://sre.google/workbook/table-of-contents/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-28",
+      "track_id": "infra",
+      "order": 28,
+      "title": "Checkpoint 4: incident commander por um dia",
+      "summary": "Treine decisões, comunicação e recuperação sob um relógio didático.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 28,
+      "competencies": [
+        "Priorizar mitigação com evidência",
+        "Comunicar impacto e próximos passos",
+        "Escrever postmortem sem culpa"
+      ],
+      "prerequisites": [
+        "infra-27"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 180
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "incident",
+        "title": "Arena de incidentes",
+        "limitations": "Máquina de estados sintética. Cada ação consome tempo fictício; não representa tráfego ou mudanças reais."
+      },
+      "sources": [
+        {
+          "title": "Google — Incident Response",
+          "url": "https://sre.google/workbook/incident-response/"
+        },
+        {
+          "title": "Google — Site Reliability Workbook",
+          "url": "https://sre.google/workbook/table-of-contents/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-29",
+      "track_id": "infra",
+      "order": 29,
+      "title": "Projeto final: do evento à recuperação",
+      "summary": "Integre AWS/GCP, observabilidade, Ansible e IA em uma entrega defensável.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 29,
+      "competencies": [
+        "Integrar o fluxo com contratos claros",
+        "Provar comportamento em falhas",
+        "Defender trade-offs e limites"
+      ],
+      "prerequisites": [
+        "infra-28"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "incident",
+        "title": "Arena de incidentes",
+        "limitations": "Máquina de estados sintética. Cada ação consome tempo fictício; não representa tráfego ou mudanças reais."
+      },
+      "sources": [
+        {
+          "title": "Ansible — Getting started",
+          "url": "https://docs.ansible.com/projects/ansible/latest/getting_started/index.html"
+        },
+        {
+          "title": "Dynatrace — Intelligence",
+          "url": "https://docs.dynatrace.com/docs/dynatrace-intelligence"
+        },
+        {
+          "title": "AWS — S3 User Guide",
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+        },
+        {
+          "title": "Google Cloud — Cloud Run overview",
+          "url": "https://cloud.google.com/run/docs/overview/what-is-cloud-run"
+        },
+        {
+          "title": "OpenSearch — Query DSL",
+          "url": "https://docs.opensearch.org/latest/query-dsl/"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "infra-30",
+      "track_id": "infra",
+      "order": 30,
+      "title": "Chegue com método e boas perguntas",
+      "summary": "Faça a avaliação final e prepare os primeiros dias na equipe.",
+      "status": "available",
+      "content_version": "1.1.0",
+      "lesson_day": 30,
+      "competencies": [
+        "Reconhecer forças e lacunas",
+        "Fazer perguntas de onboarding úteis",
+        "Planejar evolução sem prometer domínio total"
+      ],
+      "prerequisites": [
+        "infra-29"
+      ],
+      "duration_minutes": {
+        "essential": 180,
+        "complete": 300
+      },
+      "practice": {
+        "kind": "simulation",
+        "lab_id": "workflow",
+        "title": "Remediação com aprovação",
+        "limitations": "Avaliação determinística de política; não integra AAP, webhooks ou contas."
+      },
+      "sources": [
+        {
+          "title": "Google — Site Reliability Workbook",
+          "url": "https://sre.google/workbook/table-of-contents/"
+        },
+        {
+          "title": "Ansible — Getting started",
+          "url": "https://docs.ansible.com/projects/ansible/latest/getting_started/index.html"
+        },
+        {
+          "title": "Dynatrace — Intelligence",
+          "url": "https://docs.dynatrace.com/docs/dynatrace-intelligence"
+        }
+      ],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "available",
+          "content_version": "1.1.0"
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "data-01",
+      "track_id": "data",
+      "order": 1,
+      "title": "Modelagem relacional",
+      "summary": "Representar entidades, chaves e relações de um serviço fictício.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Identificar entidades e relações",
+        "Explicar chaves e integridade referencial"
+      ],
+      "prerequisites": [
+        "infra-05"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "data-02",
+      "track_id": "data",
+      "order": 2,
+      "title": "SQL e joins",
+      "summary": "Investigar registros e combinar tabelas sem perder a interpretação do resultado.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Construir consultas com filtros e joins",
+        "Reconhecer duplicação e ausência de dados"
+      ],
+      "prerequisites": [
+        "data-01"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "data-03",
+      "track_id": "data",
+      "order": 3,
+      "title": "PostgreSQL: índices e EXPLAIN",
+      "summary": "Ler um plano de execução e justificar uma melhoria de consulta.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Interpretar o plano de uma consulta",
+        "Comparar leitura, escrita e custo de índices"
+      ],
+      "prerequisites": [
+        "data-02"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "data-04",
+      "track_id": "data",
+      "order": 4,
+      "title": "Transações, backup e restauração",
+      "summary": "Preservar consistência e demonstrar recuperação com dados sintéticos.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Explicar limites de uma transação",
+        "Verificar uma restauração sem sobrescrever a origem"
+      ],
+      "prerequisites": [
+        "data-03"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "data-05",
+      "track_id": "data",
+      "order": 5,
+      "title": "Embeddings e busca com pgvector",
+      "summary": "Comparar busca semântica e filtros usando exemplos controlados.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Explicar embeddings e similaridade",
+        "Avaliar recuperação com filtros e casos fixos"
+      ],
+      "prerequisites": [
+        "data-04"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "data-06",
+      "track_id": "data",
+      "order": 6,
+      "title": "RAG com evidência e acesso",
+      "summary": "Avaliar respostas com citações e respeitar a permissão do documento recuperado.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Conferir citações e ausência de evidência",
+        "Aplicar controle de acesso antes da recuperação"
+      ],
+      "prerequisites": [
+        "data-05"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "security-01",
+      "track_id": "security",
+      "order": 1,
+      "title": "Identidade e menor privilégio",
+      "summary": "Desenhar permissões limitadas por recurso e operação.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Distinguir autenticação de autorização",
+        "Testar acesso permitido e negado"
+      ],
+      "prerequisites": [
+        "infra-03"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "security-02",
+      "track_id": "security",
+      "order": 2,
+      "title": "Segredos e proteção de dados",
+      "summary": "Separar credenciais, configurações e dados de estudo.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Reconhecer exposição de segredo",
+        "Definir retenção e recuperação sem copiar dados reais"
+      ],
+      "prerequisites": [
+        "security-01"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "security-03",
+      "track_id": "security",
+      "order": 3,
+      "title": "Redes e hardening",
+      "summary": "Reduzir a superfície de um serviço mantendo acesso de recuperação.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Explicar regras de entrada e saída",
+        "Verificar uma configuração de rede em lab isolado"
+      ],
+      "prerequisites": [
+        "security-02"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "security-04",
+      "track_id": "security",
+      "order": 4,
+      "title": "Containers e dependências",
+      "summary": "Inspecionar imagem, permissões e dependências antes de executar.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Interpretar achados sem confundir scanner com garantia",
+        "Priorizar correções e registrar versões"
+      ],
+      "prerequisites": [
+        "security-03"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "security-05",
+      "track_id": "security",
+      "order": 5,
+      "title": "Detectar, responder e recuperar",
+      "summary": "Praticar contenção e restauração em um incidente fictício.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Preservar evidências permitidas",
+        "Verificar recuperação e prevenir recorrência"
+      ],
+      "prerequisites": [
+        "security-04"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "security-06",
+      "track_id": "security",
+      "order": 6,
+      "title": "Segurança de agentes e contexto",
+      "summary": "Tratar instruções em documentos como dados sem conceder autoridade.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Testar instrução maliciosa e ferramenta negada",
+        "Impor limites e autorização fora do prompt"
+      ],
+      "prerequisites": [
+        "security-05"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "agents-01",
+      "track_id": "agents",
+      "order": 1,
+      "title": "Processos, regras e agentes",
+      "summary": "Escolher fluxo determinístico ou agente a partir do problema e do risco.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Mapear entradas, decisões e responsáveis",
+        "Justificar onde IA agrega valor ao processo"
+      ],
+      "prerequisites": [
+        "infra-06"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "agents-02",
+      "track_id": "agents",
+      "order": 2,
+      "title": "Modelos, assistentes e ferramentas",
+      "summary": "Distinguir modelo, aplicativo, runtime e integração.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Descrever o papel de cada camada",
+        "Comparar resultados com uma tarefa e critérios fixos"
+      ],
+      "prerequisites": [
+        "agents-01"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "agents-03",
+      "track_id": "agents",
+      "order": 3,
+      "title": "Saídas estruturadas e ferramentas",
+      "summary": "Validar pedidos de ação antes de executar uma ferramenta permitida.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Validar entrada e saída com schema",
+        "Rejeitar ferramenta ou alvo fora do escopo"
+      ],
+      "prerequisites": [
+        "agents-02"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "agents-04",
+      "track_id": "agents",
+      "order": 4,
+      "title": "Estado, avaliação e aprovação",
+      "summary": "Controlar repetição, retomada e aprovação sem depender da resposta do modelo.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Aplicar idempotência e limite de execução",
+        "Avaliar falhas e aprovação recusada"
+      ],
+      "prerequisites": [
+        "agents-03"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "agents-05",
+      "track_id": "agents",
+      "order": 5,
+      "title": "Desenvolvimento: triagem de bugs",
+      "summary": "Investigar código sintético, propor correção e revisar testes e diff.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Vincular hipótese a evidência no código",
+        "Preparar alteração revisável sem publicação automática"
+      ],
+      "prerequisites": [
+        "agents-04"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "agents-06",
+      "track_id": "agents",
+      "order": 6,
+      "title": "Atendimento: chamados e runbooks",
+      "summary": "Classificar solicitações e preparar resposta citando procedimentos.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Recuperar fontes permitidas",
+        "Recusar sem evidência e encaminhar para revisão"
+      ],
+      "prerequisites": [
+        "agents-05"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "agents-07",
+      "track_id": "agents",
+      "order": 7,
+      "title": "Marketing: briefing e revisão",
+      "summary": "Transformar um briefing fictício em rascunho sujeito a revisão editorial.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Separar fatos fornecidos de afirmações sem suporte",
+        "Solicitar aprovação sem postar ou enviar"
+      ],
+      "prerequisites": [
+        "agents-06"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    },
+    {
+      "id": "agents-08",
+      "track_id": "agents",
+      "order": 8,
+      "title": "Financeiro: conciliação sintética",
+      "summary": "Explicar divergências de arquivos fictícios com cálculos feitos em código.",
+      "status": "planned",
+      "content_version": null,
+      "lesson_day": null,
+      "competencies": [
+        "Conciliar valores e identificar exceções",
+        "Preservar revisão humana sem pagamentos"
+      ],
+      "prerequisites": [
+        "agents-07"
+      ],
+      "duration_minutes": null,
+      "practice": null,
+      "sources": [],
+      "translations": [
+        {
+          "locale": "pt-BR",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "en",
+          "status": "planned",
+          "content_version": null
+        },
+        {
+          "locale": "es",
+          "status": "planned",
+          "content_version": null
+        }
+      ],
+      "verified_tool_versions": []
+    }
+  ]
+}

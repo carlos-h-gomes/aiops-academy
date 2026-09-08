@@ -1,0 +1,41 @@
+name: Validate Academy
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+concurrency:
+  group: academy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  local-contracts:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: '1'
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+      - name: Prepare isolated dependencies and build
+        run: python scripts/prepare.py
+      - name: API and progress regression tests
+        run: python scripts/bounded.py 90 .venv/Scripts/python.exe -m unittest discover -s backend/tests -v
+      - name: Calendar and curriculum presentation
+        working-directory: frontend
+        run: python ../scripts/bounded.py 30 node --test tests/dates.test.mjs tests/curriculum.test.mjs
+      - name: Reference Python lab
+        run: python scripts/bounded.py 30 python labs/real/python/check.py --solution
+      - name: Loopback HTTP lab
+        run: python scripts/bounded.py 45 python labs/real/http_lab/bench.py
+      - name: Verify generated curriculum is current
+        run: |
+          python scripts/author_course.py
+          python scripts/author_manuals.py
+          .venv/Scripts/python.exe scripts/author_curriculum.py
+          git diff --exit-code -- backend/content schemas/curriculum.schema.json

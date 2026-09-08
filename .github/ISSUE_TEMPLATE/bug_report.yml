@@ -1,0 +1,26 @@
+name: App problem / Problema no app / Problema en la app
+description: Report a reproducible problem without personal data or secrets.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Use Portuguese, English or Spanish. Never include tokens, corporate data or private logs. Follow SECURITY.md for vulnerabilities."
+  - type: input
+    id: version
+    attributes:
+      label: App version and environment
+      description: Browser, operating system and online or local mode.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true

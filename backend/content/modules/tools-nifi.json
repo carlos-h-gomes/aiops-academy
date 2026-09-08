@@ -1,0 +1,23 @@
+{
+  "id": "tools-nifi",
+  "title": "Apache NiFi: dados, filas e proveniência",
+  "summary": "Rastreie ingestão, rejeição e repetição de eventos sem confundir fila com banco transacional.",
+  "minutes": 50,
+  "recommended_after": 16,
+  "body": "## O que você vai aprender\nNiFi organiza movimento e transformação de dados. Processors realizam operações; conexões mantêm filas; FlowFiles representam conteúdo e atributos; proveniência registra eventos sobre o caminho do dado. Em um lab futuro, você acompanhará um registro entre etapas e explicará onde ocorreu a falha.\n\nRevisão documental: 07/09/2026. Este é um exercício de desenho e cálculo com fixtures, não uma instância NiFi em execução. Requisitos de Java, memória, autenticação e versão serão conferidos antes de distribuir o pacote real.\n\n## Fluxo de um dado\nDesenhe entrada → leitura de registro → validação → roteamento → destino. Abra uma ramificação de rejeição para registros inválidos. Uma política de retry não deve reenviar dados inválidos para sempre. Defina retenção e acesso tanto para dados válidos quanto para a fila de rejeição.\n\nBack pressure controla a entrada na conexão quando o limite configurado é atingido. Isso não cria capacidade no destino. A fila precisa ser dimensionada junto com throughput, prazo e espaço disponível. Dados sensíveis também podem ficar em filas e registros de proveniência.\n\n## Fixture da ingestão\n```text\nid,environment,service,value\nr1,lab,quotes,18\nr2,lab,quotes,21\nr2,lab,quotes,21\nr3,lab,quotes,invalid\n```\n\nRegra de negócio deste exercício: value deve ser número inteiro não negativo; (environment,id) identifica um registro no destino. Deduplicação transacional é responsabilidade do destino. O NiFi deve preservar essa chave e encaminhar os resultados.\n\n## Prática — acompanhe cada registro\n1. Escreva quais registros seguem ao destino e qual vai para rejeição. Diferencie registros recebidos de efeitos únicos.\n2. Para cada etapa, anote atributo preservado, transformação e evidência necessária para investigar r2.\n3. O destino confirma r2 e a conexão cai antes de o produtor receber a confirmação. Descreva o próximo envio e o comportamento idempotente esperado.\n4. Considere fila vazia, entrada de 100 registros/s e saída de 60 registros/s por 30 segundos. Calcule o crescimento líquido sem back pressure; o limite didático de 1.000 registros seria alcançado quando?\n5. Explique por que aumentar o limite da fila não resolve uma diferença permanente entre entrada e saída.\n\n## Solução e evidência\nSão quatro registros recebidos: três válidos, incluindo a repetição; um inválido deve ser isolado. Há dois efeitos únicos esperados no destino, r1 e r2. A repetição de r2 após timeout deve confirmar o registro existente. Se o destino não implementa a regra, o fluxo não pode prometer ausência de duplicatas.\n\nNo modelo contínuo simplificado, a fila cresce 40 registros/s: 1.200 em 30 segundos. O limite de 1.000 seria alcançado em 25 segundos. Um NiFi real tem escalonamento, unidades de fila e configuração próprios; esse cálculo não é benchmark nem garantia de momento exato do bloqueio.\n\n## Critério de conclusão\nEntregue desenho com caminho de rejeição, as contagens, cálculo da fila e narrativa de replay. Inclua uma pergunta operacional: como localizar todas as transformações de r2 sem expor seu conteúdo sensível? A proveniência ajuda investigação; não torna correto o dado por si só.\n\n## Variação\nAgora dois ambientes usam r2. Refaça a chave e mostre que um ambiente não elimina o registro do outro. Se o atraso aceitável for menor que o tempo estimado de drenagem, proponha reduzir entrada, recuperar destino ou escalar capacidade com evidência.",
+  "sources": [
+    {
+      "title": "Apache NiFi — visão geral",
+      "url": "https://nifi.apache.org/nifi-docs/overview.html"
+    },
+    {
+      "title": "Apache NiFi — início",
+      "url": "https://nifi.apache.org/nifi-docs/getting-started.html"
+    },
+    {
+      "title": "Apache NiFi — guia do usuário",
+      "url": "https://nifi.apache.org/nifi-docs/user-guide.html"
+    }
+  ],
+  "category": "tooling"
+}

@@ -1,0 +1,19 @@
+{
+  "id": "seasonal-anomalies",
+  "title": "Anomalias e sazonalidade",
+  "summary": "Compare períodos equivalentes e avalie a qualidade dos alertas.",
+  "category": "extension",
+  "minutes": 75,
+  "recommended_after": 25,
+  "body": "## O normal depende do contexto\nUm pico de tráfego toda segunda-feira pode ser esperado. Comparar esse horário com a madrugada gera alarmes ruins. Separe tendência, sazonalidade, mudanças de configuração e resíduos. Também verifique atrasos de coleta, relógios e unidades. Dados ausentes não significam zero; ausência de telemetria merece tratamento próprio.\n\nA aula de anomalias apresenta uma linha de base simples. Aqui, escolha observações comparáveis: mesmo serviço, janela, horário e condições relevantes. Uma média ajuda a começar, mas é sensível a extremos. Mediana, quantis e medidas robustas podem ser alternativas. Escolha o método conforme o contrato do sinal e avalie em casos históricos, sem misturar futuro no treinamento.\n\n## Laboratório Python: linha de base comparável\nImplemente seasonal(values, current). Values contém pelo menos três valores positivos de períodos equivalentes, current é não negativo. Calcule baseline como a média. Deviation_pct é 100 * (current - baseline) / baseline, arredondado em duas casas. Flag é verdadeiro quando o módulo do desvio supera 20%. O limite é didático e estritamente maior, não maior ou igual.\n\n```python\nseasonal([100, 105, 95], 130)\n# {'baseline':100.0, 'deviation_pct':30.0, 'flag':True}\nseasonal([100, 105, 95], 120)\n# {'baseline':100.0, 'deviation_pct':20.0, 'flag':False}\n```\n\nExecute python check.py seasonal. Insira um valor 900 na série e observe como a média pode esconder ou criar alertas. Não remova o extremo só porque atrapalha: investigue sua origem. O código não ajusta um modelo estatístico nem estima confiança.\n\n## Avaliação temporal\nSepare uma janela de desenvolvimento e uma janela posterior de teste. Evite escolher o limite olhando os incidentes que pretende usar para avaliar. Para um conjunto rotulado, conte verdadeiros positivos, falsos positivos e falsos negativos; calcule precisão e recall. Acrescente tempo de antecedência e falsos alertas por dia. Um modelo que alerta sempre pode ter recall alto e ser operacionalmente inútil.\n\n## Evidência e aprofundamento\nEntregue os dois resultados, a hipótese que tornou os períodos comparáveis e um caso em que ela deixa de valer. Explique como lidaria com um serviço novo sem histórico. Compare o mesmo volume de alertas antes e depois, preservando a possibilidade de investigar sinais descartados. Desvio estatístico é evidência para investigar, não autorização para remediar.",
+  "sources": [
+    {
+      "title": "Google SRE — Monitoramento de sistemas distribuídos",
+      "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
+    },
+    {
+      "title": "Google Cloud — Ciclo operacional de ML",
+      "url": "https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "fundamentals-cicd",
+  "title": "CI/CD: do teste à entrega e ao rollback",
+  "summary": "Construa uma política verificável de promoção e diferencie build, entrega e implantação.",
+  "minutes": 75,
+  "body": "## O que precisa acontecer entre editar e operar\nIntegração contínua verifica alterações frequentemente e oferece feedback sobre compatibilidade e testes. Entrega contínua mantém uma mudança pronta para ser implantada conforme a política. Implantação contínua automatiza essa passagem quando os critérios são satisfeitos. Uma organização pode escolher aprovação humana para etapas de maior impacto.\n\nO pipeline didático será: mudança → revisão → testes → build → artefato identificado → ambiente de teste → aprovação → implantação → verificação operacional. Se o código muda depois dos testes, o resultado anterior não comprova a nova versão. Revisão documental: 07/09/2026.\n\n## Artefato e ambiente\nUm artefato deve ter origem, versão e integridade verificáveis. Usar o mesmo artefato validado na promoção reduz diferenças entre ambientes. Hash ajuda a comparar bytes com uma referência confiável; sozinho não autentica o publicador.\n\nConfiguração e segredos variam por ambiente e exigem controle próprio. Dados de produção não são fixture de laboratório. Mudanças de banco podem impedir retorno simples à versão anterior; planeje compatibilidade, recuperação e verificação antes de executar.\n\n## Laboratório Python: decidir promoção\nNa pasta delivery do kit, implemente decide(checks, approval, same_artifact) em exercise.py. Essa função é uma política didática, sem deploy ou acesso de rede.\n\nchecks deve conter exatamente unit, integration e security; valores permitidos: passed, failed ou missing. approval aceita approved, denied ou pending. same_artifact deve ser booleano.\n\nA ordem da regra importa: qualquer check que não seja passed retorna block. Se os checks passaram, mas same_artifact é false, retorna block. Com evidência válida, aprovação denied retorna block e pending retorna hold. Somente approved retorna promote. Entrada fora do contrato deve lançar ValueError.\n```python\nchecks = {\"unit\":\"passed\",\"integration\":\"passed\",\"security\":\"passed\"}\n# decide(checks, \"pending\", True) -> \"hold\"\n# decide(checks, \"approved\", True) -> \"promote\"\n# decide(checks, \"approved\", False) -> \"block\"\n```\n\nExecute python check.py para conferir sua resposta, ou python check.py --solution para a referência. O teste inclui falhas, evidência ausente, recusa e troca de artefato. Esses estados são sintéticos: a função não verifica assinatura real nem autentica um aprovador.\n\n## Variação de incidente\nA implantação passou, mas os erros aumentam de 0,1% para 2% em uma janela comparável e o canário apresenta latência pior. Descreva observações, critério de interrupção, retorno e pós-condição. Não use pipeline verde como prova de saúde. Consulte o aprofundamento Resiliência e canário para comparar amostras e limites.\n\nRollback é voltar uma mudança quando existe caminho compatível. Roll forward é corrigir com outra mudança. Backup só ajuda quando há procedimento de restore testado. A escolha depende do estado dos dados e do impacto; reiniciar tudo sem evidência não é estratégia de recuperação.\n\n## Solução e critério de conclusão\nA solução exige contrato completo, falha segura e prioridade das verificações antes da aprovação. Um campo missing não significa sucesso. Um booleano textual como \"true\" não atende o contrato de same_artifact.\n\nEntregue os resultados dos testes e um runbook curto: qual artefato promover, quais evidências consultar, quem autoriza, quando interromper e como validar retorno. Acrescente um indicador técnico e um indicador de impacto no serviço. Este lab exercita política de decisão; a futura implantação real precisa impor essas regras no ambiente autoritativo.",
+  "sources": [
+    {
+      "title": "GitHub — integração contínua",
+      "url": "https://docs.github.com/en/actions/get-started/continuous-integration"
+    },
+    {
+      "title": "GitHub — ambientes de implantação",
+      "url": "https://docs.github.com/en/actions/concepts/workflows-and-actions/deployment-environments"
+    },
+    {
+      "title": "Google SRE — canários",
+      "url": "https://sre.google/workbook/canarying-releases/"
+    }
+  ],
+  "category": "tooling",
+  "recommended_after": 6
+}

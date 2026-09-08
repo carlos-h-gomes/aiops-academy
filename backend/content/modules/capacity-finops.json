@@ -1,0 +1,19 @@
+{
+  "id": "capacity-finops",
+  "title": "Capacidade e FinOps",
+  "summary": "Conecte demanda, margem operacional e custo por resultado.",
+  "category": "extension",
+  "minutes": 75,
+  "recommended_after": 22,
+  "body": "## Capacidade é um orçamento de recursos\nObserve tráfego, filas, latência e saturação juntos. Uma instância pode estar com CPU baixa e ter esgotado as conexões do banco. O limite medido deve vir de um teste representativo, com latência e erro aceitáveis. Não extrapole indefinidamente uma medição pequena nem presuma que dobrar réplicas dobra capacidade: uma dependência compartilhada pode virar o gargalo.\n\nPara este exercício, o serviço é horizontalmente escalável e cada réplica suporta 500 requisições por segundo no limite medido. A política didática permite operar até 60% desse limite e manter uma réplica extra. Esses valores são hipóteses de estudo, não uma recomendação universal de dimensionamento.\n\n## Laboratório Python: número de réplicas\nImplemente replicas(demand, capacity, utilization, spare). Use arredondamento para cima: ceil(demand / (capacity * utilization)) + spare. Demand é não negativa, capacity positiva, utilization está entre zero exclusivo e um inclusive, spare é inteiro não negativo. Entradas fora desses limites devem gerar ValueError.\n\n```python\nreplicas(2400, 500, 0.60, 1)\n# Esperado: 9 (8 para a demanda + 1 reserva)\n```\n\nExecute python check.py capacity na pasta aiops_extensions. Variação: demande 2401 rps; agora são 10 réplicas. Explique a descontinuidade do arredondamento e o efeito de trabalhar tão perto de um degrau de capacidade. Esse cálculo não provisiona nada e não mede um serviço real.\n\n## Custo por unidade útil\nSuponha custo fictício de 0,10 unidade monetária por réplica-hora. Nove réplicas por 720 horas custam 648 unidades. Com 1,2 milhão de operações bem-sucedidas no mês, isso equivale a 0,54 por mil operações bem-sucedidas. Esses números não são preços de AWS ou GCP; desconsideram rede, armazenamento, impostos e custos compartilhados.\n\nEscolha o denominador que represente valor. Custo por tentativa pode parecer bom enquanto o número de falhas cresce. Compare custo por operação bem-sucedida, janela e escopo consistentes. Reduzir capacidade e violar o SLO pode deslocar custo para suporte e perda de serviço.\n\n## Evidência e limite\nEntregue a fórmula, dois cenários de demanda, política de reserva e custo unitário com exclusões explícitas. Proponha o próximo teste para validar a hipótese de escala linear. Compare previsão com observado periodicamente; uma estimativa não deve executar expansão automática sem quotas, autorização e verificação funcional.",
+  "sources": [
+    {
+      "title": "FinOps Foundation — Unit Economics",
+      "url": "https://www.finops.org/framework/capabilities/unit-economics/"
+    },
+    {
+      "title": "Google SRE — Monitoramento",
+      "url": "https://sre.google/sre-book/monitoring-distributed-systems/"
+    }
+  ]
+}

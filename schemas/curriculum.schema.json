@@ -1,0 +1,387 @@
+{
+  "$defs": {
+    "Duration": {
+      "additionalProperties": false,
+      "properties": {
+        "essential": {
+          "maximum": 1200,
+          "minimum": 1,
+          "title": "Essential",
+          "type": "integer"
+        },
+        "complete": {
+          "maximum": 1200,
+          "minimum": 1,
+          "title": "Complete",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "essential",
+        "complete"
+      ],
+      "title": "Duration",
+      "type": "object"
+    },
+    "Guide": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9-]{0,79}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "Guide",
+      "type": "object"
+    },
+    "Practice": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "simulation",
+          "title": "Kind",
+          "type": "string"
+        },
+        "lab_id": {
+          "pattern": "^[a-z][a-z0-9-]{0,79}$",
+          "title": "Lab Id",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "limitations": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Limitations",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "lab_id",
+        "title",
+        "limitations"
+      ],
+      "title": "Practice",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "maxLength": 2000,
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "url"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Track": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9-]{0,79}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "summary": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "outcome": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Outcome",
+          "type": "string"
+        },
+        "guides": {
+          "items": {
+            "$ref": "#/$defs/Guide"
+          },
+          "maxItems": 25,
+          "title": "Guides",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "summary",
+        "outcome",
+        "guides"
+      ],
+      "title": "Track",
+      "type": "object"
+    },
+    "Translation": {
+      "additionalProperties": false,
+      "properties": {
+        "locale": {
+          "enum": [
+            "pt-BR",
+            "en",
+            "es"
+          ],
+          "title": "Locale",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "planned"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "content_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Content Version"
+        }
+      },
+      "required": [
+        "locale",
+        "status",
+        "content_version"
+      ],
+      "title": "Translation",
+      "type": "object"
+    },
+    "Unit": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9-]{0,79}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "track_id": {
+          "pattern": "^[a-z][a-z0-9-]{0,79}$",
+          "title": "Track Id",
+          "type": "string"
+        },
+        "order": {
+          "maximum": 200,
+          "minimum": 1,
+          "title": "Order",
+          "type": "integer"
+        },
+        "title": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "summary": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "planned"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "content_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Content Version"
+        },
+        "lesson_day": {
+          "anyOf": [
+            {
+              "maximum": 30,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lesson Day"
+        },
+        "competencies": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Competencies",
+          "type": "array"
+        },
+        "prerequisites": {
+          "items": {
+            "pattern": "^[a-z][a-z0-9-]{0,79}$",
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Prerequisites",
+          "type": "array"
+        },
+        "duration_minutes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Duration"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "practice": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Practice"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "maxItems": 30,
+          "title": "Sources",
+          "type": "array"
+        },
+        "translations": {
+          "items": {
+            "$ref": "#/$defs/Translation"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "title": "Translations",
+          "type": "array"
+        },
+        "verified_tool_versions": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Verified Tool Versions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "track_id",
+        "order",
+        "title",
+        "summary",
+        "status",
+        "content_version",
+        "lesson_day",
+        "competencies",
+        "prerequisites",
+        "duration_minutes",
+        "practice",
+        "sources",
+        "translations",
+        "verified_tool_versions"
+      ],
+      "title": "Unit",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "version": {
+      "maxLength": 40,
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    },
+    "metadata_reviewed_on": {
+      "title": "Metadata Reviewed On",
+      "type": "string"
+    },
+    "tracks": {
+      "items": {
+        "$ref": "#/$defs/Track"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Tracks",
+      "type": "array"
+    },
+    "units": {
+      "items": {
+        "$ref": "#/$defs/Unit"
+      },
+      "maxItems": 200,
+      "minItems": 1,
+      "title": "Units",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "version",
+    "metadata_reviewed_on",
+    "tracks",
+    "units"
+  ],
+  "title": "Curriculum",
+  "type": "object"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "tools-n8n",
+  "title": "n8n: integrar processos com controle",
+  "summary": "Desenhe um fluxo de triagem com validação, deduplicação, aprovação e recuperação.",
+  "minutes": 50,
+  "recommended_after": 18,
+  "body": "## O papel de uma integração\nUm fluxo n8n pode receber uma entrada, transformar dados, consultar uma API e encaminhar trabalho. O fluxo também precisa lidar com duplicação, indisponibilidade e credenciais. A ferramenta integra etapas; código e sistemas de origem continuam responsáveis por autorização e estado autoritativo.\n\nNeste exercício você desenha um fluxo. Não há n8n instalado pela Academy, API externa, credencial ou envio de mensagem. Revisão documental: 07/09/2026. A Community Edition auto-hospedada possui recursos e termos próprios; cloud e recursos empresariais precisam de avaliação separada.\n\n## Vocabulário para começar\nUm gatilho inicia uma execução. Nós transformam ou encaminham dados. Credenciais configuram uma identidade, mas a API de destino ainda decide permissões. Um webhook aberto não é evidência de que quem enviou o evento pode autorizar uma ação. Uma execução concluída no orquestrador não prova que o efeito correto aconteceu no sistema de destino.\n\nSepare ambientes e mantenha os segredos fora do workflow exportado. Não cole tokens no corpo de um nó nem em uma captura de tela. Revisar código em um nó continua sendo necessário; arrastar blocos não elimina código executável.\n\n## Cenário: triagem de incidente fictício\nUma API recebe dois avisos do mesmo evento. Você deve abrir uma única proposta de investigação e aguardar revisão antes de qualquer remediação. Dados de entrada:\n```json\n[\n  {\"event_id\":\"e-17\",\"environment\":\"lab\",\"service\":\"quotes\",\"severity\":\"high\"},\n  {\"event_id\":\"e-17\",\"environment\":\"lab\",\"service\":\"quotes\",\"severity\":\"high\"},\n  {\"event_id\":\"e-18\",\"environment\":\"lab\",\"service\":\"quotes\",\"severity\":\"unknown\"}\n]\n```\n\n## Prática de desenho — 35 minutos\n1. Desenhe: gatilho manual com fixture → validação → API de triagem → revisão humana → consulta do resultado.\n2. Defina campos obrigatórios e valores permitidos. severity aceita low, medium ou high. Uma entrada inválida vai para revisão de dados, sem ação operacional.\n3. Proponha uma chave de deduplicação que inclua ambiente e identidade do evento. Explique por que verificar existência e gravar em operações separadas cria uma corrida.\n4. Defina o comportamento quando a chamada sofre timeout após o destino já registrar a proposta.\n5. Defina no máximo duas novas tentativas para falhas transitórias e nenhuma repetição automática para autorização negada. Especifique prazo total e desligamento.\n6. Faça uma tabela de evidências com entrada, resultado esperado, identidade usada e estado final.\n\n## Resultado esperado e solução\nO primeiro e-17 cria uma proposta; a repetição retorna a mesma proposta, sem novo efeito. e-18 é rejeitado pela validação. Com revisão negada, o estado final é negado e nenhuma remediação acontece. Com timeout, consultar a proposta pela mesma chave evita inventar um sucesso ou gerar outra solicitação.\n\nA unicidade deve ser imposta atomicamente pelo destino. Uma memória temporária do workflow não basta quando há duas execuções concorrentes. A aprovação deve vincular a ação e seus parâmetros; se os parâmetros mudarem depois da aprovação, a autorização anterior não serve para a nova ação.\n\n## Critério de conclusão\nEntregue o desenho, os três resultados e dois testes adicionais: credencial sem permissão e retorno indisponível. Uma resposta que só diz usar retry é incompleta. Mostre limite de tentativa, evento auditável e condição de parada. O objetivo é reconhecer a fronteira entre orquestração e regra de negócio.\n\n## Quando virar laboratório instalado\nO pacote futuro deverá fixar versão, usar dados fictícios e API local permitida, limitar rede/recursos e trazer exportação sem segredos. Só então será marcado como execução real de n8n. Não importe fluxos de terceiros como se fossem configurações inofensivas.",
+  "sources": [
+    {
+      "title": "n8n — modalidades de uso",
+      "url": "https://docs.n8n.io/choose-n8n/"
+    },
+    {
+      "title": "n8n — licença e limites de uso",
+      "url": "https://github.com/n8n-io/n8n-docs/blob/main/docs/privacy-and-security/sustainable-use-license.md"
+    },
+    {
+      "title": "n8n — tratamento de erros",
+      "url": "https://docs.n8n.io/flow-logic/error-handling/"
+    }
+  ],
+  "category": "tooling"
+}

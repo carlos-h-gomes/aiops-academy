@@ -1,0 +1,43 @@
+{
+  "id": "tools-map",
+  "title": "Ferramentas de automação e Ops: como escolher",
+  "summary": "Compare integração, dados, RPA, runbooks, GitOps e execução durável antes de escolher uma ferramenta.",
+  "minutes": 40,
+  "recommended_after": 6,
+  "body": "## Comece pelo problema\nUma ferramenta popular pode ser uma escolha ruim para um problema específico. Este mapa organiza capacidades documentadas, não um ranking de participação no mercado. Revisão documental: 07/09/2026. As versões dos futuros labs serão fixadas e medidas antes da distribuição.\n\nPrimeiro descreva gatilho, entrada, transformação, decisão, efeito e evidência. Depois anote volume, prazo, identidade, falha esperada e quem mantém a solução. Uma tarefa simples com regra conhecida pode precisar apenas de código pequeno e agendamento. Usar um agente não elimina esses requisitos.\n\n## Integrações e processos\n**n8n** conecta etapas e APIs em fluxos visuais. É um bom tema para estudar webhooks, transformação, ramificação e tratamento de falhas. A Community Edition pode ser auto-hospedada, mas tem termos próprios e diferenças de recursos. Não confunda código disponível com licença MIT.\n\n**Power Automate** cobre fluxos de nuvem e desktop. Estude o ambiente Microsoft, conectores, aprovações e RPA. Uma ação disponível no editor pode exigir licença ou permissão que sua conta não possui. Evite construir a trilha essencial sobre um trial temporário.\n\n## Dados e execução de processos\n**Apache NiFi** trabalha com fluxos de dados, filas, roteamento e proveniência. Use-o como referência para ingestão, pressão de fila e rastreio de dados. O estado de uma fila não substitui controle transacional no destino.\n\n**Apache Airflow** organiza workflows em lote e suas dependências. Um pipeline diário de consolidação é diferente de movimentar continuamente eventos individuais. Ensine reexecução por intervalo, dependência, atraso e dados atrasados.\n\n**Temporal** permite modelar workflows duráveis em código e recuperar a execução. Isso não torna automaticamente idempotente uma chamada externa: uma Activity pode exigir nova tentativa e o destino ainda precisa controlar efeitos duplicados.\n\n## Operação e infraestrutura\n**Ansible / AAP**: estado e configuração de máquinas, inventário, playbooks e operação de automações. AAP é a plataforma empresarial; estudar Ansible local não reproduz todos os recursos de AAP.\n\n**Rundeck**: execução de runbooks, seleção de alvos, permissões e auditoria. Uma tarefa operacional precisa de alvo limitado e condição de parada, mesmo quando tem um botão bonito.\n\n**OpenTofu**: infraestrutura declarativa, planejamento e acompanhamento de recursos. Comparar plano com configuração desejada vem antes de aplicar. Um lab de leitura de plano não exige criar nuvem.\n\n**Argo CD**: reconciliação GitOps para Kubernetes. Reconheça configuração desejada, diferença observada e política de sincronização. Não é um substituto de todo o pipeline de integração contínua.\n\n## Observabilidade como base\nOpenTelemetry fornece instrumentação e coleta de sinais. Prometheus e Alertmanager apoiam métricas e notificações; Grafana organiza visualização e investigação. Dynatrace reúne capacidades de observabilidade em uma plataforma comercial. Essas ferramentas dão evidências ao processo automatizado; um gráfico não concede permissão para reiniciar um serviço.\n\n## Exercício de decisão — 25 minutos, sem instalação\n1. Uma empresa fictícia recebe CSV diário e precisa reprocessar a data de ontem. Escolha uma categoria, a evidência de conclusão e o comportamento após falha.\n2. Outra recebe dados contínuos de fontes diferentes, precisa rotear inválidos e acompanhar cada transformação.\n3. Uma equipe precisa aprovar solicitações em seu ambiente Microsoft; outra precisa configurar cem servidores de laboratório.\n4. Um processo leva horas, espera um retorno externo e precisa continuar após a queda do executor.\n5. Para cada caso, proponha uma alternativa e escreva uma situação em que mudaria de escolha.\n\n## Solução comentada\nNo caso 1, Airflow é uma opção para dependências por lote, mas um processo pequeno pode usar código simples. No caso 2, NiFi é candidato quando suas capacidades de dataflow são necessárias. No caso 3, Power Automate se encaixa no contexto Microsoft; Ansible na configuração de servidores. No caso 4, Temporal merece avaliação pela execução durável. n8n pode coordenar integrações, respeitando limites e mantendo regras autoritativas em código.\n\nA resposta só é suficiente quando explica a entrega, a repetição e a falha. A mesma marca não é a resposta correta para todos os casos. Registre uma decisão com cinco campos: problema, escolha, alternativa, limite e teste. Compare custo operacional e capacidade da equipe, não apenas preço de licença.\n\n## Próximo passo\nLeia os guias específicos de n8n, NiFi e Power Automate nesta biblioteca. Eles oferecem exercícios de desenho com dados fictícios. Instalações reais desses três produtos ainda não fazem parte deste incremento. Os seis aprofundamentos AIOps têm exercícios Python no kit; o app distingue esses tipos de prática.",
+  "sources": [
+    {
+      "title": "Apache Airflow",
+      "url": "https://airflow.apache.org/docs/apache-airflow/stable/"
+    },
+    {
+      "title": "Temporal — documentação",
+      "url": "https://docs.temporal.io/"
+    },
+    {
+      "title": "Rundeck — manual",
+      "url": "https://docs.rundeck.com/docs/manual/"
+    },
+    {
+      "title": "OpenTofu — documentação",
+      "url": "https://opentofu.org/docs/"
+    },
+    {
+      "title": "Argo CD — GitOps",
+      "url": "https://argo-cd.readthedocs.io/en/stable/"
+    },
+    {
+      "title": "OpenTelemetry",
+      "url": "https://opentelemetry.io/docs/"
+    },
+    {
+      "title": "Prometheus — Alertmanager",
+      "url": "https://prometheus.io/docs/alerting/latest/alertmanager/"
+    },
+    {
+      "title": "Grafana — documentação",
+      "url": "https://grafana.com/docs/"
+    }
+  ],
+  "category": "tooling"
+}

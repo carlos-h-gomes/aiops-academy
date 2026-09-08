@@ -1,0 +1,33 @@
+---
+- name: Configuração local e idempotente para estudo
+  hosts: lab
+  gather_facts: false
+  vars:
+    message: observabilidade habilitada
+  tasks:
+    - name: Criar diretório exclusivo do exercício
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/workspace"
+        state: directory
+        mode: '0700'
+    - name: Renderizar configuração sem segredo
+      ansible.builtin.template:
+        src: templates/agent.conf.j2
+        dest: "{{ playbook_dir }}/workspace/agent.conf"
+        mode: '0600'
+      notify: Registrar alteração
+    - name: Ler configuração em execução normal
+      ansible.builtin.slurp:
+        src: "{{ playbook_dir }}/workspace/agent.conf"
+      register: rendered
+      when: not ansible_check_mode
+    - name: Verificar conteúdo esperado
+      ansible.builtin.assert:
+        that:
+          - "('message=' ~ message) in (rendered.content | b64decode)"
+        quiet: true
+      when: not ansible_check_mode
+  handlers:
+    - name: Registrar alteração
+      ansible.builtin.debug:
+        msg: Configuração mudou. Em uma aplicação real, validar antes de recarregar o serviço.

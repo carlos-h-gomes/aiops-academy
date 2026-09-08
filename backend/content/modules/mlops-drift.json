@@ -1,0 +1,15 @@
+{
+  "id": "mlops-drift",
+  "title": "MLOps e degradação de modelos",
+  "summary": "Diferencie mudança nos dados de perda de qualidade do modelo.",
+  "category": "extension",
+  "minutes": 90,
+  "recommended_after": 25,
+  "body": "## AIOps e MLOps se encontram na operação\nAIOps usa análise e IA para apoiar operações. MLOps trata da entrega e manutenção de sistemas de aprendizado de máquina. Um detector de incidentes precisa de ambos: boas decisões operacionais e um ciclo reproduzível para dados, modelo, avaliação e implantação. Registre versão do conjunto de dados, código, modelo e parâmetros para comparar tentativas.\n\nMudança na distribuição de entrada é data drift. Mudança na relação entre entrada e resultado é concept drift. Training-serving skew é uma diferença entre preparação dos dados em treinamento e uso. Drift não prova queda de qualidade. Para avaliar desempenho, frequentemente são necessários rótulos que chegam depois. Uma média agregada também pode esconder piora em um segmento pequeno.\n\n## Laboratório Python: triagem de degradação\nImplemente model_triage(missing_before, missing_now, accuracy_before, accuracy_now, labelled). Taxas estão entre zero e um; labelled é contagem inteira não negativa. A política didática tem esta ordem:\n\n1. Com menos de 500 exemplos rotulados, retorne insufficient_evidence.\n2. Se a proporção de valores ausentes aumentou pelo menos 0,05, retorne inspect_data.\n3. Se a acurácia caiu pelo menos 0,05, retorne review_model.\n4. Caso contrário, retorne monitor.\n\n```python\nmodel_triage(0.01, 0.12, 0.94, 0.93, 1000)\n# 'inspect_data'\nmodel_triage(0.01, 0.01, 0.94, 0.84, 1000)\n# 'review_model'\n```\n\nExecute python check.py mlops. Depois reduza labelled para 40 e observe insufficient_evidence. A prioridade de investigar dados acima do modelo é uma escolha desta rubrica; não é regra universal. Ainda é possível investigar problemas de coleta com poucos rótulos, mas a função não decide qualidade do modelo nesse caso.\n\n## O que fazer com a hipótese\nPara inspect_data, compare schema, tipos, nulos, faixas, versão do pipeline e origem. Para review_model, revise segmentação, distribuição dos erros, comparação com uma baseline simples e impacto no usuário. Não retreine automaticamente com dados possivelmente corrompidos. Uma versão nova precisa de aprovação, critérios de avaliação e possibilidade de retorno.\n\n## Evidência e limites\nEntregue três cenários e explique por que a função não deve afirmar causa raiz. Acurácia é inadequada para alguns problemas desbalanceados: acrescente precisão, recall ou custo de erro conforme o caso. Quinhentos exemplos não garantem poder estatístico; o tamanho necessário depende da variabilidade, do efeito e da segmentação. Nenhum modelo é treinado por este exercício.",
+  "sources": [
+    {
+      "title": "Google Cloud — MLOps e pipelines de entrega",
+      "url": "https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning"
+    }
+  ]
+}

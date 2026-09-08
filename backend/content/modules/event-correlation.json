@@ -1,0 +1,15 @@
+{
+  "id": "event-correlation",
+  "title": "Correlação de eventos e redução de ruído",
+  "summary": "Agrupe sinais sem misturar ambientes nem esconder incidentes distintos.",
+  "category": "extension",
+  "minutes": 75,
+  "recommended_after": 18,
+  "body": "## Da tempestade de alertas à investigação\nDez notificações não significam dez incidentes. Deduplicação elimina a repetição de uma identidade de evento. Agrupamento reúne eventos relacionados para apresentação. Inibição evita notificar um sintoma quando uma condição mais abrangente já explica o contexto. Silenciamento tem escopo e prazo explícitos. Essas operações reduzem notificações; não devem apagar a evidência original.\n\nComece com uma chave que respeite fronteiras: ambiente, serviço e janela temporal. Acrescentar região pode separar falhas independentes. Retirar ambiente pode juntar homologação e produção. Topologia ajuda a formular relações, mas uma dependência compartilhada não prova que ela causou todos os erros. Compare horários, mudanças e traces antes de concluir causa raiz.\n\n## Laboratório Python: agrupar eventos\nBaixe o kit e abra aiops_extensions/exercise.py. Implemente correlate(events). Cada evento tem id, env, service e minute, um minuto inteiro não negativo desde o início do exercício. Eventos repetidos com a mesma dupla (env, id) são uma entrega duplicada: mantenha o primeiro. Agrupe os restantes pela tupla (env, service, minute // 5). Retorne um dicionário com contagens. Essas janelas fixas são uma simplificação; 4 e 5 pertencem a grupos diferentes mesmo estando próximos.\n\n```python\nevents = [\n    {'id':'a','env':'prod','service':'api','minute':1},\n    {'id':'a','env':'prod','service':'api','minute':2},\n    {'id':'b','env':'prod','service':'api','minute':4},\n    {'id':'a','env':'test','service':'api','minute':1},\n]\n# Esperado: {('prod','api',0):2, ('test','api',0):1}\n```\n\nExecute python check.py correlation dentro da pasta. Depois crie um evento no minuto 5 e explique por que abre outro grupo. Troque service para worker sem alterar ambiente: continua um grupo diferente. O teste não usa Alertmanager real nem reproduz toda a sua política de roteamento.\n\n## Evidência e critério\nRegistre quatro entradas, uma duplicata removida e dois grupos resultantes. Mostre um contraexemplo em que sua chave agrupa coisas demais. Reduzir quatro notificações para duas não prova melhor detecção: compare falsos agrupamentos, incidentes perdidos, tempo até diagnóstico e capacidade de abrir os eventos originais.\n\n## Desafio de profundidade\nDesenhe api → pool → banco e proponha como um alerta no banco poderia inibir sintomas da API com prazo e escopo. Defina quando desfazer a inibição. Nenhuma regra deve cruzar ambiente apenas porque os nomes dos serviços são iguais. Faça um runbook para quando a topologia estiver desatualizada.",
+  "sources": [
+    {
+      "title": "Prometheus — Alertmanager",
+      "url": "https://prometheus.io/docs/alerting/latest/alertmanager/"
+    }
+  ]
+}
