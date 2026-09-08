@@ -55,7 +55,7 @@ def write_catalog(core, directory: Path, destination: Path):
     from tempfile import NamedTemporaryFile
     temporary = None
     try:
-        with NamedTemporaryFile(mode='w', encoding='utf-8', dir=destination.parent, suffix='.tmp', delete=False) as file:
+        with NamedTemporaryFile(mode='w', encoding='utf-8', newline='\n', dir=destination.parent, suffix='.tmp', delete=False) as file:
             temporary = Path(file.name)
             file.write(content)
         temporary.replace(destination)

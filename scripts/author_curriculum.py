@@ -97,7 +97,7 @@ def atomic_write(destination, content):
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = None
     try:
-        with NamedTemporaryFile(mode='w', encoding='utf-8', dir=destination.parent, suffix='.tmp', delete=False) as file:
+        with NamedTemporaryFile(mode='w', encoding='utf-8', newline='\n', dir=destination.parent, suffix='.tmp', delete=False) as file:
             temporary = Path(file.name)
             file.write(content)
         temporary.replace(destination)

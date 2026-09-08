@@ -10,6 +10,8 @@ Revisão de publicação: seleção Git e ZIP excluem `data/`, bancos, `.venv`, 
 
 O ZIP versionado contém 172 entradas, manifesto de hashes e o frontend compilado. A identidade SHA-256 final e a revisão Git são publicadas na release do GitHub depois da geração sobre o commit lançado. A release só deve ser criada se o workflow hospedado estiver verde; consulte [Actions](https://github.com/carlos-h-gomes/aiops-academy/actions) e [Releases](https://github.com/carlos-h-gomes/aiops-academy/releases).
 
+A primeira execução hospedada expôs diferença de fim de linha nos bytes gerados em Windows: arquivos versionados em `LF` eram recriados em `CRLF`. Nenhuma regra de negócio falhou. Os três escritores de conteúdo passaram a emitir `LF` explicitamente; os testes de reprodução de manuais/currículo e o `git diff --exit-code` do workflow protegem essa portabilidade.
+
 Limites mantidos: sem leitor de tela dedicado, matriz de outros navegadores/sistemas, instalação em segundo computador, aplicação hospedada, contas, sincronização, PWA ou traduções. As 20 unidades novas são planejamento; os guias não equivalem a laboratórios Docker/VM/cloud completos.
 
 Versão 1.1.0, verificada localmente em 2026-09-06.

@@ -864,5 +864,5 @@ if __name__ == '__main__':
     assert len(LESSONS) == 30 and sum(x['minutes'] for x in LESSONS) == 8520
     out = ROOT / 'backend/content'
     out.mkdir(parents=True, exist_ok=True)
-    (out / 'course.json').write_text(json.dumps(dict(version='1.1.0', lessons=LESSONS, sources=[dict(id=k,title=v[0],url=v[1]) for k,v in SOURCES.items()]),ensure_ascii=False,indent=2),encoding='utf-8')
+    (out / 'course.json').write_bytes(json.dumps(dict(version='1.1.0', lessons=LESSONS, sources=[dict(id=k,title=v[0],url=v[1]) for k,v in SOURCES.items()]),ensure_ascii=False,indent=2).encode('utf-8'))
     print(f'{len(LESSONS)} lessons / {sum(len(x["body"].split()) for x in LESSONS)} original lesson words / 142 hours')
