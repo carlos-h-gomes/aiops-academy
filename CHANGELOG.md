@@ -2,7 +2,12 @@
 
 ## Unreleased
 
-Nenhuma alteração registrada após a primeira beta pública.
+## 1.2.0-beta.2 — 2026-09-23
+
+- As 20 aulas guiadas de Dados, Segurança e Agentes/processos passam a integrar o pacote local: são 50 aulas disponíveis no total.
+- Cada aula guiada oferece um lab de escolhas fechadas, com feedback e reinício somente em memória; não há mudança de progresso, calendário, notas, quizzes, conclusão ou backup.
+- O pacote inclui apenas os 20 corpos publicados das aulas guiadas. Fixtures, validadores, pilotos, dados do aluno, dependências instaladas, memória privada e arquivos sensíveis permanecem excluídos.
+- A jornada de navegador cobre leitura, lab, respostas incompletas, feedback incorreto/correto, reinício, teclado, reflow e preservação do progresso legado.
 
 ## 1.2.0-beta.1 — 2026-09-07
 

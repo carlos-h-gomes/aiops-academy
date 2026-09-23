@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "id": "data-01",
+  "track_id": "data",
+  "order": 1,
+  "title": "Modelagem relacional",
+  "summary": "Representar entidades, chaves e relações de um serviço fictício.",
+  "status": "available",
+  "prerequisites": [
+    "infra-05"
+  ],
+  "competencies": [
+    "Identificar entidades e relações",
+    "Explicar chaves e integridade referencial"
+  ],
+  "duration_minutes": {"essential": 90, "complete": 150},
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "body": "## Objetivo observável\nAo concluir esta unidade, você será capaz de transformar um cenário sintético de operação em um modelo com `servicos`, `incidentes`, `eventos` e `runbooks`; explicar a cardinalidade de cada relação; justificar PK, FK, `NOT NULL`, `CHECK` e unicidade; e demonstrar, por execução repetível, que uma carga válida passa enquanto uma FK inexistente, uma chave de negócio duplicada e um valor fora do domínio são rejeitados.\n\n## Contexto e limites\nUm modelo relacional não começa pelos comandos SQL. Ele começa pelas perguntas que os dados precisam responder e pelos estados que jamais podem existir. Nesta unidade, um serviço pode ter muitos incidentes e muitos runbooks; um incidente pertence a um serviço, pode apontar para um runbook do mesmo serviço e reúne muitos eventos; cada evento pertence a exatamente um incidente.\n\nO cenário usa somente nomes e horários fictícios. Ele não representa um ambiente corporativo, não contém dados pessoais ou credenciais e não se conecta a banco, conta ou serviço externo. O verificador deste recorte executa o subconjunto do DDL em um banco SQLite temporário, em memória, apenas para provar as regras de integridade da fixture. Isso não qualifica uma versão de PostgreSQL nem um laboratório: tipos, mensagens de erro e comportamento operacional serão revistos contra a versão escolhida no recorte técnico posterior.\n\nModelagem também escolhe o que não duplicar. O evento guarda `incidente_id`, mas não repete `servico_id`: o serviço já é alcançado pelo incidente. A única redundância deliberada está na relação opcional entre incidente e runbook: a FK composta `(runbook_id, servico_id)` impede associar ao incidente um runbook de outro serviço.\n\n```text\nservicos  1 ─── N incidentes  1 ─── N eventos\n    │                 │\n    └──── 1 ─── N runbooks\n                      ▲\n                      └── 0..1 runbook do mesmo serviço por incidente\n```\n\n## Exemplo sintético\nO serviço `quotes` tem criticidade alta e o runbook ativo `rb-quotes-01`, código `pool-esgotado`, versão 3. O incidente `inc-100` pertence a `quotes`, tem severidade `sev2` e usa esse runbook. Dois eventos, com chaves de origem diferentes, registram o alerta e uma mudança. O serviço `ledger-demo` tem outro incidente resolvido e seu próprio runbook arquivado.\n\nA identidade técnica de cada linha é uma PK textual estável (`servico_id`, `runbook_id`, `incidente_id` ou `evento_id`). O nome do serviço é uma chave de negócio e também é único. Para eventos, `chave_origem` é única: duas entregas do mesmo sinal podem ter IDs técnicos diferentes, mas não devem virar dois fatos operacionais. A combinação `(servico_id, codigo, versao)` é única em `runbooks`: um serviço pode ter vários procedimentos, mas não duas linhas para a mesma versão do mesmo procedimento.\n\nCampos necessários para interpretar uma linha usam `NOT NULL`. Sem serviço, o incidente perde o dono; sem instante, o evento não entra na linha do tempo; sem severidade ou estado, filtros e decisões passam a depender de adivinhação. A ausência permitida é explícita: `runbook_id` pode ser nulo quando ainda não há procedimento associado.\n\n`CHECK` limita domínios pequenos e estáveis do exercício: criticidade, severidade, estado, tipo de evento e número positivo de versão. A aplicação pode apresentar opções amigáveis, mas a regra no banco protege qualquer caminho de escrita que use o mesmo armazenamento. Quando o domínio exigir atributos próprios, ciclo de vida ou tradução, uma tabela de referência poderá substituir um `CHECK`; aqui o conjunto fechado deixa a regra visível e testável.\n\n## Exercício\n1. Leia `schema.sql` e desenhe as quatro entidades, marcando `1`, `N` e a relação opcional com runbook.\n2. Para cada PK, escreva por que o identificador continua estável mesmo quando título, estado ou criticidade mudam.\n3. Para cada FK, identifique a linha órfã que ela impede. Inclua a FK composta que garante runbook e incidente no mesmo serviço.\n4. Classifique cada coluna como obrigatória ou opcional e justifique os `NOT NULL`; não trate string vazia como substituta automática para ausência.\n5. Localize os `CHECK` e as regras de unicidade de negócio. Preveja, antes de executar, qual restrição rejeita cada arquivo em `invalid/`.\n6. Execute o verificador local indicado no repositório. Registre as contagens da carga válida e as três categorias rejeitadas: `foreign_key`, `unique` e `check`.\n7. Compare sua previsão com o resultado e explique por que validar apenas na interface ou em uma função cliente não protegeria todas as escritas.\n\n## Pistas\n**Pista 1 — identidade e relações:** comece pelas PKs e ligue `eventos.incidente_id` a `incidentes.incidente_id`. Depois siga de incidente para serviço. Se uma linha filha puder apontar para algo inexistente, falta uma FK.\n\n**Pista 2 — regras do domínio:** procure estados que seriam sintaticamente válidos, mas semanticamente impossíveis: `sev0`, dois eventos com a mesma `chave_origem` ou um runbook de outro serviço. Decida entre `CHECK`, `UNIQUE` e FK antes de pensar no texto do erro.\n\n## Solução comentada\n`servicos.servico_id` é PK porque identifica o serviço sem depender de um nome exibido. `nome` recebe `UNIQUE` para impedir dois serviços com a mesma chave de negócio, e `criticidade` recebe `NOT NULL` mais `CHECK` para aceitar somente `baixa`, `media` ou `alta`.\n\n`runbooks.runbook_id` é PK. `servico_id` é `NOT NULL` e FK porque todo runbook pertence a um serviço existente. `codigo` identifica o procedimento dentro do serviço, e `UNIQUE (servico_id, codigo, versao)` impede duas linhas que aleguem a mesma versão desse procedimento sem impedir outros runbooks no mesmo serviço. `CHECK (versao > 0)` recusa versões zero ou negativas. A restrição `UNIQUE (runbook_id, servico_id)` fornece a chave candidata composta usada pela relação do incidente.\n\n`incidentes.incidente_id` é PK. `servico_id`, `aberto_em`, `severidade` e `estado` são obrigatórios. As duas FKs têm papéis diferentes: uma impede serviço inexistente; a composta permite `runbook_id` nulo, mas, quando preenchido, exige que o runbook exista e pertença ao mesmo serviço. Os `CHECK` limitam severidade a `sev1`, `sev2` ou `sev3` e estado a `aberto`, `mitigado` ou `resolvido`.\n\n`eventos.evento_id` é PK e `incidente_id` é FK obrigatória. `chave_origem` é `NOT NULL UNIQUE`: esse é o contrato de deduplicação da fixture. `ocorrido_em` é obrigatório para ordenar a linha do tempo, e `tipo` usa `CHECK` para aceitar `alerta`, `mudanca`, `anotacao` ou `recuperacao`.\n\nA carga válida cria dois serviços, dois runbooks, dois incidentes e quatro eventos. A fixture `fk.sql` tenta inserir um incidente para `servico-ausente`; `duplicate.sql` usa um novo `evento_id`, mas repete `monitor-demo:evt-001`; `check.sql` tenta gravar severidade `sev0`. Cada caso é aplicado a uma cópia nova da base válida, deve lançar erro de integridade e não pode deixar a linha inválida persistida. Colocar as regras no banco evita divergência entre importadores, scripts e futuras interfaces; ainda assim, a aplicação deve validar cedo para oferecer uma mensagem útil.\n\n## Critério de conclusão\nA unidade está concluída quando seu diagrama mostra as quatro entidades e cardinalidades, sua justificativa cobre toda PK/FK/`NOT NULL`/`CHECK`/unicidade do DDL, sua previsão das três falhas coincide com o verificador e a execução informa as contagens `servicos=2`, `runbooks=2`, `incidentes=2`, `eventos=4`, seguida das rejeições `foreign_key`, `unique` e `check`. Isso comprova a integridade da fixture neste verificador local e disponibiliza `data-01` como aula guiada local, sem registrar progresso nem qualificar um PostgreSQL real.\n\n## Variação\nAdicione um terceiro incidente de `quotes` sem `runbook_id`. Ele deve ser aceito, pois a associação é opcional. Em seguida, tente associá-lo ao `rb-ledger-01`: a FK composta deve rejeitar o vínculo por pertencer a `ledger-demo`. Explique por que uma FK apenas em `runbook_id` confirmaria a existência do runbook, mas não a coerência entre os serviços. Não altere o DDL-base ao entregar a variação; execute-a em uma cópia temporária.\n\n## Referências primárias\nFontes oficiais do PostgreSQL consultadas em 2026-09-09: **Constraints**, para PK, FK, unicidade, `NOT NULL` e `CHECK`; **CREATE TABLE**, para a forma das restrições de tabela; e **Data Types**, para revisar tipos quando a versão do laboratório for escolhida. Os links estruturados abaixo fazem parte da autoria. A documentação `current` muda com o tempo, por isso a revisão de compatibilidade PostgreSQL continua pendente e nenhuma versão é presumida neste recorte.",
+  "fixture": {
+    "schema": "backend/content/fixtures/data-01/schema.sql",
+    "valid": "backend/content/fixtures/data-01/valid.sql",
+    "invalid": {
+      "foreign_key": "backend/content/fixtures/data-01/invalid/fk.sql",
+      "unique": "backend/content/fixtures/data-01/invalid/duplicate.sql",
+      "check": "backend/content/fixtures/data-01/invalid/check.sql"
+    }
+  },
+  "sources": [
+    {
+      "title": "PostgreSQL — Constraints",
+      "url": "https://www.postgresql.org/docs/current/ddl-constraints.html",
+      "reviewed_on": "2026-09-09"
+    },
+    {
+      "title": "PostgreSQL — CREATE TABLE",
+      "url": "https://www.postgresql.org/docs/current/sql-createtable.html",
+      "reviewed_on": "2026-09-09"
+    },
+    {
+      "title": "PostgreSQL — Data Types",
+      "url": "https://www.postgresql.org/docs/current/datatype.html",
+      "reviewed_on": "2026-09-09"
+    }
+  ]
+}

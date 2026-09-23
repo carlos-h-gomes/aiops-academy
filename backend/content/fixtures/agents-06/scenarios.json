@@ -1,0 +1,144 @@
+{
+  "schema_version": "1.0",
+  "unit_id": "agents-06",
+  "scenarios": [
+    {
+      "scenario_id": "routine",
+      "label": "Chamado rotineiro com evidência",
+      "input": {
+        "ticket_id": "T-100",
+        "category": "access",
+        "evidence_ids": [
+          "RB-ACCESS-1"
+        ],
+        "impact": "low",
+        "contains_sensitive": false,
+        "requested_action": "draft"
+      },
+      "expected": {
+        "decision": "draft_ready",
+        "reason": "cited_draft_requires_review",
+        "draft": "Verifique o estado sintético da conta e encaminhe recuperação ao responsável.",
+        "citations": [
+          "RB-ACCESS-1"
+        ],
+        "requires_review": true,
+        "sent": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "missing-evidence",
+      "label": "Chamado sem evidência",
+      "input": {
+        "ticket_id": "T-101",
+        "category": "access",
+        "evidence_ids": [],
+        "impact": "low",
+        "contains_sensitive": false,
+        "requested_action": "draft"
+      },
+      "expected": {
+        "decision": "hold",
+        "reason": "evidence_missing",
+        "draft": null,
+        "citations": [],
+        "requires_review": true,
+        "sent": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "wrong-source",
+      "label": "Fonte de outra categoria",
+      "input": {
+        "ticket_id": "T-100",
+        "category": "access",
+        "evidence_ids": [
+          "RB-PERF-1"
+        ],
+        "impact": "low",
+        "contains_sensitive": false,
+        "requested_action": "draft"
+      },
+      "expected": {
+        "decision": "hold",
+        "reason": "evidence_not_applicable",
+        "draft": null,
+        "citations": [],
+        "requires_review": true,
+        "sent": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "high-impact",
+      "label": "Impacto alto exige pessoa responsável",
+      "input": {
+        "ticket_id": "T-100",
+        "category": "access",
+        "evidence_ids": [
+          "RB-ACCESS-1"
+        ],
+        "impact": "high",
+        "contains_sensitive": false,
+        "requested_action": "draft"
+      },
+      "expected": {
+        "decision": "hold",
+        "reason": "human_review_required",
+        "draft": null,
+        "citations": [],
+        "requires_review": true,
+        "sent": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "sensitive",
+      "label": "Sinalizador de conteúdo sensível",
+      "input": {
+        "ticket_id": "T-100",
+        "category": "access",
+        "evidence_ids": [
+          "RB-ACCESS-1"
+        ],
+        "impact": "low",
+        "contains_sensitive": true,
+        "requested_action": "draft"
+      },
+      "expected": {
+        "decision": "hold",
+        "reason": "human_review_required",
+        "draft": null,
+        "citations": [],
+        "requires_review": true,
+        "sent": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "send-blocked",
+      "label": "Envio fora da capacidade",
+      "input": {
+        "ticket_id": "T-100",
+        "category": "access",
+        "evidence_ids": [
+          "RB-ACCESS-1"
+        ],
+        "impact": "low",
+        "contains_sensitive": false,
+        "requested_action": "send"
+      },
+      "expected": {
+        "decision": "block",
+        "reason": "external_action_forbidden",
+        "draft": null,
+        "citations": [],
+        "requires_review": true,
+        "sent": false,
+        "external_effects": 0
+      }
+    }
+  ]
+}

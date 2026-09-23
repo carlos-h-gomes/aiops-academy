@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiops-academy.invalid/schemas/agents-01-04-control-result-v1.json",
+  "title": "Resultado do controlador didático local de agents-01 a agents-04",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "decision",
+    "reason",
+    "state",
+    "policy_id",
+    "fixture_version",
+    "idempotent",
+    "steps_used",
+    "transitions",
+    "result",
+    "counters"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "request_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+    "decision": {"enum": ["ready", "hold", "block"]},
+    "reason": {"$ref": "#/$defs/identifier"},
+    "state": {"enum": ["held", "blocked", "completed"]},
+    "policy_id": {"$ref": "#/$defs/identifier"},
+    "fixture_version": {
+      "oneOf": [
+        {"$ref": "#/$defs/version"},
+        {"type": "null"}
+      ]
+    },
+    "idempotent": {"type": "boolean"},
+    "steps_used": {"type": "integer", "minimum": 0, "maximum": 4},
+    "transitions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "reason"],
+        "properties": {
+          "from": {"$ref": "#/$defs/identifier"},
+          "to": {"$ref": "#/$defs/identifier"},
+          "reason": {"$ref": "#/$defs/identifier"}
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "response_code", "artifact_ref"],
+      "properties": {
+        "classification": {"enum": ["rule", "limited_agent", "refusal", null]},
+        "response_code": {
+          "oneOf": [{"$ref": "#/$defs/identifier"}, {"type": "null"}]
+        },
+        "artifact_ref": {
+          "oneOf": [{"$ref": "#/$defs/identifier"}, {"type": "null"}]
+        }
+      }
+    },
+    "counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_invocations",
+        "simulated_effects",
+        "network_calls",
+        "child_processes",
+        "external_writes"
+      ],
+      "properties": {
+        "tool_invocations": {"type": "integer", "minimum": 0, "maximum": 1},
+        "simulated_effects": {"type": "integer", "minimum": 0, "maximum": 1},
+        "network_calls": {"const": 0},
+        "child_processes": {"const": 0},
+        "external_writes": {"const": 0}
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{1,63}$"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"}
+  }
+}

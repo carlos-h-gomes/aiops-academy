@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "ticket_id": "BUG-1042",
+  "title": "Total com desconto usa arredondamento incorreto",
+  "observed": "subtotal 199 e desconto 15 retornam 170 centavos",
+  "expected": "subtotal 199 e desconto 15 retornam 169 centavos",
+  "rounding_rule": "half-up sobre o total final em centavos",
+  "scope": "repository/src/totals.py",
+  "contains_secret": false
+}

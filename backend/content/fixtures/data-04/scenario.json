@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "unit_id": "data-04",
+  "origin": "synthetic",
+  "engine": "SQLite :memory:",
+  "description": "Duas tabelas descartáveis: quotes existe; inc-100 pertence a quotes e está aberto. Uma transação muda o incidente para resolvido e tenta inserir inc-200 ligado a serviço inexistente. A FK rejeita a segunda instrução; o controlador faz rollback explícito. Depois a API backup do SQLite copia a origem para outra conexão vazia em memória.",
+  "services": [["quotes"]],
+  "incidents": [["inc-100", "quotes", "aberto"]],
+  "expected": {
+    "after_rollback": "aberto",
+    "backup_destination": "nova_conexao",
+    "source_unchanged": true,
+    "rows_and_checksum_match": true,
+    "foreign_keys_valid": true,
+    "postgresql_verified": false
+  }
+}

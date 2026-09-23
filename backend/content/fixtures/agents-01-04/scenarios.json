@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "scenario_id": "classify-rule",
+      "request": {
+        "schema_version": "1.0",
+        "request_id": "classify-rule",
+        "scenario_version": "1.0",
+        "subject": "learner-agent",
+        "action": "classify_process",
+        "target": "process-intake",
+        "tool": "fixture_classifier",
+        "fixture_id": "process-routine",
+        "approval_id": null,
+        "idempotency_key": "idem-rule",
+        "step_budget": 2,
+        "artifact_version": "1.0"
+      },
+      "expected": {"decision": "ready", "state": "completed", "reason": "policy_satisfied", "classification": "rule"}
+    },
+    {
+      "scenario_id": "classify-limited-agent",
+      "request": {
+        "schema_version": "1.0",
+        "request_id": "classify-limited-agent",
+        "scenario_version": "1.0",
+        "subject": "learner-agent",
+        "action": "classify_process",
+        "target": "process-intake",
+        "tool": "fixture_classifier",
+        "fixture_id": "process-ambiguous",
+        "approval_id": null,
+        "idempotency_key": "idem-agent",
+        "step_budget": 2,
+        "artifact_version": "1.0"
+      },
+      "expected": {"decision": "ready", "state": "completed", "reason": "policy_satisfied", "classification": "limited_agent"}
+    },
+    {
+      "scenario_id": "classify-high-impact-refusal",
+      "request": {
+        "schema_version": "1.0",
+        "request_id": "classify-high-impact-refusal",
+        "scenario_version": "1.0",
+        "subject": "learner-agent",
+        "action": "classify_process",
+        "target": "process-intake",
+        "tool": "fixture_classifier",
+        "fixture_id": "process-high-impact",
+        "approval_id": null,
+        "idempotency_key": "idem-high-impact",
+        "step_budget": 2,
+        "artifact_version": "1.0"
+      },
+      "expected": {"decision": "block", "state": "blocked", "reason": "process_refused", "classification": "refusal"}
+    },
+    {
+      "scenario_id": "classify-incomplete-refusal",
+      "request": {
+        "schema_version": "1.0",
+        "request_id": "classify-incomplete-refusal",
+        "scenario_version": "1.0",
+        "subject": "learner-agent",
+        "action": "classify_process",
+        "target": "process-intake",
+        "tool": "fixture_classifier",
+        "fixture_id": "process-incomplete",
+        "approval_id": null,
+        "idempotency_key": "idem-incomplete",
+        "step_budget": 2,
+        "artifact_version": "1.0"
+      },
+      "expected": {"decision": "block", "state": "blocked", "reason": "process_refused", "classification": "refusal"}
+    },
+    {
+      "scenario_id": "approval-missing-hold",
+      "request": {
+        "schema_version": "1.0",
+        "request_id": "approval-missing-hold",
+        "scenario_version": "1.0",
+        "subject": "learner-agent",
+        "action": "inspect_layers",
+        "target": "agent-layers",
+        "tool": "fixture_reader",
+        "fixture_id": "layers-v1",
+        "approval_id": null,
+        "idempotency_key": "idem-layer-resume",
+        "step_budget": 1,
+        "artifact_version": "1.0"
+      },
+      "expected": {"decision": "hold", "state": "held", "reason": "approval_missing", "classification": null}
+    },
+    {
+      "scenario_id": "approval-expired-block",
+      "request": {
+        "schema_version": "1.0",
+        "request_id": "approval-expired-block",
+        "scenario_version": "1.0",
+        "subject": "learner-agent",
+        "action": "inspect_layers",
+        "target": "agent-layers",
+        "tool": "fixture_reader",
+        "fixture_id": "layers-v1",
+        "approval_id": "approval-layer-expired",
+        "idempotency_key": "idem-layer-expired",
+        "step_budget": 1,
+        "artifact_version": "1.0"
+      },
+      "expected": {"decision": "block", "state": "blocked", "reason": "approval_expired", "classification": null}
+    },
+    {
+      "scenario_id": "approval-denied-block",
+      "request": {
+        "schema_version": "1.0",
+        "request_id": "approval-denied-block",
+        "scenario_version": "1.0",
+        "subject": "learner-agent",
+        "action": "inspect_layers",
+        "target": "agent-layers",
+        "tool": "fixture_reader",
+        "fixture_id": "layers-v1",
+        "approval_id": "approval-layer-denied",
+        "idempotency_key": "idem-layer-denied",
+        "step_budget": 1,
+        "artifact_version": "1.0"
+      },
+      "expected": {"decision": "block", "state": "blocked", "reason": "approval_denied", "classification": null}
+    }
+  ]
+}

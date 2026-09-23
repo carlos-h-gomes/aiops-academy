@@ -1,0 +1,8 @@
+{
+  "after_rollback": null,
+  "backup_destination": null,
+  "source_unchanged": null,
+  "rows_and_checksum_match": null,
+  "foreign_keys_valid": null,
+  "postgresql_verified": null
+}

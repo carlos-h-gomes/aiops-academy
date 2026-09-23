@@ -1,13 +1,13 @@
 # AIOps Academy — User Manual
 
-Status: public local-download beta
-Version: 1.2.0-beta.1
-Reviewed: 2026-09-07
+Status: local release candidate pending public upload
+Version: 1.2.0-beta.2
+Reviewed: 2026-09-23
 Owner: local learner / root implementation
 
 ## Product purpose and prerequisites
 
-Curso local para iniciante com 30 aulas e ritmo ajustável, foco na operação de infraestrutura com IA. Python 3.12+ e Node LTS22.12+/24 para preparar; app já preparado usa iniciar.cmd. Sem conta de IA ou cloud para bancadas.
+Curso local para iniciante com 50 aulas e ritmo ajustável, foco na operação de infraestrutura com IA. Python 3.12+ e Node LTS22.12+/24 para preparar; app já preparado usa iniciar.cmd. Sem conta de IA ou cloud para bancadas.
 
 ## Access and first use
 
@@ -15,7 +15,7 @@ Abra iniciar.cmd. O navegador abre http://127.0.0.1:8765. Se solicitado, rode pr
 
 ## Navigation
 
-Visão geral aponta a próxima missão. Trilha lista e busca 30 aulas. Laboratórios abre 11 bancadas. Simulados oferece diagnóstico, quatro checkpoints e final. Revisão usa recuperação espaçada. Portfólio reúne notas. Biblioteca inclui 25 conteúdos e kit. Preferências cuida de agenda e backup.
+Visão geral aponta a próxima missão. Trilhas lista e busca 50 aulas. Laboratórios abre 11 bancadas legadas. Simulados oferece diagnóstico, quatro checkpoints e final. Revisão usa recuperação espaçada. Portfólio reúne notas. Biblioteca inclui 25 conteúdos e kit. Preferências cuida de agenda e backup.
 
 ## Features and expected outcomes
 
@@ -39,7 +39,7 @@ Carregamento tem status. Lista vazia orienta próxima ação. Servidor indispon�
 
 ## Accessibility and supported interaction methods
 
-Navegação por teclado, link pular conteúdo, foco visível, labels, mensagens de status e layout responsivo. Use Tab/Shift+Tab, Enter e Space. Editores e tabelas têm rolagem horizontal própria. Respeita reduced motion. A evidência de QA específica consta em docs/VALIDATION.md; não se afirma certificação WCAG por um scanner.
+Navegação por teclado, link pular conteúdo, foco visível, labels, mensagens de status e layout responsivo. Use Tab/Shift+Tab, Enter e Space. Editores e tabelas têm rolagem horizontal própria. Respeita reduced motion. Os limites públicos aplicáveis constam neste manual e em [Segurança](../SECURITY.md); não se afirma certificação WCAG por um scanner.
 
 ## Troubleshooting and frequently asked questions
 
@@ -51,7 +51,7 @@ Registre mensagem segura, página e sequência para reproduzir; nunca envie seu 
 
 ## Version and release notes
 
-1.2.0-beta.1: 30 aulas disponíveis, 20 unidades planejadas, 11 bancadas, seis configurações de simulado, 25 itens de biblioteca, revisão, portfólio, backup e kit. É uma beta local independente; não representa empresa nem certificação. Partes externas ou não verificadas são listadas no relatório de validação.
+1.2.0-beta.2: 50 aulas disponíveis — 30 do calendário de Infraestrutura e AIOps, seis de Dados, seis de Segurança e oito de Agentes/processos —, 11 bancadas legadas, seis configurações de simulado, 25 itens de biblioteca, revisão, portfólio, backup e kit. As 20 aulas guiadas usam práticas fechadas e não registram progresso. É uma beta local independente; não representa empresa nem certificação. Partes externas ou não verificadas permanecem identificadas nas limitações deste manual e em [Segurança](../SECURITY.md).
 ## Biblioteca ampliada — beta 1.2.0
 
 Abra Biblioteca e escolha Todos, Manuais essenciais, Aprofundamentos AIOps ou Ferramentas e processos. A busca aceita nomes e conceitos sem exigir acentos; Limpar filtros recupera o catálogo. Selecione um título para ler. Fontes externas exigem internet. Em erro de carregamento, use Tentar novamente.
@@ -86,7 +86,7 @@ Backups v1 antigos continuam sendo aceitos. Os novos ritmos precisam desta vers�
 
 ## Trilhas e unidades — beta 1.2.0
 
-Abra **Trilhas de estudo** no menu. Escolha entre Infraestrutura e AIOps, Dados/SQL/RAG, Segurança operacional e Agentes/processos. A página inicial separa aulas disponíveis de unidades em preparação. Atualmente existem 30 aulas disponíveis de infraestrutura e 20 unidades previstas nas outras trilhas (6, 6 e 8).
+Abra **Trilhas de estudo** no menu. Escolha entre Infraestrutura e AIOps, Dados/SQL/RAG, Segurança operacional e Agentes/processos. Existem 30 aulas do calendário de infraestrutura, seis aulas guiadas de Dados, seis de Segurança e oito de Agentes/processos: 50 no total. As 20 aulas guiadas são acessadas pelo ID da unidade e não registram progresso.
 
 Em cada percurso, **Guias para estudar agora** abre o conteúdo correspondente na Biblioteca. Guias são complementares e não contam como conclusão das novas aulas. Links diretos para guias e trilhas podem ser reabertos no mesmo aplicativo.
 
@@ -94,6 +94,10 @@ Use **Buscar unidades** para encontrar temas e competências, inclusive sem acen
 
 Expanda **Pré-requisitos e detalhes** para ver bases recomendadas, limites da simulação, referências e idiomas. As bases são sugestões: não bloqueiam as aulas disponíveis. A data de revisão do catálogo não significa que os produtos de terceiros foram novamente executados. As versões reais de ferramentas ainda não verificadas são identificadas; inglês e espanhol permanecem em preparação.
 
-Unidades em preparação não têm aula, prática ou duração pronta e não podem ser concluídas. O calendário continua sendo o de Infraestrutura e AIOps; escolher outra página não muda datas, notas, revisões ou resultados. **Ver calendário das 30 aulas** abre a trilha anterior.
+As aulas guiadas abrem em uma página própria e usam somente conteúdo e exemplos sintéticos locais. As seis aulas de Dados, seis de Segurança e oito de Agentes/processos têm o botão **Abrir lab guiado**: escolha respostas fechadas, confira o feedback e use **Reiniciar escolhas** para limpar a tela. O lab não executa texto, SQL, arquivos, comandos, URLs, rede ou ferramentas externas, e não registra conclusão, nota, quiz, calendário ou backup. O calendário continua sendo o de Infraestrutura e AIOps; escolher outra página não muda datas, notas, revisões ou resultados. **Ver calendário das 30 aulas** abre a trilha anterior.
 
 Se o catálogo falhar, use **Tentar novamente** ou **Abrir trilha de infraestrutura**. Um link desconhecido oferece retorno à lista. Nenhum desses caminhos altera o progresso ou restaura um backup.
+
+## Conteúdo em manutenção
+
+O pacote beta.2 inclui as 20 aulas guiadas e seus conteúdos de leitura. Fixtures de autoria, validadores e laboratórios piloto permanecem fora do download; não tente instalar Docker ou alterar isolamento para acessá-los. As aulas guiadas continuam separadas do calendário e do progresso.

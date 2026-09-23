@@ -1,21 +1,39 @@
 """v1 HTTP adapters; all grading and persistence live in services."""
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import PlainTextResponse,FileResponse
 from app.schemas.requests import Note,Quiz,Settings,LabRun,Rating,Restore
+from app.schemas.unit_labs import UnitLab, UnitLabRun, UnitLabResult
 from app.services import learning,laboratories,files
 from app.services import curriculum
-from app.schemas.curriculum import Curriculum
+from app.services import unit_lessons
+from app.services import unit_labs
+from app.schemas.curriculum import Curriculum, UnitLesson
 
 router=APIRouter(prefix='/api/v1')
 
 @router.get('/health')
-def health():return dict(status='ok',product='aiops-academy',version='1.2.0-beta.1')
+def health():return dict(status='ok',product='aiops-academy',version='1.2.0-beta.2')
 
 @router.get('/course')
 def course():return learning.catalog()
 
 @router.get('/curriculum', response_model=Curriculum)
 def learning_units():return curriculum.catalog()
+
+@router.get('/units/{unit_id}', response_model=UnitLesson)
+def unit_lesson(unit_id: str):
+    try:return unit_lessons.detail(unit_id)
+    except RuntimeError as error:raise HTTPException(status_code=404, detail='Aula não encontrada.') from error
+
+@router.get('/units/{unit_id}/lab', response_model=UnitLab)
+def unit_lab(unit_id: str):
+    try:return unit_labs.detail(unit_id)
+    except (RuntimeError, ValueError) as error:raise HTTPException(status_code=404, detail='Lab não encontrado.') from error
+
+@router.post('/units/{unit_id}/lab/run', response_model=UnitLabResult)
+def unit_lab_run(unit_id: str, value: UnitLabRun):
+    try:return unit_labs.run(unit_id, value.answers)
+    except (RuntimeError, ValueError) as error:raise HTTPException(status_code=404, detail='Lab não encontrado.') from error
 
 @router.get('/progress')
 def progress():return learning.progress()

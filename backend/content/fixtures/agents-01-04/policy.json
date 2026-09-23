@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "agents-01-04-controller-policy-v1",
+  "evaluation_time": "2026-09-11T12:00:00Z",
+  "request_schema": "control-request.schema.json",
+  "result_schema": "control-result.schema.json",
+  "allowed_actions": {
+    "classify_process": {
+      "tool": "fixture_classifier",
+      "target": "process-intake",
+      "step_cost": 2,
+      "approval_required": false
+    },
+    "inspect_layers": {
+      "tool": "fixture_reader",
+      "target": "agent-layers",
+      "step_cost": 1,
+      "approval_required": true
+    }
+  },
+  "subjects": {
+    "learner-agent": {
+      "allowed_actions": ["classify_process", "inspect_layers"]
+    }
+  },
+  "targets": {
+    "process-intake": {
+      "allowed_fixtures": [
+        "process-routine",
+        "process-ambiguous",
+        "process-high-impact",
+        "process-incomplete"
+      ]
+    },
+    "agent-layers": {
+      "allowed_fixtures": ["layers-v1"]
+    }
+  },
+  "approvals": [
+    {
+      "approval_id": "approval-layer-valid",
+      "issuer": "human-reviewer",
+      "status": "approved",
+      "subject": "learner-agent",
+      "action": "inspect_layers",
+      "target": "agent-layers",
+      "tool": "fixture_reader",
+      "fixture_id": "layers-v1",
+      "artifact_version": "1.0",
+      "idempotency_key": "idem-layer-resume",
+      "expires_at": "2026-09-11T13:00:00Z"
+    },
+    {
+      "approval_id": "approval-layer-expired",
+      "issuer": "human-reviewer",
+      "status": "approved",
+      "subject": "learner-agent",
+      "action": "inspect_layers",
+      "target": "agent-layers",
+      "tool": "fixture_reader",
+      "fixture_id": "layers-v1",
+      "artifact_version": "1.0",
+      "idempotency_key": "idem-layer-expired",
+      "expires_at": "2026-09-11T11:59:59Z"
+    },
+    {
+      "approval_id": "approval-layer-denied",
+      "issuer": "human-reviewer",
+      "status": "denied",
+      "subject": "learner-agent",
+      "action": "inspect_layers",
+      "target": "agent-layers",
+      "tool": "fixture_reader",
+      "fixture_id": "layers-v1",
+      "artifact_version": "1.0",
+      "idempotency_key": "idem-layer-denied",
+      "expires_at": "2026-09-11T13:00:00Z"
+    }
+  ],
+  "budgets": {"max_steps": 4},
+  "state_transitions": {
+    "received": ["validating"],
+    "validating": ["blocked", "held", "ready"],
+    "held": ["validating"],
+    "ready": ["blocked", "completed"],
+    "blocked": ["blocked"],
+    "completed": ["completed"]
+  },
+  "capabilities": {
+    "fixture_only": true,
+    "shell": false,
+    "url_input": false,
+    "network": false,
+    "child_process": false,
+    "external_write": false,
+    "external_approval": false
+  }
+}

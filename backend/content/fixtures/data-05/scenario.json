@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "unit_id": "data-05",
+  "origin": "synthetic",
+  "description": "Vetores de duas dimensões escritos à mão, sem modelo ou significado semântico aprendido. Distância euclidiana menor vem primeiro. A audiência do exercício é student; somente documentos atuais dessa audiência podem ser candidatos. Empates usam ID em ordem crescente.",
+  "audience": "student",
+  "query_vector": [1, 0],
+  "documents": [
+    {"id": "rb-admin", "audience": "instructor", "current": true, "vector": [1, 0], "text": "Procedimento restrito fictício."},
+    {"id": "rb-a", "audience": "student", "current": true, "vector": [0.9, 0.1], "text": "Consultar a ocupação do pool antes de mudar limites."},
+    {"id": "rb-b", "audience": "student", "current": true, "vector": [0.9, 0.1], "text": "Comparar latência e fila no mesmo intervalo."},
+    {"id": "rb-old", "audience": "student", "current": false, "vector": [1, 0], "text": "Procedimento descontinuado."},
+    {"id": "rb-c", "audience": "student", "current": true, "vector": [0, 1], "text": "Revisar o resultado de um teste de restauração."}
+  ],
+  "expected": {
+    "ranking": ["rb-a", "rb-b", "rb-c"],
+    "restricted_returned": false,
+    "stale_returned": false,
+    "filter_stage": "antes_do_ranking",
+    "similarity_proves_truth": false,
+    "pgvector_verified": false
+  }
+}

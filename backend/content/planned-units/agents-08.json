@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "id": "agents-08",
+  "track_id": "agents",
+  "order": 8,
+  "title": "Financeiro: conciliação sintética",
+  "summary": "Explicar divergências de arquivos fictícios com cálculos feitos em código.",
+  "status": "available",
+  "prerequisites": [
+    "agents-07"
+  ],
+  "competencies": [
+    "Conciliar valores e identificar exceções",
+    "Preservar revisão humana sem pagamentos"
+  ],
+  "duration_minutes": {"essential": 75, "complete": 120},
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "body": "## Objetivo observável\nConcilie dois conjuntos fictícios por identificador, usando centavos inteiros. Distinga correspondência, diferença de valor, lançamento ausente e duplicata, sem compensar exceções entre si ou produzir pagamento.\n\n## Contexto e limites\nConciliação compara registros; não decide liquidação. Um total igual pode esconder uma duplicata e uma ausência. Por isso, a chave de conciliação é transaction_id e cada origem deve ter no máximo um registro por chave. Valores são inteiros não negativos em centavos, com moeda BRL fixa e teto didático de 1.000.000.000 centavos. Booleanos, frações, moedas mistas e campos extras falham antes do cálculo.\n\nledger representa o livro fictício e statement o extrato fictício, cada qual com até vinte linhas. O algoritmo reúne as chaves, identifica duplicatas primeiro e só subtrai valores quando há exatamente uma linha de cada lado. delta_cents é statement menos ledger. Nenhuma compensação automática é feita. A única ação é reconcile; não existem conta bancária, arquivo importado, credencial, transferência ou recomendação financeira.\n\n## Exemplo sintético\nR-100 tem 1250 centavos dos dois lados e corresponde. R-101 tem 2000 no livro e 1900 no extrato: delta=-100, divergência de cem centavos. R-102 existe só no livro: missing_statement. Somar tudo antes de comparar perderia a localização da exceção.\n\n## Exercício\n1. Leia o cenário matched e converta mentalmente 1250 centavos em 12,50 apenas para apresentação.\n2. Execute matched e confirme uma correspondência, zero exceções e nenhuma ação financeira.\n3. Execute amount-difference e confira o sinal de delta_cents usando extrato menos livro.\n4. Execute missing-record e identifique qual origem está ausente.\n5. Execute duplicate e confirme que a chave ambígua não foi somada, descartada nem conciliada.\n6. Execute payment-blocked e observe a recusa da ação externa.\n7. Compare as listas de evidências, não apenas a contagem final, e repita o exercício com a mesma fixture.\n\n## Pistas\n**Pista 1 — centavos:** use inteiros do início ao fim; formatação monetária não participa do cálculo.\n\n**Pista 2 — ambiguidade primeiro:** duas linhas com a mesma chave impedem uma correspondência única, mesmo se os valores coincidirem.\n\n## Solução comentada\nmatched retorna balanced com a chave R-100 em matched_ids. amount-difference retorna review e uma exceção amount_mismatch com delta_cents=-100. missing-record retorna missing_statement para R-102. duplicate retorna duplicate_id e a contagem de ocorrências em cada origem; o algoritmo não escolhe arbitrariamente uma linha. payment-blocked retorna external_action_forbidden sem fazer conciliação.\n\nO resultado mantém financial_action_allowed=false em todos os caminhos. Uma coleção vazia retorna hold/no_records, não uma falsa afirmação de equilíbrio. A ordem das exceções é estável por chave, e repetir a entrada não cria estado nem altera registros. Resultado balanced significa apenas correspondência da amostra, não quitação, fraude ausente ou demonstração contábil validada.\n\n## Critério de conclusão\nReproduza correspondência e três tipos de exceção, explique o sinal da diferença e mostre por que duplicatas não podem ser resolvidas por soma. Confirme recusa de pagamento, ausência de dados reais e cálculo sem ponto flutuante. A pessoa responsável pela revisão continua decidindo fora do laboratório.\n\n## Variação\nEm cópia em memória, crie uma chave presente apenas no extrato e antecipe missing_ledger. Em outra cópia, troque cents por true ou 12.5: ambas devem ser recusadas por tipo. Não conecte banco, CSV pessoal ou serviço financeiro.\n\n## Referências primárias\nAs fontes conceituais tratam gestão de risco e contratos estruturados. As regras de centavos, limite, chave e exceções são explicitamente didáticas, não política contábil ou aconselhamento financeiro. Metadados de fontes reaproveitados da revisão editorial de 2026-09-11.",
+  "fixture": {
+    "scenarios": "backend/content/fixtures/agents-08/scenarios.json",
+    "evaluator": "scripts/validate_agents_06_08.py"
+  },
+  "sources": [
+    {
+      "title": "NIST AI RMF 1.0 — governança, contexto e medição",
+      "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10",
+      "reviewed_on": "2026-09-11"
+    },
+    {
+      "title": "JSON Schema Draft 2020-12 — contratos fechados",
+      "url": "https://json-schema.org/draft/2020-12",
+      "reviewed_on": "2026-09-11"
+    }
+  ]
+}

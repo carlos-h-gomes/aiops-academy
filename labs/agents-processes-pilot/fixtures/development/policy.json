@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "agents-05-development-policy-v1",
+  "scenario_id": "development-v1",
+  "artifact_version": "1.0",
+  "allowlisted_reads": [
+    "ticket.json",
+    "proposal.json",
+    "repository/src/totals.py",
+    "repository/tests/test_totals.py"
+  ],
+  "ephemeral_writes": [
+    "proposal.diff",
+    "candidate/repository/src/totals.py",
+    "acceptance.json"
+  ],
+  "approval": {
+    "required": true,
+    "issuer": "human-reviewer",
+    "action": "accept-diff",
+    "target": "ephemeral-diff",
+    "binding_fields": [
+      "scenario_id",
+      "action",
+      "target",
+      "artifact_version",
+      "diff_sha256"
+    ]
+  },
+  "capabilities": {
+    "fixture_read": true,
+    "ephemeral_diff_write": true,
+    "fixture_write": false,
+    "git": false,
+    "shell": false,
+    "child_process": false,
+    "network": false,
+    "secret_input": false,
+    "external_write": false
+  }
+}

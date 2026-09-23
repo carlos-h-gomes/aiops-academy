@@ -1,0 +1,10 @@
+{
+  "before_estimate_factor": null,
+  "repeated_rows_total": null,
+  "index_columns": [],
+  "cost_is_milliseconds": null,
+  "runtime_verified": null,
+  "speedup_proven": null,
+  "write_overhead": null,
+  "buffers_available": null
+}

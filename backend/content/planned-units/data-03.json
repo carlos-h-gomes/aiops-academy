@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "data-03",
+  "track_id": "data",
+  "order": 3,
+  "title": "PostgreSQL: índices e EXPLAIN",
+  "summary": "Ler um plano de execução e justificar uma melhoria de consulta.",
+  "status": "available",
+  "prerequisites": [
+    "data-02"
+  ],
+  "competencies": [
+    "Interpretar o plano de uma consulta",
+    "Comparar leitura, escrita e custo de índices"
+  ],
+  "duration_minutes": {"essential": 75, "complete": 120},
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "body": "## Objetivo observável\nLer um plano simplificado, calcular a diferença entre estimativa e linhas retornadas e justificar um índice para igualdade em incidente_id seguida de intervalo em ocorrido_em. Entregar oito respostas e uma explicação dos custos de manter o índice. Pré-requisito: data-02.\n\n## Contexto e limites\nEsta autoria continua planned. scenario.json é uma simulação construída manualmente, sem captura de PostgreSQL, tempos medidos ou buffers observados. Os nomes dos campos são um contrato didático próprio, não o formato JSON nativo de EXPLAIN. O corretor roda sem banco. postgresql.sql é um roteiro ainda não executado, reservado ao futuro ambiente descartável qualificado.\nEXPLAIN descreve o plano; ANALYZE também executa a consulta. Custos do planejador não são milissegundos. Compare estimativas e linhas reais no mesmo nó; com loops, as linhas reais apresentadas são médias por execução. Tempos e buffers de pais podem incluir filhos: não os some indiscriminadamente. BUFFERS descreve acessos a blocos, não a quantidade de registros.\nUm índice B-tree com igualdade na coluna inicial e faixa na seguinte é um candidato para este predicado. Isso não obriga o planejador a escolhê-lo; a distribuição dos dados e as estatísticas influenciam a decisão. Um Seq Scan pode ser adequado quando muitas linhas serão lidas. Índices também ocupam espaço e acrescentam trabalho de manutenção às escritas.\n\n## Exemplo sintético\nNo cenário, before usa Seq Scan: estimativa 100, dez linhas por execução e um loop; 19.990 linhas são removidas pelo filtro. after usa Index Scan: estimativa dez, dez linhas por execução e um loop. O nó separado repeated_node retorna três linhas por execução durante quatro loops. Esses números foram escolhidos para fazer contas à mão; não correspondem a uma execução ou promessa de melhoria.\nA consulta futura busca incidente_id=42 e o intervalo de segundos [10000,11000) em uma tabela de 20.000 eventos sintéticos. Pela fórmula de geração, a resposta deve conter os dez IDs 10042, 10142, ..., 10942. Conferir os mesmos IDs antes/depois é necessário; igualdade de contagem sozinha não comprova igualdade do resultado.\n\n## Exercício\n1. Abra backend/content/fixtures/data-03/scenario.json e identifique a origem. Registre o que não foi medido.\n2. Calcule before_estimate_factor como estimated_rows dividido por actual_rows_per_loop no nó before. Calcule repeated_rows_total multiplicando as linhas médias pelos loops de repeated_node.\n3. Escolha index_columns na ordem adequada ao predicado deste exercício: igualdade em incidente_id e faixa em ocorrido_em. Justifique a ordem sem afirmar que outras ordens nunca podem ser usadas.\n4. Responda com true ou false: cost_is_milliseconds, runtime_verified, speedup_proven, write_overhead e buffers_available. Use false quando a conclusão exigiria evidência ausente.\n5. Copie answer-template.json para submission.json na mesma pasta e substitua null e a lista vazia por suas respostas. O arquivo deve conter apenas os oito campos do modelo e menos de 64 KiB.\n6. Na raiz do app, com o ambiente Python já preparado, execute python scripts/bounded.py 30 .venv/Scripts/python.exe scripts/validate_data_03.py --submission. Saída 1 indica respostas a revisar, listadas em review_fields; saída 2 indica arquivo ausente ou estrutura inválida; saída 0 significa oito respostas corretas.\n7. Revise postgresql.sql sem executá-lo neste exercício. Localize a tabela temporária, a carga limitada, os prazos, ANALYZE, os dois EXPLAIN e ROLLBACK. Descreva quais evidências faltam para qualificar o laboratório.\n8. Entregue as respostas e um parágrafo explicando o índice escolhido, seu custo de escrita e por que não há um fator de aceleração comprovado.\n\n## Pistas\n**Pista 1 —** Compare 100 com dez no mesmo nó. O nó repetido tem um número de loops diferente; não confunda os dois cálculos.\n**Pista 2 —** Um nome de acesso diferente não é uma medição de tempo. Procure métricas efetivamente fornecidas antes de afirmar ganho ou leitura de blocos.\n\n## Solução comentada\nbefore_estimate_factor=10; repeated_rows_total=12; index_columns=[\"incidente_id\",\"ocorrido_em\"]. cost_is_milliseconds=false; runtime_verified=false; speedup_proven=false; write_overhead=true; buffers_available=false.\nO fator dez compara estimativa e resultado didático, não rapidez. O total do nó repetido é 3×4=12. Quando o denominador é zero ou o nó não executou, o avaliador devolve razão indefinida, não infinito ou zero inventado. O corretor aceita somente a resposta de índice definida para este exercício; uma alternativa em situação real exige avaliação própria.\nO roteiro SQL usa uma transação e tabela temporária; insere apenas uma sequência sintética fixa, mede somente SELECT e termina em rollback. Se futuramente houver erro, o controlador precisa interromper e fechar a conexão, sem continuar após falha. A existência desse arquivo não prova sua execução, os timeouts ou a limpeza em runtime.\n\n## Critério de conclusão\nOito respostas corretas, justificativa escrita e distinção clara entre simulação e medição. O comando sem --submission valida a autoria e a solução de referência, não suas respostas. Os testes focados verificam o corretor com python scripts/bounded.py 30 .venv/Scripts/python.exe -m unittest backend.tests.test_data_03 -v. A unidade permanece em preparação até integração e revisão de prática real.\n\n## Variação\nImagine um filtro que seleciona quase todos os 20.000 eventos. Explique por que exigir Index Scan seria uma regra incorreta. Para a qualificação futura, capture o plano real em JSON, versão do servidor, estatísticas, IDs retornados, tempos e buffers antes/depois em condições comparáveis. Registre repetição e efeitos de cache; não transforme uma execução isolada em benchmark geral. O roteiro atual não mede custo de escrita ou espaço do índice: essas comparações ainda precisam de um experimento limitado e revisado.\n\n## Referências primárias\nDocumentação PostgreSQL 18 consultada em 2026-09-16: Using EXPLAIN, Multicolumn Indexes e Introduction to Indexes. A versão da documentação é uma referência editorial; não representa runtime instalado ou qualificado.",
+  "fixture": {
+    "scenario": "backend/content/fixtures/data-03/scenario.json",
+    "answers": "backend/content/fixtures/data-03/answer-template.json",
+    "sql": "backend/content/fixtures/data-03/postgresql.sql",
+    "validator": "scripts/validate_data_03.py",
+    "tests": "backend/tests/test_data_03.py"
+  },
+  "sources": [
+    {
+      "title": "PostgreSQL 18 — Using EXPLAIN",
+      "url": "https://www.postgresql.org/docs/18/using-explain.html",
+      "reviewed_on": "2026-09-16"
+    },
+    {
+      "title": "PostgreSQL 18 — Multicolumn Indexes",
+      "url": "https://www.postgresql.org/docs/18/indexes-multicolumn.html",
+      "reviewed_on": "2026-09-16"
+    },
+    {
+      "title": "PostgreSQL 18 — Introduction to Indexes",
+      "url": "https://www.postgresql.org/docs/18/indexes-intro.html",
+      "reviewed_on": "2026-09-16"
+    }
+  ]
+}

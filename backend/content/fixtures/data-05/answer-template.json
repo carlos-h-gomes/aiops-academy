@@ -1,0 +1,8 @@
+{
+  "ranking": [],
+  "restricted_returned": null,
+  "stale_returned": null,
+  "filter_stage": null,
+  "similarity_proves_truth": null,
+  "pgvector_verified": null
+}

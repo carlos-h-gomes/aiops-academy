@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "accept-isolated-hardening",
+  "authorization": {
+    "subject": "ana-sre",
+    "action": "alterar",
+    "resource": "runbook-alpha"
+  },
+  "service": {
+    "id": "policy-runner",
+    "network": {
+      "mode": "isolated",
+      "internal": true,
+      "enable_ip_masquerade": false,
+      "publications": [
+        {
+          "publisher": "recovery-gateway",
+          "host_ip": "127.0.0.1"
+        }
+      ],
+      "egress": {
+        "mode": "fixed",
+        "destinations": [
+          "audit-sink"
+        ],
+        "user_configurable": false
+      }
+    },
+    "process": {
+      "user": "runtime-user",
+      "privileged": false,
+      "cap_drop": [
+        "ALL"
+      ],
+      "cap_add": [],
+      "read_only": true,
+      "no_new_privileges": true,
+      "init": true,
+      "restart": "no",
+      "pids_limit": true
+    },
+    "mounts": [],
+    "secrets": []
+  }
+}

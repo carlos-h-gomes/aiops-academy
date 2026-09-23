@@ -1,0 +1,4 @@
+*
+!Dockerfile
+!strip_installer.py
+!.dockerignore

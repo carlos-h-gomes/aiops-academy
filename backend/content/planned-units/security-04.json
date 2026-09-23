@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "id": "security-04",
+  "track_id": "security",
+  "order": 4,
+  "title": "Containers e dependências",
+  "summary": "Inspecionar imagem, permissões e dependências antes de executar.",
+  "status": "available",
+  "prerequisites": [
+    "security-03"
+  ],
+  "competencies": [
+    "Interpretar achados sem confundir scanner com garantia",
+    "Priorizar correções e registrar versões"
+  ],
+  "duration_minutes": {"essential": 90, "complete": 150},
+  "translations": [
+    {"locale": "pt-BR", "authoring_status": "authored"},
+    {"locale": "en", "authoring_status": "planned"},
+    {"locale": "es", "authoring_status": "planned"}
+  ],
+  "body": "## Objetivo observável\nAo final, você deverá avaliar os seis cenários sintéticos, obter uma aprovação, quatro bloqueios e uma revisão, e explicar a prioridade e a ação de cada achado. Você deverá bloquear `latest`, digest ausente, proveniência verificável ausente e licença incerta; encaminhar o pacote marcado como desatualizado para correção antes de runtime; e demonstrar que imagem fixada, SBOM e eventual scanner são evidências limitadas, não garantias de segurança ou autenticidade.\n\n## Contexto e limites\nUma tag é um nome mutável atribuído a uma imagem; um digest identifica conteúdo específico. Fixar por digest melhora a repetibilidade, mas um hash só prova igualdade em relação a uma referência confiável: não autentica sozinho o publicador nem demonstra que o conteúdo é seguro. Por isso, o registro também exige proveniência verificável que relacione o digest avaliado ao artefato declarado. Nesta fixture, a verificação é apenas uma prova sintética offline e não representa assinatura, registry ou cadeia real.\n\nUm SBOM organiza componentes, versões e declarações de licença. Ele ajuda a responder o que foi declarado no artefato, mas pode estar incompleto, incorreto ou desatualizado. O subconjunto `SPDX-synthetic-subset` desta prática é propositalmente didático e não afirma conformidade integral com SPDX. Do mesmo modo, um scanner encontra apenas classes cobertas pela ferramenta, base de dados e configuração no instante da execução; resultado sem achados não garante ausência de vulnerabilidade, código malicioso, falha de configuração ou risco em runtime.\n\nAntes de executar um container, revise também identidade não-root, filesystem somente leitura, `no-new-privileges`, remoção de capabilities e declaração de limites. Esses controles reduzem impacto, mas não corrigem origem não confiável, licença incerta ou dependência que precisa de decisão. O avaliador falha fechado para formato inesperado, produz somente ID, decisão e códigos de achado, e não baixa imagem, consulta registry, chama rede, executa Docker, scanner, gerenciador de pacotes ou código da fixture. Todos os nomes, versões e digests são fictícios sob `registry.invalid`.\n\n## Exemplo sintético\nO cenário `approve-pinned-fixture` usa a tag fictícia `1.4.0-fixture`, digest SHA-256 explícito, proveniência marcada como verificada pela prova offline da própria fixture, controles mínimos e dois componentes com versão e licença confirmadas. O avaliador retorna `approve` e `supply_chain_policy_satisfied`. Essa aprovação vale somente para o contrato didático; não autoriza pull ou runtime.\n\nEm `block-latest`, ainda existe digest e SBOM, mas a tag flutuante produz o achado crítico `floating_tag_latest` e a ação `pin_version_and_digest`. Em `block-missing-digest`, a ausência de digest produz `missing_image_digest`. Em `block-unverified-provenance`, uma alegação não verificada produz `provenance_not_verifiable`. Em `block-uncertain-license`, `NOASSERTION` e estado incerto produzem `uncertain_license`. Por fim, `review-outdated-package` não inventa CVE: ele informa somente que a fixture declara atualização disponível, atribui prioridade média e exige `update_before_runtime`; a decisão é `review`, não uma alegação de vulnerabilidade real.\n\n## Exercício\n1. Leia `policy.json` e anote os quatro bloqueios mínimos, os cinco controles de runtime e os três únicos campos permitidos no relatório.\n2. Para cada registro de `scenarios.json`, compare tag, digest, digest sujeito da proveniência, base de verificação, controles, versão, licença e estado de manutenção.\n3. Antes de executar, preveja `approve`, `block` ou `review` e escreva a prioridade e a ação correspondente sem inferir CVE ou licença não declarada.\n4. Execute o validador focado registrado no repositório e compare os seis resultados com sua previsão.\n5. Explique por que o digest fixado melhora repetibilidade, mas não autentica sozinho o publicador; depois explique por que SBOM e scanner não garantem ausência de risco.\n6. Priorize primeiro os bloqueios críticos de referência/digest, depois proveniência e licença, e por fim a atualização marcada. Registre correção ou adiamento justificado; nenhum bloqueio pode ser adiado para runtime neste exercício.\n7. Confirme que a prática realizou zero pull, zero scanner, zero consulta externa, zero execução de imagem e zero alteração de dependência.\n\n## Pistas\n**Pista 1 — identidade do artefato:** confira tag e digest antes de olhar componentes. `latest` continua flutuante mesmo quando um digest aparece em outro campo do registro.\n\n**Pista 2 — evidências diferentes:** digest responde qual conteúdo; proveniência verificável ajuda a rastrear como e de onde ele veio; SBOM declara componentes; licença exige confirmação. Uma dessas evidências não substitui as outras.\n\n## Solução comentada\nA aprovação ocorre somente em `approve-pinned-fixture`: tag não flutuante, digest sintaticamente válido, proveniência verificada ligada ao mesmo digest, controles mínimos presentes e componentes com licença confirmada e manutenção atual. O relatório permanece mínimo e a ação externa continua proibida.\n\n`block-latest` recebe prioridade crítica porque a referência permite mudança futura; a correção é fixar versão e digest. `block-missing-digest` também é crítico porque falta a identidade imutável do conteúdo. `block-unverified-provenance` é alto: uma origem apenas declarada não é evidência verificável. `block-uncertain-license` é alto e permanece em hold até confirmação oficial; escolher uma licença provável seria fabricar evidência. `review-outdated-package` é médio: a própria fixture sinaliza atualização disponível, então a ação é revisar e atualizar antes de runtime. Sem advisory real, não se afirma que a versão é vulnerável.\n\nA ordem de prioridade não transforma o avaliador em SCA. Nenhum banco de vulnerabilidades foi consultado e nenhuma ferramenta externa foi executada. Em um caso real, versão, digest, atestação, SBOM, licença, suporte, advisories, permissões e limites precisariam ser confirmados em fontes oficiais e no artefato efetivamente resolvido.\n\n## Critério de conclusão\nA unidade está concluída quando você reproduz exatamente uma decisão `approve`, quatro `block` e uma `review`; associa `floating_tag_latest`, `missing_image_digest`, `provenance_not_verifiable`, `uncertain_license` e `dependency_update_due` às prioridades e ações esperadas; explica os limites de digest, SBOM e scanner; identifica os cinco controles mínimos; e confirma zero ação externa. A unidade está disponível no catálogo local; as traduções adicionais continuam uma expansão editorial separada.\n\n## Variação\nEm uma cópia em memória do cenário aprovado, altere apenas `resource_limits_declared` para `false`. O resultado deve ser `block` com `runtime_control_missing:resource_limits_declared`. Depois restaure o valor e altere somente o digest sujeito da proveniência: o resultado deve bloquear com `provenance_subject_mismatch`. Não grave a variação na fixture-base, não use digest ou imagem real e não faça pull.\n\n## Referências primárias\nFontes oficiais revisadas em 2026-09-10: Docker Docs sobre digests de imagem; SPDX Specification 3.0.1 e SPDX License List para estrutura e expressões de licença; e SLSA v1.2 para o conceito de proveniência verificável. Os links estruturados abaixo fazem parte da autoria. A fixture não certifica conformidade com Docker, SPDX ou SLSA e não seleciona produto, imagem ou dependência real.",
+  "fixture": {
+    "policy": "backend/content/fixtures/security-04/policy.json",
+    "scenarios": "backend/content/fixtures/security-04/scenarios.json"
+  },
+  "sources": [
+    {
+      "title": "Docker Docs — Image digests",
+      "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/",
+      "reviewed_on": "2026-09-10"
+    },
+    {
+      "title": "SPDX Specification 3.0.1",
+      "url": "https://spdx.github.io/spdx-spec/v3.0.1/",
+      "reviewed_on": "2026-09-10"
+    },
+    {
+      "title": "SPDX License List",
+      "url": "https://spdx.org/licenses/",
+      "reviewed_on": "2026-09-10"
+    },
+    {
+      "title": "SLSA v1.2 — Provenance",
+      "url": "https://slsa.dev/spec/v1.2/provenance",
+      "reviewed_on": "2026-09-10"
+    }
+  ]
+}

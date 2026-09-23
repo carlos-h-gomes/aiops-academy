@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "id": "data-02",
+  "track_id": "data",
+  "order": 2,
+  "title": "SQL e joins",
+  "summary": "Investigar registros e combinar tabelas sem perder a interpretação do resultado.",
+  "status": "available",
+  "prerequisites": [
+    "data-01"
+  ],
+  "competencies": [
+    "Construir consultas com filtros e joins",
+    "Reconhecer duplicação e ausência de dados"
+  ],
+  "duration_minutes": {"essential": 90, "complete": 150},
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "body": "## Objetivo observável\nConstruir três consultas sobre incidentes, eventos e runbooks e explicar cada linha retornada. Entregar consultas parametrizadas, previsão de resultados e diagnóstico de uma contagem inflada. Pré-requisito: data-01.\n\n## Contexto e limites\nAutoria PT-BR ainda planned, fora das aulas disponíveis do aplicativo. A prática usa SQLite em memória e arquivos sintéticos locais; não executa PostgreSQL, não mede desempenho e não acessa o banco do aluno. Os marcadores :servico e :estado pertencem ao cliente sqlite3 usado aqui; a forma de parâmetros deve ser revista ao adotar outro driver. Valores são vinculados ao executar a consulta, nunca concatenados ao SQL. Nomes de tabelas e consultas não vêm do aluno.\n\n## Exemplo sintético\nReutilize schema.sql e valid.sql de data-01 e carregue extension.sql de data-02 em uma base descartável. A base resultante tem 2 serviços, 3 runbooks, 3 incidentes e 5 eventos. inc-100 tem quatro eventos e aponta para rb-quotes-01. inc-200 tem um evento e nenhum runbook associado. inc-300 não tem eventos nem runbook. O novo rb-quotes-02 pertence a quotes, mas não é o runbook associado a inc-100.\nevt-001 e evt-005 compartilham mensagem, porém têm IDs e chaves de origem diferentes. São dois registros legítimos. Deduplicar pela mensagem perderia informação.\n\n## Exercício\n1. Antes de abrir as soluções SQL, desenhe as relações e preveja os resultados para svc-quotes e svc-ledger-demo.\n2. Escreva uma consulta com INNER JOIN entre incidentes, eventos e o runbook associado, filtrando por :servico. Retorne incidente_id, evento_id e runbook_id; ordene por incidente e evento.\n3. Escreva a segunda consulta preservando todos os incidentes do serviço com LEFT JOIN. Restrinja runbooks ao :estado no ON e explique a diferença se o filtro for movido para WHERE.\n4. Escreva a terceira consulta com uma linha por incidente, número de eventos e runbook associado. Agregue eventos antes do join e retorne zero quando não houver eventos.\n5. Compare suas consultas com inner.sql, left.sql e summary.sql em backend/content/fixtures/data-02. Para svc-quotes, espere respectivamente 4, 5 e 2 linhas. Para svc-ledger-demo, espere 0, 1 e 1 linha.\n6. Una runbooks apenas pelo serviço em uma consulta experimental da cópia em memória. Explique por que inc-100 passa de quatro para oito linhas. Compare COUNT(*) com COUNT(e.evento_id) para inc-300.\n7. Na raiz de aiops-academy, execute a validação limitada: python scripts/bounded.py 30 .venv/Scripts/python.exe scripts/validate_data_02.py. Execute também python scripts/bounded.py 30 .venv/Scripts/python.exe -m unittest backend.tests.test_data_02 -v. O ambiente Python local já deve estar preparado. Os comandos verificam as soluções versionadas; não corrigem automaticamente uma consulta sua.\n8. Entregue as três consultas e uma explicação para as ausências, as oito linhas incorretas e os dois eventos de mensagem igual. Teste um serviço inexistente: todas as consultas devem retornar lista vazia.\n\n## Pistas\n**Pista 1 —** Comece por incidentes e identifique qual relação pode faltar. O vínculo ao runbook usa o ID associado, não todos os runbooks do serviço.\n**Pista 2 —** Conte identidades de eventos antes de adicionar outra relação um-para-muitos. Uma linha preservada pelo LEFT JOIN não implica a existência de um evento.\n\n## Solução comentada\ninner.sql retorna inc-100 com evt-001, evt-002, evt-003 e evt-005, sempre associado a rb-quotes-01. left.sql acrescenta (inc-300, NULL, NULL). Para ledger-demo retorna (inc-200, evt-004, NULL). summary.sql retorna (inc-100, 4, rb-quotes-01) e (inc-300, 0, NULL); para ledger-demo, (inc-200, 1, NULL).\nO runbook extra não está associado a inc-100: juntá-lo somente por servico_id produz duas correspondências para cada um dos quatro eventos. Não use DISTINCT para esconder esse erro de relacionamento. A consulta de resumo agrega os eventos por incidente e mantém o join pela identidade do runbook associado.\nPara inc-300, COUNT(*) sobre o LEFT JOIN vale 1, enquanto COUNT(e.evento_id) vale 0. O COALESCE do resumo converte a ausência de uma contagem em zero. Mover r.estado para WHERE elimina as linhas sem correspondência; mantê-lo no ON preserva os incidentes.\nO validador ativa query_only depois da carga, e os testes confirmam a recusa de DELETE. Essa proteção do exercício não é uma política de autorização para uma aplicação. A ligação de parâmetros mantém uma string com apóstrofos como valor, sem convertê-la em condição SQL.\n\n## Critério de conclusão\nAs três consultas e suas previsões coincidem com as soluções, inclusive a ordem. Você explica o fan-out de oito linhas, a diferença entre falta de evento e falta de runbook, e por que mensagens iguais não bastam para deduplicar. Validador e nove testes terminam com saída 0. O aluno deve revisar sua própria explicação; a execução automatizada não comprova compreensão nem publica a unidade.\n\n## Variação\nNa cópia descartável, filtre :estado por arquivado. Para quotes, left.sql continua com cinco linhas, todas sem runbook correspondente. A associação ausente de inc-200 não deve ser substituída por rb-ledger-01 apenas porque ele pertence ao mesmo serviço. Depois descarte a conexão e confirme que uma nova carga reproduz o resultado original.\n\n## Referências primárias\nPostgreSQL, Table Expressions, para semântica de joins e agregação; Python, sqlite3, para execução com parâmetros vinculados. Fontes consultadas em 2026-09-16, com URLs abaixo. São referências conceituais e do cliente local; não comprovam compatibilidade de runtime PostgreSQL.",
+  "fixture": {
+    "schema": "backend/content/fixtures/data-01/schema.sql",
+    "base": "backend/content/fixtures/data-01/valid.sql",
+    "extension": "backend/content/fixtures/data-02/extension.sql",
+    "inner": "backend/content/fixtures/data-02/inner.sql",
+    "left": "backend/content/fixtures/data-02/left.sql",
+    "summary": "backend/content/fixtures/data-02/summary.sql",
+    "validator": "scripts/validate_data_02.py",
+    "tests": "backend/tests/test_data_02.py"
+  },
+  "sources": [
+    {
+      "title": "PostgreSQL — Table Expressions",
+      "url": "https://www.postgresql.org/docs/current/queries-table-expressions.html",
+      "reviewed_on": "2026-09-16"
+    },
+    {
+      "title": "Python — sqlite3",
+      "url": "https://docs.python.org/3/library/sqlite3.html",
+      "reviewed_on": "2026-09-16"
+    }
+  ]
+}

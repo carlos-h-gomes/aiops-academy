@@ -1,0 +1,41 @@
+name: aiops-academy-agents-processes-pilot
+
+# Local qualified image; rebuild and rescan before changing the pinned artifact.
+services:
+  development-triage:
+    image: sha256:a3ec1ef54271cf9640728b8ad52d6ca382649cc383ff473e2ccf7d5d3ff7e368
+    pull_policy: never
+    platform: "${AGENTS_PLATFORM:?runtime qualification required}"
+    command: ["python", "-B", "/opt/lab/src/learning_session.py", "review"]
+    init: true
+    user: "${AGENTS_UID:?runtime qualification required}:${AGENTS_GID:?runtime qualification required}"
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: "${AGENTS_PIDS_LIMIT:?runtime measurement required}"
+    cpus: "${AGENTS_CPU_LIMIT:?runtime measurement required}"
+    mem_limit: "${AGENTS_MEMORY_LIMIT:?runtime measurement required}"
+    memswap_limit: "${AGENTS_MEMORY_LIMIT:?runtime measurement required}"
+    restart: "no"
+    stop_grace_period: "${AGENTS_STOP_GRACE_PERIOD:?runtime measurement required}"
+    network_mode: "none"
+    environment:
+      TMPDIR: /work
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - type: bind
+        source: ./src
+        target: /opt/lab/src
+        read_only: true
+      - type: bind
+        source: ./fixtures
+        target: /opt/lab/fixtures
+        read_only: true
+    tmpfs:
+      - "/work:size=${AGENTS_TMPFS_LIMIT:?runtime measurement required},uid=${AGENTS_UID:?runtime qualification required},gid=${AGENTS_GID:?runtime qualification required},mode=0700,nosuid,nodev,noexec"
+    logging:
+      driver: json-file
+      options:
+        max-size: "${AGENTS_LOG_MAX_SIZE:?runtime measurement required}"
+        max-file: "${AGENTS_LOG_MAX_FILES:?runtime measurement required}"

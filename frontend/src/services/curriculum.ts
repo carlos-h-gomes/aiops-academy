@@ -17,7 +17,8 @@ export function unitComplete(unit:LearningUnit, progress:Progress) {
 
 export function trackSummary(units:LearningUnit[], progress:Progress) {
   const available=units.filter(unit=>unit.status==='available')
-  return {available:available.length,planned:units.length-available.length,
+  const trackable=available.filter(unit=>unit.lesson_day!==null)
+  return {available:available.length,planned:units.length-available.length,trackable:trackable.length,
     complete:available.filter(unit=>unitComplete(unit,progress)).length,
     essentialMinutes:available.reduce((total,unit)=>total+(unit.duration_minutes?.essential??0),0)}
 }

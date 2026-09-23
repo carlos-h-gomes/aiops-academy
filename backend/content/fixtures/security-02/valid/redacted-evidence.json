@@ -1,0 +1,10 @@
+{
+  "event_id": "evt-redaction-demo-01",
+  "decision": "blocked",
+  "rule_id": "redact-sensitive-data",
+  "summary": "Registro revisado; valores protegidos foram redigidos.",
+  "redactions": {
+    "secret_marker": "[REDIGIDO]",
+    "study_record": "[REDIGIDO]"
+  }
+}

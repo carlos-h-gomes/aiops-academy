@@ -1,0 +1,11 @@
+import {ArrowLeft,BookOpen,FlaskConical} from 'lucide-react'
+import {useUnitLesson} from '../hooks/useUnitLesson'
+import {Badge,External,Message,PageTitle} from '../components/ui/Common'
+import {Markdown} from '../components/ui/Markdown'
+
+export function UnitLessonPage({unitId}:{unitId:string}) {
+  const {lesson,error,loading,retry}=useUnitLesson(unitId)
+  if(loading)return <><PageTitle eyebrow="AULA GUIADA" title="Carregando aula" description="Preparando o conteúdo local…"/><p role="status">Carregando aula…</p></>
+  if(error||!lesson)return <><PageTitle eyebrow="AULA GUIADA" title="Aula indisponível" description="Não foi possível carregar este conteúdo local."/><Message text={error||'Aula não encontrada.'} error/><button className="primary" onClick={retry}>Tentar novamente</button><a className="back-link" href="#/tracks">Voltar às trilhas</a></>
+  return <><a className="back-link" href={`#/tracks/${unitId.split('-')[0]}`}><ArrowLeft size={16}/>Voltar à trilha</a><PageTitle eyebrow={`AULA GUIADA · ${unitId.toUpperCase()}`} title={lesson.title} description={lesson.summary} action={<Badge>Acesso local · sem registro de progresso</Badge>}/><div className="notice"><strong>Prática sintética e guiada</strong><p>{lesson.practice?.limitations}</p><p>Esta aula não altera calendário, notas, quizzes, conclusão ou backup. Use somente os exemplos locais e não informe dados de trabalho.</p></div><div className="lesson-columns"><section className="lesson-paper"><div className="objectives"><p className="eyebrow">LEIA, PRATIQUE E EXPLIQUE</p><p><BookOpen size={16}/>Conteúdo em português · revisão {lesson.content_version}</p></div><Markdown text={lesson.body}/></section><aside className="lesson-aside"><div className="panel"><FlaskConical size={22}/><p className="eyebrow">PRÁTICA LOCAL</p><h3>{lesson.practice?.title}</h3><p className="muted">{lesson.duration_minutes?.essential} min essenciais · {lesson.duration_minutes?.complete} min com variação</p><a className="primary" href={`#/unit/${unitId}/lab`}>Abrir lab guiado</a></div><div className="references"><h3>Fontes para aprofundar</h3>{lesson.sources.map(source=><External key={source.url} href={source.url}>{source.title}</External>)}</div></aside></div></>
+}

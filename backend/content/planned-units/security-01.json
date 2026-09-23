@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "id": "security-01",
+  "track_id": "security",
+  "order": 1,
+  "title": "Identidade e menor privilégio",
+  "summary": "Desenhar permissões limitadas por recurso e operação.",
+  "status": "available",
+  "prerequisites": [
+    "infra-03"
+  ],
+  "competencies": [
+    "Distinguir autenticação de autorização",
+    "Testar acesso permitido e negado"
+  ],
+  "duration_minutes": {"essential": 75, "complete": 120},
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "body": "## Objetivo observável\nAo final, você deverá identificar sujeito, ação e recurso em cada pedido, separar autenticação de autorização e obter exatamente as quatro decisões esperadas da fixture: uma permissão explícita e três negações, respectivamente por ausência de autorização, escopo cruzado e tentativa de escalonamento. Você também deverá demonstrar, pela matriz, que somente as ações `ler` e `alterar` podem ser concedidas e que toda ausência resulta em negação.\n\n## Contexto e limites\nAutenticação responde quem apresentou uma identidade; autorização decide se esse sujeito pode realizar uma ação sobre um recurso específico. Uma identidade autenticada não recebe acesso automático. Nesta prática, a identidade já chega como um identificador sintético e o avaliador não autentica senha, token, certificado ou conta. A decisão usa apenas uma política local, legível e fechada.\n\nO avaliador aplica negação por padrão. Primeiro confirma que sujeito e recurso existem; depois recusa ações fora de `ler` e `alterar`, bloqueia acesso entre escopos e, por fim, procura uma concessão que corresponda exatamente ao trio sujeito–ação–recurso. Grupo, cargo, proximidade de nome ou uma permissão sobre outro recurso não se propagam. A ordem deixa o motivo da negação observável sem transformar o exercício em um IAM real.\n\nTodos os nomes, recursos e escopos são fictícios. A prática não cria usuário, credencial, política de nuvem, chamada de rede, processo, arquivo externo ou alteração fora das fixtures. Ela ensina a revisar uma decisão determinística; não qualifica uma plataforma de identidade nem substitui análise de risco para produção.\n\n## Exemplo sintético\nA política contém `ana-sre` no escopo `equipe-alfa`, os recursos `runbook-alpha` e `runbook-beta` em escopos diferentes e concessões explícitas para `ana-sre` ler e alterar somente `runbook-alpha`. Para o pedido `ana-sre`, `ler`, `runbook-alpha`, o resultado é `allow` com a regra `explicit_permission`. Trocar apenas o recurso para `runbook-beta` produz `deny` por `cross_scope`; a autenticação presumida da mesma identidade não muda essa fronteira.\n\nA matriz completa da prática é: `allow-explicit` permite a leitura concedida; `deny-missing-authorization` nega a leitura de `bia-estagiaria` sem concessão; `deny-cross-scope` nega o recurso de outra equipe; `deny-escalation` recusa `administrar`, ação que não pertence à allowlist didática. A concessão de `alterar` aparece na política para provar que leitura e alteração são capacidades distintas e igualmente explícitas.\n\n## Exercício\n1. Abra `policy.json` e monte uma tabela com sujeito, escopo do sujeito, ação, recurso, escopo do recurso e existência de concessão exata.\n2. Antes de executar, preveja decisão e regra para os quatro registros de `scenarios.json`; não trate identidade conhecida como permissão.\n3. Execute o verificador focado indicado no repositório e compare as quatro decisões com sua previsão.\n4. Localize as concessões de `ler` e `alterar` sobre `runbook-alpha`. Explique por que uma não implica a outra e por que nenhuma vale para `runbook-beta`.\n5. Remova mentalmente a concessão de leitura e descreva o resultado esperado sem inventar herança de cargo, grupo ou escopo.\n6. Classifique cada negação como ausência de autorização, escopo cruzado ou escalonamento e relacione o motivo ao ponto exato da avaliação.\n7. Registre a conclusão sem copiar identificador de ambiente real, conta, token ou política externa; a evidência permitida é apenas o ID sintético do cenário, a decisão e a regra aplicada.\n\n## Pistas\n**Pista 1 — trio exato:** procure uma linha que combine simultaneamente sujeito, ação e recurso. Uma linha para o mesmo sujeito e outra ação não autoriza o pedido atual.\n\n**Pista 2 — ordem das fronteiras:** confira primeiro a ação permitida e os escopos. Só depois procure a concessão explícita; isso distingue escalonamento e escopo cruzado de uma simples concessão ausente.\n\n## Solução comentada\nNo cenário `allow-explicit`, `ana-sre`, `ler` e `runbook-alpha` formam um trio presente nas concessões; sujeito e recurso pertencem a `equipe-alfa`, portanto a decisão é `allow` e a regra é `explicit_permission`. A linha separada de `alterar` confirma que a capacidade de modificar não nasce da leitura: ela precisa de sua própria concessão.\n\nEm `deny-missing-authorization`, `bia-estagiaria` e `runbook-alpha` estão no mesmo escopo, mas não existe concessão para o trio solicitado. O avaliador retorna `deny` com `missing_explicit_permission`. Em `deny-cross-scope`, `ana-sre` pede `runbook-beta`, pertencente a `equipe-beta`; a decisão é `deny` com `cross_scope`, antes de qualquer tentativa de inferir permissão. Em `deny-escalation`, a ação `administrar` não está na allowlist de capacidades didáticas e produz `deny` com `escalation_attempt`.\n\nEssa política é deliberadamente pequena: não há wildcard, papel implícito, negação que possa ser sobreposta, herança ou condição ambiental. Em um sistema real, atributos e relações precisam de governança, origem confiável e ciclo de vida; aqui a forma fechada permite verificar o princípio de menor privilégio sem criar contas ou tocar um provedor.\n\n## Critério de conclusão\nA unidade está concluída quando sua tabela contém os quatro cenários e coincide com `allow/explicit_permission`, `deny/missing_explicit_permission`, `deny/cross_scope` e `deny/escalation_attempt`; você explica a diferença entre autenticação e autorização; demonstra que `ler` e `alterar` só passam com concessões distintas e exatas; e confirma que a execução não realizou rede, IAM, criação de conta ou ação externa. Isso conclui a autoria e a prática local de `security-01` como aula guiada, sem criar contas, políticas reais ou registrar progresso.\n\n## Variação\nEm uma cópia temporária da política, substitua a concessão `ana-sre`–`alterar`–`runbook-alpha` por `bia-estagiaria`–`alterar`–`runbook-alpha`. Avalie os dois sujeitos para a mesma ação e recurso. Apenas `bia-estagiaria` deve receber `allow`; `ana-sre` deve receber `missing_explicit_permission`. Não grave a variação na fixture-base e não adicione wildcard, grupo ou conta real.\n\n## Referências primárias\nFontes oficiais revisadas em 2026-09-10: NIST SP 800-207, para a separação entre autenticação, autorização e proteção orientada a recursos; e NIST SP 800-162, para decisões de autorização sobre atributos do sujeito, objeto/recurso e operação. Os links estruturados abaixo fazem parte da autoria. A prática usa uma política mínima inspirada nesses conceitos e não afirma implementar integralmente uma arquitetura Zero Trust ou ABAC.",
+  "fixture": {
+    "policy": "backend/content/fixtures/security-01/policy.json",
+    "scenarios": "backend/content/fixtures/security-01/scenarios.json"
+  },
+  "sources": [
+    {
+      "title": "NIST SP 800-207 — Zero Trust Architecture",
+      "url": "https://csrc.nist.gov/pubs/sp/800/207/final",
+      "reviewed_on": "2026-09-10"
+    },
+    {
+      "title": "NIST SP 800-162 — Guide to Attribute Based Access Control (ABAC) Definition and Considerations",
+      "url": "https://csrc.nist.gov/pubs/sp/800/162/upd2/final",
+      "reviewed_on": "2026-09-10"
+    }
+  ]
+}

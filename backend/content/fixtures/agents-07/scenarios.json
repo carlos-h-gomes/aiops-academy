@@ -1,0 +1,160 @@
+{
+  "schema_version": "1.0",
+  "unit_id": "agents-07",
+  "scenarios": [
+    {
+      "scenario_id": "missing-approval",
+      "label": "Rascunho fundamentado sem revisão",
+      "input": {
+        "brief_id": "B-100",
+        "provided_fact_ids": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "draft_claim_ids": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "artifact_version": "v1",
+        "approval": null,
+        "requested_action": "draft"
+      },
+      "expected": {
+        "decision": "hold",
+        "reason": "approval_missing",
+        "draft": "Data: 12 de outubro de 2030. Formato: oficina online.",
+        "supported_claims": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "publication_allowed": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "unsupported-claim",
+      "label": "Promessa sem suporte",
+      "input": {
+        "brief_id": "B-100",
+        "provided_fact_ids": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "draft_claim_ids": [
+          "F-GUARANTEE"
+        ],
+        "artifact_version": "v1",
+        "approval": {
+          "reviewer": "synthetic-reviewer",
+          "decision": "approved",
+          "artifact_version": "v1"
+        },
+        "requested_action": "draft"
+      },
+      "expected": {
+        "decision": "block",
+        "reason": "unsupported_claim",
+        "draft": null,
+        "supported_claims": [],
+        "publication_allowed": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "wrong-version",
+      "label": "Revisão vinculada à versão anterior",
+      "input": {
+        "brief_id": "B-100",
+        "provided_fact_ids": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "draft_claim_ids": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "artifact_version": "v2",
+        "approval": {
+          "reviewer": "synthetic-reviewer",
+          "decision": "approved",
+          "artifact_version": "v1"
+        },
+        "requested_action": "draft"
+      },
+      "expected": {
+        "decision": "block",
+        "reason": "approval_version_mismatch",
+        "draft": "Data: 12 de outubro de 2030. Formato: oficina online.",
+        "supported_claims": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "publication_allowed": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "reviewed-draft",
+      "label": "Revisão sintética da versão exata",
+      "input": {
+        "brief_id": "B-100",
+        "provided_fact_ids": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "draft_claim_ids": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "artifact_version": "v1",
+        "approval": {
+          "reviewer": "synthetic-reviewer",
+          "decision": "approved",
+          "artifact_version": "v1"
+        },
+        "requested_action": "draft"
+      },
+      "expected": {
+        "decision": "reviewed_draft",
+        "reason": "synthetic_review_bound",
+        "draft": "Data: 12 de outubro de 2030. Formato: oficina online.",
+        "supported_claims": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "publication_allowed": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "publish-blocked",
+      "label": "Publicação fora da capacidade",
+      "input": {
+        "brief_id": "B-100",
+        "provided_fact_ids": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "draft_claim_ids": [
+          "F-DATE",
+          "F-FORMAT"
+        ],
+        "artifact_version": "v1",
+        "approval": {
+          "reviewer": "synthetic-reviewer",
+          "decision": "approved",
+          "artifact_version": "v1"
+        },
+        "requested_action": "post"
+      },
+      "expected": {
+        "decision": "block",
+        "reason": "external_action_forbidden",
+        "draft": null,
+        "supported_claims": [],
+        "publication_allowed": false,
+        "external_effects": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "redaction_token": "[REDIGIDO]",
+  "allowed_output_fields": [
+    "event_id",
+    "decision",
+    "rule_id",
+    "summary",
+    "redactions"
+  ],
+  "required_redactions": [
+    "secret_marker",
+    "study_record"
+  ],
+  "classifications": {
+    "event_id": {
+      "category": "evidence",
+      "persist": true,
+      "retention_days": 30
+    },
+    "decision": {
+      "category": "evidence",
+      "persist": true,
+      "retention_days": 30
+    },
+    "rule_id": {
+      "category": "evidence",
+      "persist": true,
+      "retention_days": 30
+    },
+    "summary": {
+      "category": "evidence",
+      "persist": true,
+      "retention_days": 30
+    },
+    "runtime_mode": {
+      "category": "configuration",
+      "persist": false,
+      "retention_days": 0
+    },
+    "secret_marker": {
+      "category": "secret_like",
+      "persist": false,
+      "retention_days": 0
+    },
+    "study_record": {
+      "category": "study_data",
+      "persist": false,
+      "retention_days": 0
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "id": "agents-01",
+  "track_id": "agents",
+  "order": 1,
+  "title": "Processos, regras e agentes",
+  "summary": "Escolher fluxo determinístico ou agente a partir do problema e do risco.",
+  "status": "available",
+  "prerequisites": ["infra-06"],
+  "competencies": [
+    "Mapear entradas, decisões e responsáveis",
+    "Justificar onde IA agrega valor ao processo"
+  ],
+  "duration_minutes": {"essential": 75, "complete": 120},
+  "translations": [
+    {"locale": "pt-BR", "authoring_status": "authored"},
+    {"locale": "en", "authoring_status": "planned"},
+    {"locale": "es", "authoring_status": "planned"}
+  ],
+  "body": "## Objetivo observável\nAo final, você deverá classificar quatro solicitações sintéticas em regra determinística, assistência limitada ou recusa; identificar entrada, decisão, responsável e exceção em cada uma; e demonstrar que impacto alto ou entrada incompleta não é automatizado. O resultado esperado é uma regra, uma assistência limitada e duas recusas, sempre por código reproduzível.\n\n## Contexto e limites\nUm processo organiza trabalho: recebe uma entrada, aplica decisões, atribui responsabilidade e trata exceções. Uma regra determinística é preferível quando os dados são completos, o risco é baixo e o resultado pode ser descrito sem interpretação aberta. Assistência limitada pode ajudar quando existe ambiguidade controlada, mas a pessoa responsável continua decidindo. Recusa é a saída correta quando faltam dados ou o impacto é alto.\n\nA prática não usa modelo, prompt remoto, conta, rede ou automação externa. O controlador lê somente fixtures fechadas e não interpreta texto livre. O campo `owner` registra quem responde pelo caso, enquanto a classificação apenas recomenda o modo. Um resultado plausível nunca transfere responsabilidade nem cria autorização.\n\n## Exemplo sintético\nA fixture `process-routine` representa uma solicitação de baixo impacto, baixa ambiguidade, entradas completas e responsável de operações. O classificador interno retorna `rule` e o código pré-definido `use-fixed-rule`. Já `process-high-impact` retorna `refusal/human-only`, mesmo que exista uma resposta pré-definida: alto impacto não pode ser promovido por conveniência.\n\n## Exercício\n1. Desenhe para cada fixture as colunas entrada, regra, decisão, responsável e exceção.\n2. Preveja a classificação das quatro solicitações antes de executar o controlador.\n3. Execute `classify-rule` e confirme `ready/completed`, classificação `rule` e dois passos usados.\n4. Execute `classify-limited-agent` e explique por que a ambiguidade leva a assistência, não a autonomia.\n5. Execute os dois casos de recusa e confirme zero efeito simulado.\n6. Compare o pedido com a saída e confirme que nenhum campo da fixture foi alterado.\n7. Registre por que adicionar um agente ao caso rotineiro aumentaria superfície sem mudar o resultado.\n\n## Pistas\n**Pista 1 — comece pelo risco:** se o impacto é alto ou a entrada está incompleta, pare antes de escolher tecnologia.\n\n**Pista 2 — ambiguidade não é autorização:** assistência limitada pode organizar uma análise, mas não decide por quem responde pelo processo.\n\n## Solução comentada\n`process-routine` usa regra porque as entradas são completas e risco e ambiguidade são baixos. `process-ambiguous` usa `limited_agent`: a fixture permite apenas a resposta pré-definida `assist-with-review`, sem modelo, e mantém `human-reviewer` como responsável. `process-high-impact` e `process-incomplete` resultam em `block/process_refused`; o primeiro protege uma decisão relevante e o segundo impede decidir sem dados suficientes.\n\nA máquina passa por `received`, `validating` e `ready` apenas nos casos admissíveis. Regra e assistência concluem em `completed`; recusas passam de `ready` para `blocked` após a classificação. Essa transição prova que o adaptador pode recusar sem executar efeito.\n\n## Critério de conclusão\nConclua quando reproduzir exatamente uma regra, uma assistência limitada e duas recusas; explicar responsável e exceção em cada caso; confirmar que alto impacto não é automatizado; e verificar contadores zero para rede, subprocesso e escrita externa. A autoria PT-BR está disponível como aula guiada local; traduções EN e ES continuam em preparação, e a aula não executa modelo, ferramenta ou registra progresso.\n\n## Variação\nEm uma cópia em memória da lógica conceitual, trate impacto médio com ambiguidade alta como assistência sujeita a revisão e compare com uma regra explícita. Não altere a fixture, não introduza modelo e não permita que a classificação substitua o responsável.\n\n## Referências primárias\nFontes oficiais revisadas em 2026-09-11: NIST AI RMF 1.0 para governar, mapear, medir e gerenciar risco; NIST AI 600-1 para riscos específicos de IA generativa; e o AI RMF Playbook para ações voluntárias de operacionalização. O AI RMF 1.0 está em revisão, e nenhuma dessas fontes certifica o processo ou exige IA. A política local do plano V1-08 é a autoridade específica desta prática.",
+  "fixture": {
+    "schema": "backend/content/fixtures/agents-01-04/control-request.schema.json",
+    "result_schema": "backend/content/fixtures/agents-01-04/control-result.schema.json",
+    "policy": "backend/content/fixtures/agents-01-04/policy.json",
+    "data": "backend/content/fixtures/agents-01-04/fixtures.json",
+    "scenarios": "backend/content/fixtures/agents-01-04/scenarios.json"
+  },
+  "sources": [
+    {"title": "NIST AI 100-1 — Artificial Intelligence Risk Management Framework 1.0", "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10", "reviewed_on": "2026-09-11"},
+    {"title": "NIST AI 600-1 — Generative Artificial Intelligence Profile", "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence", "reviewed_on": "2026-09-11"},
+    {"title": "NIST AI RMF Playbook", "url": "https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-rmf-playbook", "reviewed_on": "2026-09-11"}
+  ]
+}

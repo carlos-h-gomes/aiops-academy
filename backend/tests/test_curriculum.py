@@ -28,13 +28,16 @@ class CurriculumTests(unittest.TestCase):
         value = Curriculum.model_validate(self.catalog)
         self.assertEqual([track.id for track in value.tracks], ['infra','data','security','agents'])
         available = [unit for unit in value.units if unit.status == 'available']
-        self.assertEqual([(unit.id,unit.lesson_day) for unit in available], [(f'infra-{day:02d}',day) for day in range(1,31)])
-        self.assertEqual(sum(unit.duration_minutes.essential for unit in available), 90*60)
-        self.assertEqual(sum(unit.duration_minutes.complete for unit in available), 142*60)
+        legacy_available = [unit for unit in available if unit.lesson_day is not None]
+        self.assertEqual([(unit.id,unit.lesson_day) for unit in legacy_available], [(f'infra-{day:02d}',day) for day in range(1,31)])
+        self.assertEqual({unit.id for unit in available if unit.lesson_day is None}, {'data-01','data-02','data-03','data-04','data-05','data-06','security-01','security-02','security-03','security-04','security-05','security-06','agents-01','agents-02','agents-03','agents-04','agents-05','agents-06','agents-07','agents-08'})
+        self.assertEqual(sum(unit.duration_minutes.essential for unit in legacy_available), 90*60)
+        self.assertEqual(sum(unit.duration_minutes.complete for unit in legacy_available), 142*60)
         for track, count in [('data',6),('security',6),('agents',8)]:
             units = [unit for unit in value.units if unit.track_id == track]
             self.assertEqual(len(units), count)
-            self.assertTrue(all(unit.status=='planned' and unit.lesson_day is None and unit.practice is None for unit in units))
+            expected_available = {f'data-{order:02d}' for order in range(1,7)} if track == 'data' else ({f'security-{order:02d}' for order in range(1,7)} if track == 'security' else {f'agents-{order:02d}' for order in range(1,9)})
+            self.assertTrue(all(unit.lesson_day is None and (unit.id in expected_available or unit.status=='planned') for unit in units))
 
     def test_graph_rejects_duplicates_dangling_references_and_cycles(self):
         cases = [
@@ -66,7 +69,7 @@ class CurriculumTests(unittest.TestCase):
             lambda c: c['units'][0]['sources'][0].update(url='https://fixture:inert@example.org'),
             lambda c: c['units'][0]['translations'][0].update(content_version='older'),
             lambda c: c['units'][0]['translations'][1].update(locale='pt-BR'),
-            lambda c: c['units'][30].update(status='available'),
+            lambda c: c['units'][43].update(content_version=None),
             lambda c: c['units'][30].update(lesson_day=1),
             lambda c: c['units'][0].update(unexpected='value'),
         ]

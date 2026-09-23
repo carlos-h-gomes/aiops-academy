@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "id": "allow-explicit",
+      "subject": "ana-sre",
+      "action": "ler",
+      "resource": "runbook-alpha",
+      "expected": {
+        "decision": "allow",
+        "reason": "explicit_permission"
+      }
+    },
+    {
+      "id": "deny-missing-authorization",
+      "subject": "bia-estagiaria",
+      "action": "ler",
+      "resource": "runbook-alpha",
+      "expected": {
+        "decision": "deny",
+        "reason": "missing_explicit_permission"
+      }
+    },
+    {
+      "id": "deny-cross-scope",
+      "subject": "ana-sre",
+      "action": "ler",
+      "resource": "runbook-beta",
+      "expected": {
+        "decision": "deny",
+        "reason": "cross_scope"
+      }
+    },
+    {
+      "id": "deny-escalation",
+      "subject": "ana-sre",
+      "action": "administrar",
+      "resource": "runbook-alpha",
+      "expected": {
+        "decision": "deny",
+        "reason": "escalation_attempt"
+      }
+    }
+  ]
+}

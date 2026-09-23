@@ -1841,8 +1841,8 @@
       "order": 1,
       "title": "Modelagem relacional",
       "summary": "Representar entidades, chaves e relações de um serviço fictício.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.20.1",
       "lesson_day": null,
       "competencies": [
         "Identificar entidades e relações",
@@ -1851,14 +1851,35 @@
       "prerequisites": [
         "infra-05"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 90,
+        "complete": 150
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "data-01",
+        "title": "Fixture relacional local",
+        "limitations": "Use somente os arquivos sintéticos e o verificador local; não conecta PostgreSQL nem um banco externo."
+      },
+      "sources": [
+        {
+          "title": "PostgreSQL — Constraints",
+          "url": "https://www.postgresql.org/docs/current/ddl-constraints.html"
+        },
+        {
+          "title": "PostgreSQL — CREATE TABLE",
+          "url": "https://www.postgresql.org/docs/current/sql-createtable.html"
+        },
+        {
+          "title": "PostgreSQL — Data Types",
+          "url": "https://www.postgresql.org/docs/current/datatype.html"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.20.1"
         },
         {
           "locale": "en",
@@ -1879,8 +1900,8 @@
       "order": 2,
       "title": "SQL e joins",
       "summary": "Investigar registros e combinar tabelas sem perder a interpretação do resultado.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Construir consultas com filtros e joins",
@@ -1889,14 +1910,31 @@
       "prerequisites": [
         "data-01"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 90,
+        "complete": 150
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "data-02",
+        "title": "Joins e contagens locais",
+        "limitations": "Avalia escolhas fechadas sobre fixtures SQLite; não executa SQL do aluno nem conecta um banco externo."
+      },
+      "sources": [
+        {
+          "title": "PostgreSQL — Table Expressions",
+          "url": "https://www.postgresql.org/docs/current/queries-table-expressions.html"
+        },
+        {
+          "title": "Python — sqlite3",
+          "url": "https://docs.python.org/3/library/sqlite3.html"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -1917,8 +1955,8 @@
       "order": 3,
       "title": "PostgreSQL: índices e EXPLAIN",
       "summary": "Ler um plano de execução e justificar uma melhoria de consulta.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Interpretar o plano de uma consulta",
@@ -1927,14 +1965,35 @@
       "prerequisites": [
         "data-02"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 75,
+        "complete": 120
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "data-03",
+        "title": "Plano de execução sintético",
+        "limitations": "Usa um plano desenhado para estudo; não mede PostgreSQL, runtime, buffers ou desempenho."
+      },
+      "sources": [
+        {
+          "title": "PostgreSQL 18 — Using EXPLAIN",
+          "url": "https://www.postgresql.org/docs/18/using-explain.html"
+        },
+        {
+          "title": "PostgreSQL 18 — Multicolumn Indexes",
+          "url": "https://www.postgresql.org/docs/18/indexes-multicolumn.html"
+        },
+        {
+          "title": "PostgreSQL 18 — Introduction to Indexes",
+          "url": "https://www.postgresql.org/docs/18/indexes-intro.html"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -1955,8 +2014,8 @@
       "order": 4,
       "title": "Transações, backup e restauração",
       "summary": "Preservar consistência e demonstrar recuperação com dados sintéticos.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Explicar limites de uma transação",
@@ -1965,14 +2024,35 @@
       "prerequisites": [
         "data-03"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 90,
+        "complete": 150
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "data-04",
+        "title": "Rollback e restauração local",
+        "limitations": "Usa conexões SQLite em memória; não abre dumps, arquivos do aluno ou um banco PostgreSQL."
+      },
+      "sources": [
+        {
+          "title": "PostgreSQL — Transactions",
+          "url": "https://www.postgresql.org/docs/current/tutorial-transactions.html"
+        },
+        {
+          "title": "PostgreSQL — Backup and Restore",
+          "url": "https://www.postgresql.org/docs/current/backup.html"
+        },
+        {
+          "title": "Python — sqlite3",
+          "url": "https://docs.python.org/3/library/sqlite3.html"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -1993,8 +2073,8 @@
       "order": 5,
       "title": "Embeddings e busca com pgvector",
       "summary": "Comparar busca semântica e filtros usando exemplos controlados.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Explicar embeddings e similaridade",
@@ -2003,14 +2083,31 @@
       "prerequisites": [
         "data-04"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 75,
+        "complete": 120
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "data-05",
+        "title": "Busca vetorial sintética",
+        "limitations": "Usa vetores escritos à mão e filtros fechados; não chama modelo, pgvector, banco ou rede."
+      },
+      "sources": [
+        {
+          "title": "pgvector — documentação oficial",
+          "url": "https://github.com/pgvector/pgvector"
+        },
+        {
+          "title": "PostgreSQL — Row Security Policies",
+          "url": "https://www.postgresql.org/docs/current/ddl-rowsecurity.html"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2031,8 +2128,8 @@
       "order": 6,
       "title": "RAG com evidência e acesso",
       "summary": "Avaliar respostas com citações e respeitar a permissão do documento recuperado.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Conferir citações e ausência de evidência",
@@ -2041,14 +2138,31 @@
       "prerequisites": [
         "data-05"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 75,
+        "complete": 120
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "data-06",
+        "title": "Evidência e acesso local",
+        "limitations": "Avalia casos de citação predefinidos; não interpreta texto livre, chama modelo ou altera permissões."
+      },
+      "sources": [
+        {
+          "title": "OWASP — Top 10 for LLM Applications",
+          "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+        },
+        {
+          "title": "NIST — AI Risk Management Framework",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2069,8 +2183,8 @@
       "order": 1,
       "title": "Identidade e menor privilégio",
       "summary": "Desenhar permissões limitadas por recurso e operação.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.20.1",
       "lesson_day": null,
       "competencies": [
         "Distinguir autenticação de autorização",
@@ -2079,14 +2193,31 @@
       "prerequisites": [
         "infra-03"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 75,
+        "complete": 120
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "security-01",
+        "title": "Matriz local de autorização",
+        "limitations": "Avalia somente identidades e recursos sintéticos; não cria contas, credenciais, políticas ou chamadas de rede."
+      },
+      "sources": [
+        {
+          "title": "NIST SP 800-207 — Zero Trust Architecture",
+          "url": "https://csrc.nist.gov/pubs/sp/800/207/final"
+        },
+        {
+          "title": "NIST SP 800-162 — Guide to Attribute Based Access Control (ABAC) Definition and Considerations",
+          "url": "https://csrc.nist.gov/pubs/sp/800/162/upd2/final"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.20.1"
         },
         {
           "locale": "en",
@@ -2107,8 +2238,8 @@
       "order": 2,
       "title": "Segredos e proteção de dados",
       "summary": "Separar credenciais, configurações e dados de estudo.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Reconhecer exposição de segredo",
@@ -2117,14 +2248,35 @@
       "prerequisites": [
         "security-01"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 75,
+        "complete": 120
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "security-02",
+        "title": "Redação de evidência local",
+        "limitations": "Avalia escolhas fechadas sobre registros sintéticos; não lê, testa, registra ou transmite segredos."
+      },
+      "sources": [
+        {
+          "title": "NIST SP 800-92 — Guide to Computer Security Log Management",
+          "url": "https://csrc.nist.gov/pubs/sp/800/92/final"
+        },
+        {
+          "title": "NIST SP 800-122 — Guide to Protecting the Confidentiality of Personally Identifiable Information (PII)",
+          "url": "https://csrc.nist.gov/pubs/sp/800/122/final"
+        },
+        {
+          "title": "OWASP Cheat Sheet Series — Secrets Management",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2145,8 +2297,8 @@
       "order": 3,
       "title": "Redes e hardening",
       "summary": "Reduzir a superfície de um serviço mantendo acesso de recuperação.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Explicar regras de entrada e saída",
@@ -2155,14 +2307,43 @@
       "prerequisites": [
         "security-02"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 90,
+        "complete": 150
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "security-03",
+        "title": "Hardening de topologia local",
+        "limitations": "Avalia escolhas fechadas de manifests sintéticos; não inicia Docker, rede, serviço ou processo."
+      },
+      "sources": [
+        {
+          "title": "Docker Engine security",
+          "url": "https://docs.docker.com/engine/security/"
+        },
+        {
+          "title": "Docker Engine — Rootless mode",
+          "url": "https://docs.docker.com/engine/security/rootless/"
+        },
+        {
+          "title": "Docker Compose reference — Services",
+          "url": "https://docs.docker.com/reference/compose-file/services/"
+        },
+        {
+          "title": "Docker Compose reference — Networks",
+          "url": "https://docs.docker.com/reference/compose-file/networks/"
+        },
+        {
+          "title": "CIS Docker Benchmark",
+          "url": "https://www.cisecurity.org/benchmark/docker"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2183,8 +2364,8 @@
       "order": 4,
       "title": "Containers e dependências",
       "summary": "Inspecionar imagem, permissões e dependências antes de executar.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Interpretar achados sem confundir scanner com garantia",
@@ -2193,14 +2374,39 @@
       "prerequisites": [
         "security-03"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 90,
+        "complete": 150
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "security-04",
+        "title": "Cadeia de suprimento sintética",
+        "limitations": "Avalia decisões fechadas de artefatos fictícios; não baixa imagem, consulta registry, executa scanner ou runtime."
+      },
+      "sources": [
+        {
+          "title": "Docker Docs — Image digests",
+          "url": "https://docs.docker.com/dhi/explore/security-concepts/digests/"
+        },
+        {
+          "title": "SPDX Specification 3.0.1",
+          "url": "https://spdx.github.io/spdx-spec/v3.0.1/"
+        },
+        {
+          "title": "SPDX License List",
+          "url": "https://spdx.org/licenses/"
+        },
+        {
+          "title": "SLSA v1.2 — Provenance",
+          "url": "https://slsa.dev/spec/v1.2/provenance"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2221,8 +2427,8 @@
       "order": 5,
       "title": "Detectar, responder e recuperar",
       "summary": "Praticar contenção e restauração em um incidente fictício.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Preservar evidências permitidas",
@@ -2231,14 +2437,35 @@
       "prerequisites": [
         "security-04"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 90,
+        "complete": 150
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "security-05",
+        "title": "Resposta a incidente em memória",
+        "limitations": "Avalia decisões fechadas sobre snapshots sintéticos; não restaura arquivo, banco, volume ou serviço."
+      },
+      "sources": [
+        {
+          "title": "NIST SP 800-61 Rev. 3 — Incident Response Recommendations and Considerations for Cybersecurity Risk Management",
+          "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+        },
+        {
+          "title": "NIST SP 800-34 Rev. 1 — Contingency Planning Guide for Federal Information Systems",
+          "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final"
+        },
+        {
+          "title": "NIST Cybersecurity Framework 2.0",
+          "url": "https://www.nist.gov/cyberframework"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2259,8 +2486,8 @@
       "order": 6,
       "title": "Segurança de agentes e contexto",
       "summary": "Tratar instruções em documentos como dados sem conceder autoridade.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Testar instrução maliciosa e ferramenta negada",
@@ -2269,14 +2496,39 @@
       "prerequisites": [
         "security-05"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 90,
+        "complete": 150
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "security-06",
+        "title": "Política estática de agentes",
+        "limitations": "Avalia escolhas fechadas de policy; não chama modelo, ferramenta, rede, processo ou aprovação real."
+      },
+      "sources": [
+        {
+          "title": "OWASP Top 10 for Agentic Applications for 2026",
+          "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+        },
+        {
+          "title": "NIST AI 600-1 — Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence"
+        },
+        {
+          "title": "NIST AI 100-1 — Artificial Intelligence Risk Management Framework 1.0",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10"
+        },
+        {
+          "title": "JSON Schema Draft 2020-12",
+          "url": "https://json-schema.org/draft/2020-12"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2297,8 +2549,8 @@
       "order": 1,
       "title": "Processos, regras e agentes",
       "summary": "Escolher fluxo determinístico ou agente a partir do problema e do risco.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.20.1",
       "lesson_day": null,
       "competencies": [
         "Mapear entradas, decisões e responsáveis",
@@ -2307,14 +2559,35 @@
       "prerequisites": [
         "infra-06"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 75,
+        "complete": 120
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "agents-01",
+        "title": "Classificação determinística de processos",
+        "limitations": "Não chama modelo, rede, ferramenta, subprocesso ou sistema externo; os cenários são fixtures fechadas."
+      },
+      "sources": [
+        {
+          "title": "NIST AI 100-1 — Artificial Intelligence Risk Management Framework 1.0",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10"
+        },
+        {
+          "title": "NIST AI 600-1 — Generative Artificial Intelligence Profile",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence"
+        },
+        {
+          "title": "NIST AI RMF Playbook",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework/nist-ai-rmf-playbook"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.20.1"
         },
         {
           "locale": "en",
@@ -2335,8 +2608,8 @@
       "order": 2,
       "title": "Modelos, assistentes e ferramentas",
       "summary": "Distinguir modelo, aplicativo, runtime e integração.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Descrever o papel de cada camada",
@@ -2345,14 +2618,35 @@
       "prerequisites": [
         "agents-01"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 75,
+        "complete": 120
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "agents-02",
+        "title": "Camadas e autoridade local",
+        "limitations": "Avalia escolhas fechadas sobre camadas sintéticas; não chama modelo, rede, ferramenta, subprocesso ou sistema externo."
+      },
+      "sources": [
+        {
+          "title": "NIST AI 100-1 — Artificial Intelligence Risk Management Framework 1.0",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10"
+        },
+        {
+          "title": "NIST AI 600-1 — Generative Artificial Intelligence Profile",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence"
+        },
+        {
+          "title": "OWASP Top 10 for Agentic Applications for 2026",
+          "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2373,8 +2667,8 @@
       "order": 3,
       "title": "Saídas estruturadas e ferramentas",
       "summary": "Validar pedidos de ação antes de executar uma ferramenta permitida.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Validar entrada e saída com schema",
@@ -2383,14 +2677,35 @@
       "prerequisites": [
         "agents-02"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 90,
+        "complete": 150
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "agents-03",
+        "title": "Contratos e ferramentas fechadas",
+        "limitations": "Avalia escolhas fechadas de contratos sintéticos; não interpreta comandos, URLs, caminhos, SQL ou texto livre."
+      },
+      "sources": [
+        {
+          "title": "JSON Schema Draft 2020-12",
+          "url": "https://json-schema.org/draft/2020-12"
+        },
+        {
+          "title": "OWASP Top 10 for Agentic Applications for 2026",
+          "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+        },
+        {
+          "title": "NIST AI 600-1 — Generative Artificial Intelligence Profile",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2411,8 +2726,8 @@
       "order": 4,
       "title": "Estado, avaliação e aprovação",
       "summary": "Controlar repetição, retomada e aprovação sem depender da resposta do modelo.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Aplicar idempotência e limite de execução",
@@ -2421,14 +2736,39 @@
       "prerequisites": [
         "agents-03"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 90,
+        "complete": 150
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "agents-04",
+        "title": "Estado e aprovação sintéticos",
+        "limitations": "Avalia decisões fechadas em memória; não cria aprovação, persiste estado, chama modelo ou executa ferramenta externa."
+      },
+      "sources": [
+        {
+          "title": "OWASP Top 10 for Agentic Applications for 2026",
+          "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+        },
+        {
+          "title": "NIST AI 100-1 — Artificial Intelligence Risk Management Framework 1.0",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10"
+        },
+        {
+          "title": "JSON Schema Draft 2020-12",
+          "url": "https://json-schema.org/draft/2020-12"
+        },
+        {
+          "title": "NIST SP 800-204A — Building Secure Microservices-based Applications Using Service-Mesh Architecture",
+          "url": "https://csrc.nist.gov/pubs/sp/800/204/a/final"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2449,8 +2789,8 @@
       "order": 5,
       "title": "Desenvolvimento: triagem de bugs",
       "summary": "Investigar código sintético, propor correção e revisar testes e diff.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Vincular hipótese a evidência no código",
@@ -2459,14 +2799,39 @@
       "prerequisites": [
         "agents-04"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 90,
+        "complete": 150
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "agents-05",
+        "title": "Triagem de bug sintética",
+        "limitations": "Avalia escolhas fechadas de revisão; não abre repositório, executa Docker, cria commit, envia alteração ou acessa rede."
+      },
+      "sources": [
+        {
+          "title": "NIST SP 800-218 — Secure Software Development Framework 1.1",
+          "url": "https://csrc.nist.gov/pubs/sp/800/218/final"
+        },
+        {
+          "title": "OWASP Secure Coding Practices — Quick Reference Guide",
+          "url": "https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/"
+        },
+        {
+          "title": "Git — git-diff Documentation",
+          "url": "https://git-scm.com/docs/git-diff"
+        },
+        {
+          "title": "Python 3.14 — difflib",
+          "url": "https://docs.python.org/3.14/library/difflib.html"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2487,8 +2852,8 @@
       "order": 6,
       "title": "Atendimento: chamados e runbooks",
       "summary": "Classificar solicitações e preparar resposta citando procedimentos.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Recuperar fontes permitidas",
@@ -2497,14 +2862,31 @@
       "prerequisites": [
         "agents-05"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 75,
+        "complete": 120
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "agents-06",
+        "title": "Chamados e runbooks locais",
+        "limitations": "Avalia escolhas fechadas de atendimento; não envia mensagens, altera contas, executa runbooks ou acessa rede."
+      },
+      "sources": [
+        {
+          "title": "NIST AI RMF 1.0 — governança, contexto e medição",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10"
+        },
+        {
+          "title": "JSON Schema Draft 2020-12 — contratos fechados",
+          "url": "https://json-schema.org/draft/2020-12"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2525,8 +2907,8 @@
       "order": 7,
       "title": "Marketing: briefing e revisão",
       "summary": "Transformar um briefing fictício em rascunho sujeito a revisão editorial.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Separar fatos fornecidos de afirmações sem suporte",
@@ -2535,14 +2917,31 @@
       "prerequisites": [
         "agents-06"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 75,
+        "complete": 120
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "agents-07",
+        "title": "Briefing e revisão local",
+        "limitations": "Avalia escolhas fechadas de revisão editorial; não publica, envia conteúdo, chama modelo ou acessa plataforma externa."
+      },
+      "sources": [
+        {
+          "title": "NIST AI RMF 1.0 — governança, contexto e medição",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10"
+        },
+        {
+          "title": "JSON Schema Draft 2020-12 — contratos fechados",
+          "url": "https://json-schema.org/draft/2020-12"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",
@@ -2563,8 +2962,8 @@
       "order": 8,
       "title": "Financeiro: conciliação sintética",
       "summary": "Explicar divergências de arquivos fictícios com cálculos feitos em código.",
-      "status": "planned",
-      "content_version": null,
+      "status": "available",
+      "content_version": "2026.09.21.1",
       "lesson_day": null,
       "competencies": [
         "Conciliar valores e identificar exceções",
@@ -2573,14 +2972,31 @@
       "prerequisites": [
         "agents-07"
       ],
-      "duration_minutes": null,
-      "practice": null,
-      "sources": [],
+      "duration_minutes": {
+        "essential": 75,
+        "complete": 120
+      },
+      "practice": {
+        "kind": "guided_fixture",
+        "lab_id": "agents-08",
+        "title": "Conciliação sintética local",
+        "limitations": "Avalia escolhas fechadas de registros fictícios; não importa arquivos, transfere valores, conecta banco ou acessa rede."
+      },
+      "sources": [
+        {
+          "title": "NIST AI RMF 1.0 — governança, contexto e medição",
+          "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10"
+        },
+        {
+          "title": "JSON Schema Draft 2020-12 — contratos fechados",
+          "url": "https://json-schema.org/draft/2020-12"
+        }
+      ],
       "translations": [
         {
           "locale": "pt-BR",
-          "status": "planned",
-          "content_version": null
+          "status": "available",
+          "content_version": "2026.09.21.1"
         },
         {
           "locale": "en",

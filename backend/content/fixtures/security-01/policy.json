@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "allowed_actions": [
+    "ler",
+    "alterar"
+  ],
+  "subjects": [
+    {
+      "id": "ana-sre",
+      "scope": "equipe-alfa"
+    },
+    {
+      "id": "bia-estagiaria",
+      "scope": "equipe-alfa"
+    }
+  ],
+  "resources": [
+    {
+      "id": "runbook-alpha",
+      "scope": "equipe-alfa"
+    },
+    {
+      "id": "runbook-beta",
+      "scope": "equipe-beta"
+    }
+  ],
+  "grants": [
+    {
+      "subject": "ana-sre",
+      "action": "ler",
+      "resource": "runbook-alpha"
+    },
+    {
+      "subject": "ana-sre",
+      "action": "alterar",
+      "resource": "runbook-alpha"
+    }
+  ]
+}

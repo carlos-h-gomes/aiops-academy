@@ -58,6 +58,39 @@ PLANNED = {
     ],
 }
 
+PUBLISHED_INITIAL = {
+    'data-01': {'content_version': '2026.09.20.1', 'duration_minutes': {'essential': 90, 'complete': 150}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'data-01', 'title': 'Fixture relacional local', 'limitations': 'Use somente os arquivos sintéticos e o verificador local; não conecta PostgreSQL nem um banco externo.'}},
+    'data-02': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 90, 'complete': 150}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'data-02', 'title': 'Joins e contagens locais', 'limitations': 'Avalia escolhas fechadas sobre fixtures SQLite; não executa SQL do aluno nem conecta um banco externo.'}},
+    'data-03': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 75, 'complete': 120}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'data-03', 'title': 'Plano de execução sintético', 'limitations': 'Usa um plano desenhado para estudo; não mede PostgreSQL, runtime, buffers ou desempenho.'}},
+    'data-04': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 90, 'complete': 150}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'data-04', 'title': 'Rollback e restauração local', 'limitations': 'Usa conexões SQLite em memória; não abre dumps, arquivos do aluno ou um banco PostgreSQL.'}},
+    'data-05': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 75, 'complete': 120}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'data-05', 'title': 'Busca vetorial sintética', 'limitations': 'Usa vetores escritos à mão e filtros fechados; não chama modelo, pgvector, banco ou rede.'}},
+    'data-06': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 75, 'complete': 120}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'data-06', 'title': 'Evidência e acesso local', 'limitations': 'Avalia casos de citação predefinidos; não interpreta texto livre, chama modelo ou altera permissões.'}},
+    'security-01': {'content_version': '2026.09.20.1', 'duration_minutes': {'essential': 75, 'complete': 120}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'security-01', 'title': 'Matriz local de autorização', 'limitations': 'Avalia somente identidades e recursos sintéticos; não cria contas, credenciais, políticas ou chamadas de rede.'}},
+    'security-02': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 75, 'complete': 120}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'security-02', 'title': 'Redação de evidência local', 'limitations': 'Avalia escolhas fechadas sobre registros sintéticos; não lê, testa, registra ou transmite segredos.'}},
+    'security-03': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 90, 'complete': 150}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'security-03', 'title': 'Hardening de topologia local', 'limitations': 'Avalia escolhas fechadas de manifests sintéticos; não inicia Docker, rede, serviço ou processo.'}},
+    'security-04': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 90, 'complete': 150}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'security-04', 'title': 'Cadeia de suprimento sintética', 'limitations': 'Avalia decisões fechadas de artefatos fictícios; não baixa imagem, consulta registry, executa scanner ou runtime.'}},
+    'security-05': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 90, 'complete': 150}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'security-05', 'title': 'Resposta a incidente em memória', 'limitations': 'Avalia decisões fechadas sobre snapshots sintéticos; não restaura arquivo, banco, volume ou serviço.'}},
+    'security-06': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 90, 'complete': 150}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'security-06', 'title': 'Política estática de agentes', 'limitations': 'Avalia escolhas fechadas de policy; não chama modelo, ferramenta, rede, processo ou aprovação real.'}},
+    'agents-01': {'content_version': '2026.09.20.1', 'duration_minutes': {'essential': 75, 'complete': 120}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'agents-01', 'title': 'Classificação determinística de processos', 'limitations': 'Não chama modelo, rede, ferramenta, subprocesso ou sistema externo; os cenários são fixtures fechadas.'}},
+    'agents-02': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 75, 'complete': 120}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'agents-02', 'title': 'Camadas e autoridade local', 'limitations': 'Avalia escolhas fechadas sobre camadas sintéticas; não chama modelo, rede, ferramenta, subprocesso ou sistema externo.'}},
+    'agents-03': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 90, 'complete': 150}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'agents-03', 'title': 'Contratos e ferramentas fechadas', 'limitations': 'Avalia escolhas fechadas de contratos sintéticos; não interpreta comandos, URLs, caminhos, SQL ou texto livre.'}},
+    'agents-04': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 90, 'complete': 150}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'agents-04', 'title': 'Estado e aprovação sintéticos', 'limitations': 'Avalia decisões fechadas em memória; não cria aprovação, persiste estado, chama modelo ou executa ferramenta externa.'}},
+    'agents-05': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 90, 'complete': 150}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'agents-05', 'title': 'Triagem de bug sintética', 'limitations': 'Avalia escolhas fechadas de revisão; não abre repositório, executa Docker, cria commit, envia alteração ou acessa rede.'}},
+    'agents-06': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 75, 'complete': 120}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'agents-06', 'title': 'Chamados e runbooks locais', 'limitations': 'Avalia escolhas fechadas de atendimento; não envia mensagens, altera contas, executa runbooks ou acessa rede.'}},
+    'agents-07': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 75, 'complete': 120}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'agents-07', 'title': 'Briefing e revisão local', 'limitations': 'Avalia escolhas fechadas de revisão editorial; não publica, envia conteúdo, chama modelo ou acessa plataforma externa.'}},
+    'agents-08': {'content_version': '2026.09.21.1', 'duration_minutes': {'essential': 75, 'complete': 120}, 'practice': {'kind': 'guided_fixture', 'lab_id': 'agents-08', 'title': 'Conciliação sintética local', 'limitations': 'Avalia escolhas fechadas de registros fictícios; não importa arquivos, transfere valores, conecta banco ou acessa rede.'}},
+}
+
+def load_published_authored_unit(identity):
+    path = ROOT / 'backend/content/planned-units' / f'{identity}.json'
+    raw = path.read_bytes()
+    if len(raw) > 100_000:
+        raise ValueError('Published lesson source exceeds size limit.')
+    value = json.loads(raw)
+    if value.get('id') != identity or value.get('status') != 'available' or not isinstance(value.get('body'), str):
+        raise ValueError('Published lesson source is inconsistent.')
+    return value
+
 
 def build_catalog(course, manuals, labs):
     sources = {source['id']: source for source in course['sources']}
@@ -82,12 +115,15 @@ def build_catalog(course, manuals, labs):
     bases = {'data':'infra-05', 'security':'infra-03', 'agents':'infra-06'}
     for track_id, items in PLANNED.items():
         for order, (title, summary, competencies) in enumerate(items, 1):
-            units.append(dict(id=f'{track_id}-{order:02d}', track_id=track_id, order=order,
-                title=title, summary=summary, competencies=competencies, status='planned',
-                content_version=None, lesson_day=None, duration_minutes=None, practice=None, sources=[],
-                prerequisites=[f'{track_id}-{order-1:02d}' if order > 1 else bases[track_id]],
-                translations=[dict(locale=locale, status='planned', content_version=None) for locale in ('pt-BR','en','es')],
-                verified_tool_versions=[]))
+            identity = f'{track_id}-{order:02d}'
+            published = PUBLISHED_INITIAL.get(identity)
+            if published:
+                authored = load_published_authored_unit(identity)
+                if authored['title'] != title or authored['summary'] != summary or authored['competencies'] != competencies:
+                    raise ValueError('Published lesson metadata does not match the editorial plan.')
+                units.append(dict(id=identity, track_id=track_id, order=order, title=title, summary=summary, competencies=competencies, status='available', content_version=published['content_version'], lesson_day=None, duration_minutes=published['duration_minutes'], practice=published['practice'], sources=[dict(title=item['title'], url=item['url']) for item in authored['sources']], prerequisites=[f'{track_id}-{order-1:02d}' if order > 1 else bases[track_id]], translations=[dict(locale='pt-BR', status='available', content_version=published['content_version']), *[dict(locale=locale, status='planned', content_version=None) for locale in ('en','es')]], verified_tool_versions=[]))
+            else:
+                units.append(dict(id=identity, track_id=track_id, order=order, title=title, summary=summary, competencies=competencies, status='planned', content_version=None, lesson_day=None, duration_minutes=None, practice=None, sources=[], prerequisites=[f'{track_id}-{order-1:02d}' if order > 1 else bases[track_id]], translations=[dict(locale=locale, status='planned', content_version=None) for locale in ('pt-BR','en','es')], verified_tool_versions=[]))
     value = Curriculum.model_validate(dict(schema_version='1.0', version='2026.09.07.1',
         metadata_reviewed_on='2026-09-07', tracks=tracks, units=units))
     return validate_content_links(value, course, manuals, labs)

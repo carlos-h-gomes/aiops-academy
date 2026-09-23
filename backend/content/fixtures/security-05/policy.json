@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "required_decision_order": [
+    "detect",
+    "preserve_evidence",
+    "contain",
+    "eradicate",
+    "recover",
+    "verify",
+    "prevent"
+  ],
+  "allowed_evidence_fields": [
+    "incident_id",
+    "signal_id",
+    "observed_at",
+    "summary"
+  ],
+  "required_evidence_fields": [
+    "incident_id",
+    "signal_id",
+    "observed_at",
+    "summary"
+  ],
+  "allowed_containment_actions": [
+    "isolate-fixture-workload"
+  ],
+  "allowed_eradication_actions": [
+    "remove-fixture-change-from-copy"
+  ],
+  "allowed_recovery_destinations": [
+    "recovery-slot-beta"
+  ],
+  "required_postconditions": [
+    "origin_unchanged",
+    "destination_matches_known_good",
+    "containment_remains_active",
+    "prevention_recorded"
+  ],
+  "report_fields": [
+    "scenario_id",
+    "decision",
+    "reasons",
+    "completed_stages",
+    "origin_unchanged",
+    "postconditions"
+  ]
+}

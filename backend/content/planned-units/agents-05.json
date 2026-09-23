@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "id": "agents-05",
+  "track_id": "agents",
+  "order": 5,
+  "title": "Desenvolvimento: triagem de bugs",
+  "summary": "Investigar código sintético, propor correção e revisar testes e diff.",
+  "status": "available",
+  "prerequisites": [
+    "agents-04"
+  ],
+  "competencies": [
+    "Vincular hipótese a evidência no código",
+    "Preparar alteração revisável sem publicação automática"
+  ],
+  "duration_minutes": {
+    "essential": 90,
+    "complete": 150
+  },
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "body": "## Objetivo observável\nAo final, você deverá relacionar um ticket fictício a evidências específicas em código e teste sintéticos, formular uma hipótese verificável, gerar um unified diff somente em área efêmera e decidir se ele pode ser aceito. Você deverá demonstrar que leitura fora da allowlist falha, que o repositório fixture permanece imutável e que somente uma aprovação humana sintética vinculada ao SHA-256 do diff registra o aceite.\n\n## Contexto e limites\nTriagem de bug não é sinônimo de modificar um repositório. Primeiro se confirma o comportamento esperado, localiza-se a evidência, propõe-se uma explicação refutável e descrevem-se testes capazes de distinguir a hipótese. Nesta prática, o controlador determinístico usa biblioteca padrão, não usa modelo e não interpreta instruções abertas como autoridade.\n\nAs únicas leituras são `ticket.json`, `proposal.json`, `repository/src/totals.py` e `repository/tests/test_totals.py`. Código, ticket e proposta são dados sintéticos; nenhum deles amplia a policy. Candidato, diff e registro de aceite existem apenas em `TemporaryDirectory`. Não há Git, commit, push, checkout, shell livre, subprocesso, URL, rede, segredo, pacote, escrita no repositório fixture ou integração externa.\n\nA aprovação não nasce de texto do ticket nem da saída da ferramenta. Ela é um registro sintético fornecido pela pessoa revisora, com emissor, estado, cenário, ação, alvo, versão e hash exatos. Ausência de aprovação resulta em `hold`; vínculo divergente resulta em `block`. Mesmo `accepted` significa somente aceite didático do diff efêmero, nunca aplicação ou publicação.\n\n## Exemplo sintético\nO ticket `BUG-1042` informa que 15% de desconto sobre 199 centavos deve resultar em 169 centavos segundo arredondamento half-up do total final, mas a função fixture retorna 170 porque trunca o desconto antes de subtraí-lo. A proposta troca a expressão por `(subtotal_cents * (100 - discount_percent) + 50) // 100` e aponta o teste de arredondamento como evidência. O controlador exige que o trecho anterior ocorra exatamente uma vez, gera o diff e calcula seu SHA-256 sem executar o código da fixture.\n\n## Exercício\nUse o roteiro executável `labs/agents-processes-pilot/GUIDE.md`, a entrada `src/learning_session.py` e o perfil não secreto `runtime.env` do piloto. A imagem Linux amd64 foi qualificada localmente em 2026-09-15. Cada comando termina e limpa a área temporária; uma nova execução reconstrói a proposta determinística. Esta integração é local e não abre a aula nem salva progresso no aplicativo.\n\n1. Leia o ticket e separe comportamento observado, comportamento esperado e regra de arredondamento.\n2. Inspecione os dois arquivos de repositório allowlisted e associe a hipótese a linhas de código e teste.\n3. Execute `review` pelo Compose indicado no guia. Leia ticket, código, teste e diff; confirme `hold` e anote o SHA-256 somente depois de revisar.\n4. Execute `check-paths`: os três exemplos fixos de leitura fora da allowlist devem ser recusados; não forneça caminhos pessoais.\n5. Revise o diff e os três testes propostos. Execute `reject` e explique por que uma proposta pode ser negada mesmo quando seu hash é válido.\n6. Compare `review` sem aprovação (`hold`), `approve` sem hash (erro de uso) e `approve` com hash divergente (`block`).\n7. Execute `approve --reviewed-hash` com o SHA-256 que você revisou; confirme o aceite humano sintético e que `acceptance.json` foi apenas temporário, sem aplicação do patch.\n8. Execute `reset`: confirme dois resets consecutivos, repetição do hash e limpeza final. Registre sua explicação e os limites usando o roteiro de evidência do guia.\n\n## Pistas\n**Pista 1 — evidência antes da correção:** a descrição do ticket sugere uma hipótese, mas o trecho exato e o teste de fronteira devem sustentá-la antes do diff.\n\n**Pista 2 — aceite não é aplicação:** verifique onde cada arquivo foi escrito e quais campos ligam a decisão humana à versão revisada.\n\n## Solução comentada\nA hipótese correta é que a implementação arredonda indiretamente ao truncar o valor do desconto, enquanto o contrato pede half-up sobre o total final. O código e o teste fixture formam duas evidências independentes. A substituição é aceita para proposta apenas se o texto anterior aparece exatamente uma vez; zero ou múltiplas ocorrências bloqueiam uma edição ambígua. `difflib.unified_diff` produz um artefato revisável, e o hash identifica exatamente os bytes analisados.\n\nO leitor resolve o nome contra a raiz conhecida e compara com a allowlist antes de abrir o arquivo. O escritor só conhece três destinos internos no diretório temporário. Sem registro humano, o estado fica `hold/approval_missing`; campos extras, emissor incorreto, negação ou vínculo divergente ficam `block`. Com vínculo integral, `acceptance.json` guarda apenas IDs, versão e hash. O código original nunca é substituído, e o reset remove somente candidato, diff e aceite.\n\nOs testes propostos são: reproduzir 199 centavos com 15%, preservar um caso exato como 200 com 15%, e manter negações para subtotal ou percentual fora do contrato. Eles são descritos e inspecionados, não executados contra software real nesta prática.\n\n## Critério de conclusão\nConclua quando o relatório referenciar ticket, código e teste; o diff corresponder à única substituição prevista; todas as leituras não allowlisted forem recusadas; candidato, diff e aceite existirem somente na área efêmera; aprovação ausente/divergente não aceitar; aprovação correta aceitar apenas o artefato sintético; reset restaurar o cenário; e a fixture conservar os mesmos hashes. Confirme também ausência de Git, shell, rede, segredo e escrita externa. `agents-05` e suas traduções PT-BR, EN e ES permanecem `planned`, sem duração ou publicação.\n\n## Variação\nAltere apenas uma cópia em memória do pedido para declarar uma regra de arredondamento diferente. A hipótese deve ser marcada incompatível com a evidência versionada, não convertida automaticamente em outro patch. Depois, simule aprovação com o hash da versão anterior: ela deve falhar por vínculo, mostrando por que revisar uma versão não autoriza outra.\n\n## Referências primárias\nFontes oficiais revisadas em 2026-09-11: NIST SP 800-218 para práticas seguras no ciclo de desenvolvimento; OWASP Secure Coding Practices como checklist tecnológico agnóstico, observando que o projeto original foi arquivado e migrado ao Developer Guide; Git `git-diff` para o significado de um diff revisável, sem executar Git nesta prática; e Python `difflib` para o formato unified diff usado pela biblioteca padrão. Essas fontes orientam a prática, mas não aprovam uma correção nem substituem revisão humana.",
+  "fixture": {
+    "policy": "labs/agents-processes-pilot/fixtures/development/policy.json",
+    "ticket": "labs/agents-processes-pilot/fixtures/development/ticket.json",
+    "proposal": "labs/agents-processes-pilot/fixtures/development/proposal.json",
+    "repository": "labs/agents-processes-pilot/fixtures/development/repository",
+    "controller": "labs/agents-processes-pilot/src/development_triage.py",
+    "guide": "labs/agents-processes-pilot/GUIDE.md",
+    "session": "labs/agents-processes-pilot/src/learning_session.py",
+    "runtime_profile": "labs/agents-processes-pilot/runtime.env"
+  },
+  "sources": [
+    {
+      "title": "NIST SP 800-218 — Secure Software Development Framework 1.1",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "reviewed_on": "2026-09-11"
+    },
+    {
+      "title": "OWASP Secure Coding Practices — Quick Reference Guide",
+      "url": "https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/",
+      "reviewed_on": "2026-09-11"
+    },
+    {
+      "title": "Git — git-diff Documentation",
+      "url": "https://git-scm.com/docs/git-diff",
+      "reviewed_on": "2026-09-11"
+    },
+    {
+      "title": "Python 3.14 — difflib",
+      "url": "https://docs.python.org/3.14/library/difflib.html",
+      "reviewed_on": "2026-09-11"
+    }
+  ]
+}

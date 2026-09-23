@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiops-academy.invalid/schemas/agents-01-04-control-request-v1.json",
+  "title": "Pedido do controlador didático local de agents-01 a agents-04",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "scenario_version",
+    "subject",
+    "action",
+    "target",
+    "tool",
+    "fixture_id",
+    "approval_id",
+    "idempotency_key",
+    "step_budget",
+    "artifact_version"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "request_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+    "scenario_version": {"$ref": "#/$defs/version"},
+    "subject": {"$ref": "#/$defs/identifier"},
+    "action": {"$ref": "#/$defs/identifier"},
+    "target": {"$ref": "#/$defs/identifier"},
+    "tool": {"$ref": "#/$defs/identifier"},
+    "fixture_id": {"$ref": "#/$defs/identifier"},
+    "approval_id": {
+      "oneOf": [
+        {"$ref": "#/$defs/identifier"},
+        {"type": "null"}
+      ]
+    },
+    "idempotency_key": {"$ref": "#/$defs/identifier"},
+    "step_budget": {"type": "integer", "minimum": 1, "maximum": 16},
+    "artifact_version": {"$ref": "#/$defs/version"}
+  },
+  "$defs": {
+    "identifier": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{1,63}$"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"}
+  }
+}

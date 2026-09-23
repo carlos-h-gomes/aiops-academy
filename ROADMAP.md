@@ -1,6 +1,6 @@
 # Roadmap do AIOps Academy
 
-Atualização de planejamento, 2026-09-07: o [desenho da V1 pública](docs/planning/V1-PROPOSTA.md) e seu [backlog](docs/planning/V1-BACKLOG.md) foram aprovados; a implementação incremental começou. Essa proposta amplia a direção abaixo para quatro trilhas, contas opcionais e PWA; substitui como direção aprovada a sequência futura 1.2–1.4 abaixo, mantida como histórico. Não altera o marco entregue 1.1 nem representa funcionalidades implementadas.
+Atualização de planejamento, 2026-09-07: a direção da V1 pública e seu backlog foram aprovados; a implementação incremental começou. Essa direção amplia o plano abaixo para quatro trilhas, contas opcionais e PWA; substitui como direção aprovada a sequência futura 1.2–1.4 abaixo, mantida como histórico. Não altera o marco entregue 1.1 nem representa funcionalidades implementadas.
 
 Direção: tornar o estudo de AIOps acessível, prático e verificável. Português primeiro, funcionamento local e evolução sem apagar o progresso de quem já começou. As etapas abaixo são propostas de escopo, não promessas de data.
 

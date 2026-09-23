@@ -1,0 +1,216 @@
+name: aiops-academy-observability-pilot
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aiops-academy-observability-pilot-python:local
+    command: ["app.py", "--host", "0.0.0.0", "--port", "8080", "--seconds", "2400"]
+    init: true
+    user: "65532:65532"
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 64
+    cpus: 0.25
+    mem_limit: 96m
+    restart: "no"
+    stop_grace_period: 5s
+    tmpfs:
+      - /tmp:size=16m,mode=1777,nosuid,nodev,noexec
+    networks: [lab_internal]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=1).close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 6
+      start_period: 3s
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  loadgen:
+    image: aiops-academy-observability-pilot-python:local
+    command: ["loadgen.py", "--seconds", "1800", "--interval", "0.5"]
+    init: true
+    user: "65532:65532"
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 32
+    cpus: 0.10
+    mem_limit: 48m
+    restart: "no"
+    stop_grace_period: 5s
+    tmpfs:
+      - /tmp:size=8m,mode=1777,nosuid,nodev,noexec
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [lab_internal]
+    logging:
+      driver: json-file
+      options:
+        max-size: "2m"
+        max-file: "2"
+
+  prometheus:
+    image: prom/prometheus:v3.5.5
+    user: "65534:65534"
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 96
+    cpus: 0.50
+    mem_limit: 384m
+    restart: "no"
+    stop_grace_period: 10s
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=1h
+      - --storage.tsdb.retention.size=128MB
+      - --web.listen-address=0.0.0.0:9090
+      - --log.level=info
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    tmpfs:
+      - /prometheus:size=128m,uid=65534,gid=65534,mode=0750,nosuid,nodev,noexec
+      - /tmp:size=16m,uid=65534,gid=65534,mode=1777,nosuid,nodev,noexec
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [lab_internal]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:9090/-/ready"]
+      interval: 5s
+      timeout: 2s
+      retries: 12
+      start_period: 5s
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  grafana:
+    image: grafana/grafana-oss:13.0.2
+    user: "472:0"
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 96
+    cpus: 0.50
+    mem_limit: 384m
+    restart: "no"
+    stop_grace_period: 10s
+    environment:
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
+      GF_PLUGINS_PLUGIN_ADMIN_ENABLED: "false"
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_USERS_ALLOW_ORG_CREATE: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    tmpfs:
+      - /var/lib/grafana:size=128m,uid=472,gid=0,mode=0750,nosuid,nodev,noexec
+      - /tmp:size=32m,uid=472,gid=0,mode=1777,nosuid,nodev,noexec
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    networks: [lab_internal]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/api/health"]
+      interval: 5s
+      timeout: 2s
+      retries: 12
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  gateway:
+    image: aiops-academy-observability-pilot-python:local
+    command: ["gateway.py"]
+    init: true
+    user: "65532:65532"
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 48
+    cpus: 0.10
+    mem_limit: 64m
+    restart: "no"
+    stop_grace_period: 5s
+    tmpfs:
+      - /tmp:size=8m,mode=1777,nosuid,nodev,noexec
+    ports:
+      - "127.0.0.1:13000:13000"
+      - "127.0.0.1:18080:18080"
+      - "127.0.0.1:19090:19090"
+    depends_on:
+      app:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
+      grafana:
+        condition: service_healthy
+    networks: [lab_internal, host_access]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 13000), timeout=1).close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 6
+      start_period: 3s
+    logging:
+      driver: json-file
+      options:
+        max-size: "2m"
+        max-file: "2"
+
+  control:
+    image: aiops-academy-observability-pilot-python:local
+    entrypoint: ["python", "control.py"]
+    command: ["--help"]
+    profiles: ["tools"]
+    user: "65532:65532"
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 16
+    cpus: 0.10
+    mem_limit: 48m
+    restart: "no"
+    stop_grace_period: 3s
+    tmpfs:
+      - /tmp:size=8m,mode=1777,nosuid,nodev,noexec
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [lab_internal]
+    logging:
+      driver: json-file
+      options:
+        max-size: "1m"
+        max-file: "1"
+
+networks:
+  lab_internal:
+    internal: true
+  host_access:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"

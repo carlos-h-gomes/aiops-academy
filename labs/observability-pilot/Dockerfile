@@ -1,0 +1,10 @@
+FROM python:3.13.15-alpine3.24
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /opt/lab
+COPY --chown=65532:65532 src/ /opt/lab/
+
+USER 65532:65532
+ENTRYPOINT ["python"]

@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "security-02",
+  "track_id": "security",
+  "order": 2,
+  "title": "Segredos e proteção de dados",
+  "summary": "Separar credenciais, configurações e dados de estudo.",
+  "status": "available",
+  "prerequisites": [
+    "security-01"
+  ],
+  "competencies": [
+    "Reconhecer exposição de segredo",
+    "Definir retenção e recuperação sem copiar dados reais"
+  ],
+  "duration_minutes": {"essential": 75, "complete": 120},
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "body": "## Objetivo observável\nAo final, você deverá classificar os sete campos da fixture como evidência permitida, configuração, marcador semelhante a segredo ou dado de estudo; produzir uma saída contendo exclusivamente os cinco campos permitidos; substituir os dois valores protegidos por `[REDIGIDO]`; e obter a aceitação da saída válida e a rejeição tipada dos quatro exemplos inválidos, sem registrar, testar ou armazenar credencial real.\n\n## Contexto e limites\nSegredo é um valor que concede ou ajuda a obter capacidade, como uma senha, chave ou token. Configuração descreve comportamento sem necessariamente conceder autoridade. Dado de estudo pode ser sintético e ainda assim deve obedecer à finalidade e à minimização do exercício. Evidência é o conjunto mínimo necessário para demonstrar uma decisão, não uma cópia indiscriminada da entrada. A classificação depende de contexto; nome de campo ou aparência isolada não substitui uma política.\n\nA fixture usa um marcador explicitamente inerte, com texto que afirma não ser credencial, e um registro de pessoa fictícia sob domínio reservado `.invalid`. Nenhum deles funciona em serviço algum. A política permite persistir apenas `event_id`, `decision`, `rule_id`, `summary` e `redactions`; exclui a configuração de treino; e exige que `secret_marker` e `study_record` apareçam somente como nomes dentro do mapa `redactions`, ambos com o valor literal `[REDIGIDO]`. O verificador nunca imprime os valores protegidos.\n\nRetenção é definida por finalidade: os quatro campos de evidência têm janela didática declarada de 30 dias na fixture; configuração e valores protegidos têm retenção zero na saída. Em um incidente real, suspeita de credencial exposta exige interromper a cópia, conter o acesso e acionar o responsável para revogação/rotação e recuperação conforme procedimento autorizado. Esta prática não simula uso, validade, rotação ou restauração de segredo e não aceita valor real como entrada.\n\n## Exemplo sintético\nO registro de origem contém um ID de evento, a decisão `blocked`, a regra `redact-sensitive-data`, um resumo aprovado, a configuração `training`, o marcador `SEGREDO-DEMO-INERTE-NAO-USAR-7Q2X` e um registro de estudo fictício. A saída correta conserva os quatro campos de evidência e adiciona `redactions` com os nomes `secret_marker` e `study_record`, ambos mapeados para `[REDIGIDO]`. Ela não inclui `runtime_mode` nem qualquer valor bruto protegido.\n\nAs fixtures inválidas isolam quatro falhas: `log-secret-leak` coloca o marcador inerte onde deveria existir redaction; `evidence-study-data-leak` inclui o registro de estudo; `missing-redaction` omite uma redaction obrigatória; e `unapproved-field` acrescenta um campo fora da allowlist. O erro informa apenas a categoria da violação, nunca o conteúdo encontrado.\n\n## Exercício\n1. Leia `source-record.json` e classifique cada campo pela finalidade, sensibilidade e necessidade de retenção, sem copiar os valores protegidos para suas anotações.\n2. Compare sua classificação com `handling-policy.json` e justifique por que configuração, dado de estudo e evidência não são sinônimos.\n3. Escreva a lista exata dos cinco campos permitidos e marque quais nomes precisam aparecer no mapa de redaction.\n4. Inspecione `redacted-evidence.json` e confirme que os dois campos protegidos têm somente `[REDIGIDO]`, que a configuração foi excluída e que não existe campo extra.\n5. Antes de executar, associe cada arquivo em `invalid/` a um dos códigos: `secret_leak`, `study_data_leak`, `missing_redaction` e `unapproved_field`.\n6. Execute o verificador local e confirme uma saída aceita e quatro rejeições tipadas; a saída do comando deve conter apenas IDs/códigos e contagens, nunca os marcadores brutos.\n7. Descreva a resposta segura caso um valor possa ser uma credencial real: parar, não persistir nem testar, restringir a evidência, acionar o proprietário e seguir revogação/rotação autorizada.\n\n## Pistas\n**Pista 1 — finalidade mínima:** comece perguntando quais campos bastam para provar que a regra de redaction foi aplicada. Tudo que não serve a essa finalidade deve ser excluído ou reduzido.\n\n**Pista 2 — redaction verificável:** o nome do campo protegido pode ser evidência de que houve redaction; o valor original não pode. Compare o mapa `redactions` com a lista obrigatória e exija o token literal, sem tentar reconhecer ou validar um segredo real.\n\n## Solução comentada\n`event_id`, `decision`, `rule_id` e `summary` são evidência permitida porque identificam o caso sintético, o resultado e a regra sem reproduzir o conteúdo de origem. `redactions` também é permitido, mas contém somente nomes de campos e o token `[REDIGIDO]`. A janela de 30 dias é um parâmetro da fixture para discutir retenção; não cria armazenamento nem política de produção.\n\n`runtime_mode` é configuração: informa que o cenário é de treino, mas não é necessário na evidência final e recebe retenção zero. `secret_marker` é classificado como semelhante a segredo apesar de ser declaradamente inerte; ele exercita a regra de nunca registrar plaintext. `study_record` é dado sintético de estudo e também recebe retenção zero na saída, porque a finalidade pode ser comprovada sem seu conteúdo. Ser fictício reduz risco, mas não autoriza coleta sem necessidade.\n\nA saída válida tem exatamente os cinco campos permitidos, valores públicos iguais aos esperados e duas redactions completas. O primeiro inválido retorna `secret_leak`; o segundo, `study_data_leak`; o terceiro, `missing_redaction`; o quarto, `unapproved_field`. O verificador compara apenas fixtures locais limitadas, não usa padrões de provedor, não tenta autenticar o marcador, não acessa ambiente, rede, cofre ou log do sistema e não ecoa o valor rejeitado.\n\nSe um segredo real for suspeitado, a evidência deve ser reduzida a metadados seguros; testar o valor ampliaria o uso indevido. Revogação, rotação, investigação e recuperação dependem do sistema e do responsável autorizados. Esta unidade ensina a decisão de manuseio, mas não concede autorização para alterar credenciais ou apagar logs.\n\n## Critério de conclusão\nA unidade está concluída quando sua classificação cobre os sete campos; a saída aceita contém somente `event_id`, `decision`, `rule_id`, `summary` e `redactions`; os dois campos protegidos aparecem apenas como `[REDIGIDO]`; os quatro inválidos são rejeitados pelos códigos esperados; e você explica retenção zero, minimização e resposta a suspeita de credencial sem testar o valor. Isso conclui a autoria e a prática local, mas `security-02`, PT-BR, EN e ES continuam `planned` no catálogo.\n\n## Variação\nEm uma cópia temporária, adicione o campo sintético `correlation_id` à origem. Primeiro execute sem mudar a política: a saída que o incluir deve falhar como `unapproved_field`. Depois acrescente o nome à allowlist, classifique-o como evidência e defina retenção; só então ele poderá aparecer. Não altere a fixture-base, não use identificador de pessoa e não cole valor de ambiente real.\n\n## Referências primárias\nFontes primárias revisadas em 2026-09-10: NIST SP 800-92 final para geração, armazenamento, acesso e descarte de logs; NIST SP 800-122 para identificação e proteção contextual de PII; e OWASP Secrets Management Cheat Sheet para ciclo de vida, menor privilégio e proibição de segredos em plaintext nos logs. A revisão 1 de SP 800-92 permanecia rascunho na consulta, por isso a autoria referencia explicitamente a publicação final de 2006. Os links estruturados abaixo fazem parte da autoria e não constituem alegação regulatória.",
+  "fixture": {
+    "policy": "backend/content/fixtures/security-02/handling-policy.json",
+    "source": "backend/content/fixtures/security-02/source-record.json",
+    "valid_output": "backend/content/fixtures/security-02/valid/redacted-evidence.json",
+    "invalid_outputs": {
+      "secret_leak": "backend/content/fixtures/security-02/invalid/log-secret-leak.json",
+      "study_data_leak": "backend/content/fixtures/security-02/invalid/evidence-study-data-leak.json",
+      "missing_redaction": "backend/content/fixtures/security-02/invalid/missing-redaction.json",
+      "unapproved_field": "backend/content/fixtures/security-02/invalid/unapproved-field.json"
+    }
+  },
+  "sources": [
+    {
+      "title": "NIST SP 800-92 — Guide to Computer Security Log Management",
+      "url": "https://csrc.nist.gov/pubs/sp/800/92/final",
+      "reviewed_on": "2026-09-10"
+    },
+    {
+      "title": "NIST SP 800-122 — Guide to Protecting the Confidentiality of Personally Identifiable Information (PII)",
+      "url": "https://csrc.nist.gov/pubs/sp/800/122/final",
+      "reviewed_on": "2026-09-10"
+    },
+    {
+      "title": "OWASP Cheat Sheet Series — Secrets Management",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
+      "reviewed_on": "2026-09-10"
+    }
+  ]
+}

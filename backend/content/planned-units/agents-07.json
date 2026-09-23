@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "id": "agents-07",
+  "track_id": "agents",
+  "order": 7,
+  "title": "Marketing: briefing e revisão",
+  "summary": "Transformar um briefing fictício em rascunho sujeito a revisão editorial.",
+  "status": "available",
+  "prerequisites": [
+    "agents-06"
+  ],
+  "competencies": [
+    "Separar fatos fornecidos de afirmações sem suporte",
+    "Solicitar aprovação sem postar ou enviar"
+  ],
+  "duration_minutes": {"essential": 75, "complete": 120},
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "body": "## Objetivo observável\nAvalie cinco versões de um briefing fictício, identifique afirmações sem suporte e compare ausência, divergência e vínculo válido de uma aprovação sintética. Produza somente um rascunho apoiado em fatos fornecidos.\n\n## Contexto e limites\nO briefing do evento fictício Oficina Horizonte contém três fatos: F-DATE indica 12 de outubro de 2030, F-FORMAT indica oficina online e F-DURATION indica duração de 60 minutos. Esses identificadores e seus textos são o universo fechado desta prática. F-GUARANTEE, usado em um caso negativo, representa uma promessa de resultado sem evidência. O avaliador não inventa fatos ou completa lacunas por probabilidade.\n\nUma aprovação editorial deve identificar a versão examinada. A fixture usa artifact_version e um registro com reviewer, decision e artifact_version. É um exercício de vínculo, não autenticação humana nem autorização para publicar. A única ação aceita é draft; post e send são recusadas. Não há plataforma social, conta, contato, modelo ou serviço de IA.\n\n## Exemplo sintético\nUm rascunho com F-DATE e F-FORMAT, presentes no briefing, é fundamentado. Sem aprovação ele fica em hold/approval_missing. Se a aprovação aponta v1 e o artefato é v2, o resultado é block/approval_version_mismatch. Reaproveitar a aprovação antiga esconderia uma alteração editorial.\n\n## Exercício\n1. Leia os três fatos e escreva uma frase usando somente informações fornecidas.\n2. Execute missing-approval e confira que a existência de fatos não substitui a revisão.\n3. Execute unsupported-claim e identifique a promessa sem suporte.\n4. Compare wrong-version e reviewed-draft; confira a versão de ambos os objetos.\n5. Execute publish-blocked e explique por que revisão editorial não cria capacidade de publicação.\n6. Verifique que o rascunho é montado com os textos fixos correspondentes aos identificadores.\n7. Repita reviewed-draft e confirme determinismo e preservação da fixture.\n\n## Pistas\n**Pista 1 — suporte:** cada afirmação precisa pertencer aos fatos fornecidos e ao vocabulário permitido.\n\n**Pista 2 — vínculo:** a revisão vale para uma versão exata; o campo reviewer é uma identidade sintética, não prova de autenticação.\n\n## Solução comentada\nmissing-approval retorna hold mesmo com afirmações sustentadas. unsupported-claim bloqueia F-GUARANTEE antes da aprovação: aceitar um registro de revisão não torna uma promessa verdadeira. wrong-version bloqueia o vínculo divergente. reviewed-draft retorna reviewed_draft com frases fixas sobre a data e o formato, registrando publication_allowed=false. publish-blocked é recusado antes da elaboração porque post não está no contrato.\n\nOs fatos não são buscados na internet. A solução usa igualdade de identificadores e versões, sem interpretar texto livre. Uma revisão negada retorna approval_denied; um objeto com campos extras é inválido. A atividade termina com explicação e rascunho local, sem postagem ou envio.\n\n## Critério de conclusão\nDistinga fatos, afirmações e decisão editorial; reproduza os cinco cenários e explique por que um rascunho revisado continua sem permissão de publicação. Demonstre que nenhum valor rejeitado é convertido em comando e que não existem modelo, rede ou escrita externa.\n\n## Variação\nAdicione F-DURATION aos fatos e afirmações em uma cópia em memória, mude a versão para v2 e observe que a aprovação v1 deixa de valer. Faça uma nova decisão sintética explicitamente vinculada a v2 e compare os resultados. Não insira marcas, campanhas ou pessoas reais.\n\n## Referências primárias\nNIST AI RMF fundamenta a separação entre contexto, medição e responsabilidade. JSON Schema inspira o fechamento dos objetos, implementado aqui de forma específica. Fontes herdadas da revisão editorial de 2026-09-11; os fatos e regras de aprovação são inteiramente didáticos.",
+  "fixture": {
+    "scenarios": "backend/content/fixtures/agents-07/scenarios.json",
+    "evaluator": "scripts/validate_agents_06_08.py"
+  },
+  "sources": [
+    {
+      "title": "NIST AI RMF 1.0 — governança, contexto e medição",
+      "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10",
+      "reviewed_on": "2026-09-11"
+    },
+    {
+      "title": "JSON Schema Draft 2020-12 — contratos fechados",
+      "url": "https://json-schema.org/draft/2020-12",
+      "reviewed_on": "2026-09-11"
+    }
+  ]
+}

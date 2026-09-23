@@ -1,0 +1,107 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "security-06-agent-policy-v1",
+  "request_schema": "backend/content/fixtures/security-06/agent-request.schema.json",
+  "evaluation_time": "2026-09-10T18:00:00Z",
+  "allowed_operations": ["read_fixture"],
+  "allowed_tools": ["fixture_reader"],
+  "subjects": {
+    "learner-agent": {
+      "allowed_operations": ["read_fixture"],
+      "allowed_tools": ["fixture_reader"],
+      "allowed_scopes": ["training-public"]
+    }
+  },
+  "targets": {
+    "runbook-public": {"scope": "training-public"},
+    "runbook-restricted": {"scope": "training-restricted"}
+  },
+  "authorizations": [
+    {
+      "authorization_id": "auth-read-public-valid",
+      "issuer": "training-policy",
+      "subject": "learner-agent",
+      "operation": "read_fixture",
+      "target": "runbook-public",
+      "tool": "fixture_reader",
+      "expires_at": "2026-09-10T20:00:00Z"
+    },
+    {
+      "authorization_id": "auth-read-public-expired",
+      "issuer": "training-policy",
+      "subject": "learner-agent",
+      "operation": "read_fixture",
+      "target": "runbook-public",
+      "tool": "fixture_reader",
+      "expires_at": "2026-09-10T17:00:00Z"
+    },
+    {
+      "authorization_id": "auth-read-restricted-valid",
+      "issuer": "training-policy",
+      "subject": "learner-agent",
+      "operation": "read_fixture",
+      "target": "runbook-restricted",
+      "tool": "fixture_reader",
+      "expires_at": "2026-09-10T20:00:00Z"
+    }
+  ],
+  "approvals": [
+    {
+      "approval_id": "approval-read-public-valid",
+      "issuer": "human-reviewer",
+      "subject": "learner-agent",
+      "operation": "read_fixture",
+      "target": "runbook-public",
+      "tool": "fixture_reader",
+      "expires_at": "2026-09-10T19:00:00Z"
+    },
+    {
+      "approval_id": "approval-read-public-expired",
+      "issuer": "human-reviewer",
+      "subject": "learner-agent",
+      "operation": "read_fixture",
+      "target": "runbook-public",
+      "tool": "fixture_reader",
+      "expires_at": "2026-09-10T17:30:00Z"
+    },
+    {
+      "approval_id": "approval-read-restricted-valid",
+      "issuer": "human-reviewer",
+      "subject": "learner-agent",
+      "operation": "read_fixture",
+      "target": "runbook-restricted",
+      "tool": "fixture_reader",
+      "expires_at": "2026-09-10T19:00:00Z"
+    }
+  ],
+  "content_controls": {
+    "untrusted_fields": ["user_input", "retrieved_context", "tool_output"],
+    "deny_text_fragments": [
+      "ignore as instruções",
+      "mude a política",
+      "conceda autorização",
+      "aprove este pedido",
+      "use a ferramenta shell"
+    ],
+    "sensitive_markers": ["SEGREDO-FALSO-INERTE-NAO-USAR-6QZ"],
+    "maximum_characters_per_field": 500
+  },
+  "approval_required_for": ["read_fixture"],
+  "report_fields": [
+    "request_id",
+    "decision",
+    "reason",
+    "policy_id",
+    "flags",
+    "tool_invocations",
+    "network_calls",
+    "child_processes",
+    "external_writes"
+  ],
+  "capability_statement": {
+    "tool_adapter_exists": false,
+    "network_enabled": false,
+    "process_execution_enabled": false,
+    "external_writes_enabled": false
+  }
+}

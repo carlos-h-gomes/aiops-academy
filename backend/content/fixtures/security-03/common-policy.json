@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "imports": {
+    "identity_policy": "backend/content/fixtures/security-01/policy.json",
+    "handling_policy": "backend/content/fixtures/security-02/handling-policy.json",
+    "handling_source": "backend/content/fixtures/security-02/source-record.json"
+  },
+  "evidence_contract": {
+    "allowed_fields": [
+      "scenario_id",
+      "decision",
+      "reasons"
+    ],
+    "protected_categories": [
+      "secret_like",
+      "study_data"
+    ],
+    "redaction_token": "[REDIGIDO]"
+  },
+  "hardening": {
+    "allowed_network_mode": "isolated",
+    "require_internal_network": true,
+    "require_ip_masquerade_disabled": true,
+    "allowed_publishers": [
+      "recovery-gateway"
+    ],
+    "allowed_publish_hosts": [
+      "127.0.0.1"
+    ],
+    "allowed_egress_mode": "fixed",
+    "allowed_egress_destinations": [
+      "audit-sink"
+    ],
+    "forbid_user_configurable_egress": true,
+    "forbidden_docker_socket_paths": [
+      "/var/run/docker.sock",
+      "//./pipe/docker_engine"
+    ],
+    "forbid_host_bind_mounts": true,
+    "forbidden_process_users": [
+      "root",
+      "0",
+      "0:0"
+    ],
+    "required_process_controls": {
+      "privileged": false,
+      "cap_drop": [
+        "ALL"
+      ],
+      "cap_add": [],
+      "read_only": true,
+      "no_new_privileges": true,
+      "init": true,
+      "restart": "no",
+      "pids_limit": true
+    }
+  }
+}

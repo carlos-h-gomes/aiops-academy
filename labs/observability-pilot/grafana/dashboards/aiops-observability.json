@@ -1,0 +1,119 @@
+{
+  "annotations": {"list": []},
+  "description": "Healthy, controlled degradation, investigation, and recovery using only synthetic local signals.",
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "lab-prometheus"},
+      "description": "1 means the synthetic degraded mode is active; 0 means healthy mode.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "mappings": [
+            {"options": {"0": {"color": "green", "text": "HEALTHY"}, "1": {"color": "red", "text": "DEGRADED"}}, "type": "value"}
+          ],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0},
+      "id": 1,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true},
+      "targets": [{"editorMode": "code", "expr": "lab_mode{mode=\"degraded\"}", "legendFormat": "Current scenario", "range": true, "refId": "A"}],
+      "title": "Scenario state",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "lab-prometheus"},
+      "description": "Share of quote requests returning a synthetic 5xx during the last minute.",
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "decimals": 1, "max": 1, "min": 0, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 0.05}, {"color": "red", "value": 0.25}]}, "unit": "percentunit"}, "overrides": []},
+      "gridPos": {"h": 5, "w": 9, "x": 6, "y": 0},
+      "id": 2,
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto", "wideLayout": true},
+      "targets": [{"editorMode": "code", "expr": "sum(rate(lab_http_requests_total{route=\"/quotes\",status=~\"5..\"}[1m])) / clamp_min(sum(rate(lab_http_requests_total{route=\"/quotes\"}[1m])), 0.001)", "legendFormat": "Error ratio", "range": true, "refId": "A"}],
+      "title": "Error ratio — 1 minute",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "lab-prometheus"},
+      "description": "95th percentile estimated from the synthetic request-duration histogram.",
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 0.1}, {"color": "red", "value": 0.3}]}, "unit": "s"}, "overrides": []},
+      "gridPos": {"h": 5, "w": 9, "x": 15, "y": 0},
+      "id": 3,
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto", "wideLayout": true},
+      "targets": [{"editorMode": "code", "expr": "histogram_quantile(0.95, sum by (le) (rate(lab_http_request_duration_seconds_bucket{route=\"/quotes\"}[1m])))", "legendFormat": "p95", "range": true, "refId": "A"}],
+      "title": "p95 latency — 1 minute",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "lab-prometheus"},
+      "description": "Throughput grouped by the scenario in which each request began.",
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"drawStyle": "line", "fillOpacity": 12, "lineInterpolation": "linear", "lineWidth": 2, "pointSize": 4, "showPoints": "never", "spanNulls": false}, "unit": "reqps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 5},
+      "id": 4,
+      "options": {"legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [{"editorMode": "code", "expr": "sum by (mode) (rate(lab_http_requests_total{route=\"/quotes\"}[1m]))", "legendFormat": "{{mode}}", "range": true, "refId": "A"}],
+      "title": "Request rate by scenario",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "lab-prometheus"},
+      "description": "Status-code rate. Synthetic 503 responses should appear only after degradation.",
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"drawStyle": "line", "fillOpacity": 12, "lineInterpolation": "linear", "lineWidth": 2, "pointSize": 4, "showPoints": "never", "spanNulls": false}, "unit": "reqps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 5},
+      "id": 5,
+      "options": {"legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"}},
+      "targets": [{"editorMode": "code", "expr": "sum by (status) (rate(lab_http_requests_total{route=\"/quotes\"}[1m]))", "legendFormat": "HTTP {{status}}", "range": true, "refId": "A"}],
+      "title": "Request rate by status",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "lab-prometheus"},
+      "description": "Liveness answers whether the process responds; it intentionally stays 1 during functional degradation.",
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [{"options": {"0": {"color": "red", "text": "PROCESS DOWN"}, "1": {"color": "green", "text": "PROCESS UP"}}, "type": "value"}], "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}}, "overrides": []},
+      "gridPos": {"h": 5, "w": 8, "x": 0, "y": 13},
+      "id": 6,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true},
+      "targets": [{"editorMode": "code", "expr": "up{job=\"synthetic-app\"}", "legendFormat": "Liveness", "range": true, "refId": "A"}],
+      "title": "Process liveness",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "lab-prometheus"},
+      "description": "A reset clears workload counters and returns the synthetic mode to healthy. The reset counter remains monotonic.",
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "decimals": 0, "thresholds": {"mode": "absolute", "steps": [{"color": "blue", "value": null}]}}, "overrides": []},
+      "gridPos": {"h": 5, "w": 8, "x": 8, "y": 13},
+      "id": 7,
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true},
+      "targets": [{"editorMode": "code", "expr": "lab_resets_total", "legendFormat": "Resets", "range": true, "refId": "A"}],
+      "title": "Reset commands",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "lab-prometheus"},
+      "description": "Use this with the state and error panels: a healthy process can still serve a degraded function.",
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 0.25}]}, "unit": "percentunit"}, "overrides": []},
+      "gridPos": {"h": 5, "w": 8, "x": 16, "y": 13},
+      "id": 8,
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto", "wideLayout": true},
+      "targets": [{"editorMode": "code", "expr": "sum(rate(lab_http_requests_total{route=\"/quotes\",status=~\"5..\"}[1m])) / clamp_min(sum(rate(lab_http_requests_total{route=\"/quotes\"}[1m])), 0.001)", "legendFormat": "Functional errors", "range": true, "refId": "A"}],
+      "title": "Function health",
+      "type": "stat"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 42,
+  "tags": ["aiops-academy", "local", "synthetic"],
+  "templating": {"list": []},
+  "time": {"from": "now-10m", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "AIOps Academy — Synthetic service investigation",
+  "uid": "aiops-observability-pilot",
+  "version": 1,
+  "weekStart": ""
+}

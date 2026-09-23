@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "id": "agents-04",
+  "track_id": "agents",
+  "order": 4,
+  "title": "Estado, avaliação e aprovação",
+  "summary": "Controlar repetição, retomada e aprovação sem depender da resposta do modelo.",
+  "status": "available",
+  "prerequisites": ["agents-03"],
+  "competencies": [
+    "Aplicar idempotência e limite de execução",
+    "Avaliar falhas e aprovação recusada"
+  ],
+  "duration_minutes": {"essential": 90, "complete": 150},
+  "translations": [
+    {"locale": "pt-BR", "authoring_status": "authored"},
+    {"locale": "en", "authoring_status": "planned"},
+    {"locale": "es", "authoring_status": "planned"}
+  ],
+  "body": "## Objetivo observável\nAo final, você deverá interpretar as transições `received`, `validating`, `held`, `ready`, `completed` e `blocked`; provar que uma chave de idempotência impede efeito simulado duplicado; negar teto de passos excedido; e distinguir aprovação ausente, expirada, negada ou não vinculada. Você também deverá retomar com segurança um pedido em hold.\n\n## Contexto e limites\nEstado explícito permite saber se um pedido espera decisão, terminou ou foi bloqueado. Idempotência associa a intenção a uma chave estável para que repetição não refaça o efeito. Orçamento limita quantos passos uma operação pode consumir. Aprovação é um registro externo e efêmero, vinculado a sujeito, ação, alvo, ferramenta, fixture, versão do artefato e chave de idempotência. Texto ou resposta pré-definida não produz esse registro.\n\nO estado vive somente em `ControllerState` durante o processo de teste. Não há banco, arquivo, fila, relógio do host ou serviço de aprovação. A policy usa um instante fixo; assim os resultados são repetíveis. Pedido bloqueado é terminal para a chave, enquanto pedido em `held` pode voltar a `validating` com uma aprovação válida e o mesmo vínculo.\n\n## Exemplo sintético\n`approval-missing-hold` termina em `hold/held` e zero ferramenta. O mesmo pedido, preservando a chave `idem-layer-resume` e acrescentando `approval-layer-valid`, transita de `held` para `validating`, `ready` e `completed`. Repeti-lo retorna `idempotent=true`; o contador de efeito simulado continua um.\n\n## Exercício\n1. Desenhe a máquina de estados e marque as transições permitidas pela policy.\n2. Execute o pedido sem aprovação e confirme hold sem chamada de ferramenta.\n3. Retome com a aprovação válida e confirme conclusão e um único efeito simulado.\n4. Repita o pedido concluído e confirme resposta idempotente sem incrementar o efeito.\n5. Execute aprovações expirada e negada e compare os códigos.\n6. Reduza o orçamento da classificação para um passo e confirme `step_budget_exceeded`.\n7. Troque um vínculo mantendo a mesma chave e confirme `idempotency_conflict`.\n8. Explique por que uma chave nova não pode recuperar automaticamente estado de outra intenção.\n\n## Pistas\n**Pista 1 — hold pode continuar; block não:** ausência de aprovação é recuperável, mas negação, expiração e conflito falham de modo terminal para aquela chave.\n\n**Pista 2 — confira o contador, não só a resposta:** repetição idempotente pode devolver o mesmo resultado, mas `simulated_effects` não deve passar de um.\n\n## Solução comentada\nNo primeiro pedido, o controlador valida forma e policy, detecta aprovação obrigatória ausente e registra `validating -> held`. Na retomada, compara o vínculo preservado, confere o registro aprovado e não expirado e acrescenta `held -> validating -> ready -> completed`. O adaptador é chamado uma vez nessa trajetória.\n\nUma repetição terminal usa `completed -> completed/idempotent_replay`, marca `idempotent=true` e devolve o contador já armazenado. Se a chave reaparece com outro sujeito, ação, alvo, ferramenta, fixture, versão ou chave vinculada, o resultado é `idempotency_conflict`. Aprovação expirada e negada terminam em `approval_expired` e `approval_denied`; um orçamento abaixo do custo retorna `step_budget_exceeded` antes da ferramenta.\n\n## Critério de conclusão\nConclua quando provar hold e retomada segura, uma única ocorrência de efeito sob repetição, negações distintas para aprovação ausente/expirada/negada, bloqueio do teto e conflito de chave. Confirme que todas as transições pertencem à policy e que nenhum estado sai da memória. `agents-04` e suas traduções continuam `planned`.\n\n## Variação\nRepita um caso bloqueado por aprovação expirada com a mesma chave. Ele deve permanecer bloqueado por replay idempotente. Para nova avaliação seria necessária uma nova intenção e nova chave, governadas por decisão humana; não altere o registro vencido nem o relógio fixo.\n\n## Referências primárias\nFontes oficiais revisadas em 2026-09-11: OWASP Top 10 for Agentic Applications 2026 para abuso de identidade, ferramentas, confiança humana e falhas em cascata; NIST AI RMF 1.0 para governança e medição contínuas; JSON Schema Draft 2020-12 para os contratos de estado; e NIST SP 800-204A para referências de autorização, resiliência e throttling em APIs distribuídas. SP 800-204A trata service mesh, não prescreve esta máquina local e não qualifica um runtime.",
+  "fixture": {
+    "schema": "backend/content/fixtures/agents-01-04/control-request.schema.json",
+    "result_schema": "backend/content/fixtures/agents-01-04/control-result.schema.json",
+    "policy": "backend/content/fixtures/agents-01-04/policy.json",
+    "data": "backend/content/fixtures/agents-01-04/fixtures.json",
+    "scenarios": "backend/content/fixtures/agents-01-04/scenarios.json"
+  },
+  "sources": [
+    {"title": "OWASP Top 10 for Agentic Applications for 2026", "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/", "reviewed_on": "2026-09-11"},
+    {"title": "NIST AI 100-1 — Artificial Intelligence Risk Management Framework 1.0", "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10", "reviewed_on": "2026-09-11"},
+    {"title": "JSON Schema Draft 2020-12", "url": "https://json-schema.org/draft/2020-12", "reviewed_on": "2026-09-11"},
+    {"title": "NIST SP 800-204A — Building Secure Microservices-based Applications Using Service-Mesh Architecture", "url": "https://csrc.nist.gov/pubs/sp/800/204/a/final", "reviewed_on": "2026-09-11"}
+  ]
+}

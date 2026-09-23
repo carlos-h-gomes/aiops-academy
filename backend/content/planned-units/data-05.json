@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "track_id": "data",
+  "status": "available",
+  "duration_minutes": {"essential": 75, "complete": 120},
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "id": "data-05",
+  "order": 5,
+  "title": "Embeddings e busca com pgvector",
+  "summary": "Comparar busca semântica e filtros usando exemplos controlados.",
+  "prerequisites": [
+    "data-04"
+  ],
+  "competencies": [
+    "Explicar embeddings e similaridade",
+    "Avaliar recuperação com filtros e casos fixos"
+  ],
+  "body": "## Objetivo observável\nCalcular e interpretar um ranking vetorial pequeno, aplicar o filtro de acesso antes da seleção e explicar por que similaridade não prova verdade. Entregue o ranking de três documentos e cinco decisões sobre segurança, atualidade e evidência. Pré-requisito: data-04.\n\n## Contexto e limites\nUm embedding representa itens por vetores produzidos por um modelo. A representação depende do modelo, versão, dimensão, preparação e domínio; vetores de modelos diferentes não são automaticamente comparáveis. Este exercício escreve vetores de duas dimensões à mão. Eles permitem verificar a aritmética, mas não demonstram significado aprendido nem qualidade de um modelo.\n\npgvector é uma extensão para armazenar e consultar vetores no PostgreSQL. O título apresenta esse contexto; o lab padrão calcula distância euclidiana em Python sobre um corpus local e não executa PostgreSQL, pgvector ou geração de embeddings. Não há download, conta, chave, modelo ou serviço externo. A integração real exigiria versão da extensão, dimensão, métrica, índices e consultas validados no mecanismo escolhido.\n\nA consulta deve recuperar apenas documentos que o leitor pode acessar. A audiência student vem do cenário confiável; não é uma credencial que o aluno possa inventar. Filtrar depois de retornar resultados pode revelar IDs, textos ou estatísticas de itens restritos e reduzir indevidamente os resultados úteis. Aqui o conjunto autorizado e atual é formado antes do ranking. Em uma aplicação real, essa regra pertence ao servidor e à consulta de dados, e deve valer por todas as rotas.\n\n## Exemplo sintético\nA consulta é q=[1,0]. rb-admin tem vetor [1,0], mas audiência instructor; rb-old tem [1,0], mas está descontinuado. Ambos seriam os mais próximos se elegibilidade fosse ignorada, porém não entram no conjunto de candidatos.\n\nrb-a e rb-b têm [0.9,0.1], portanto distância sqrt((1−0.9)²+(0−0.1)²), aproximadamente 0.1414. rb-c tem [0,1], distância sqrt(2), aproximadamente 1.4142. O empate entre rb-a e rb-b é resolvido por ID crescente. A ordem final é rb-a, rb-b, rb-c. Esses números são pedagógicos e não representam relevância medida.\n\n## Exercício\n1. Leia backend/content/fixtures/data-05/scenario.json. Marque os documentos acessíveis à audiência student e remova os descontinuados.\n2. Calcule a distância euclidiana entre a consulta e cada candidato. Confira a dimensão e recuse valores não finitos em qualquer vetor.\n3. Produza o ranking usando distância crescente e ID como desempate. Não inclua rb-admin nem rb-old, mesmo com distância zero.\n4. Explique o que mudaria se você pegasse primeiro o melhor resultado global e só depois filtrasse: o melhor item poderia ser recusado e nenhum item útil retornaria.\n5. Copie answer-template.json para submission.json na pasta da unidade. Preencha ranking, restricted_returned, stale_returned, filter_stage, similarity_proves_truth e pgvector_verified.\n6. Na raiz do app, com Python preparado, execute: python scripts/bounded.py 30 .venv/Scripts/python.exe scripts/validate_data_04_06.py --unit data-05 --submission. Corrija somente os campos apontados como review_fields.\n7. Execute sem --submission para conferir o ranking calculado sobre a fixture. Compare a saída com seu cálculo manual; não confunda esse verificador com um gerador de embeddings.\n8. Entregue um parágrafo comparando busca lexical e vetorial: termos exatos podem favorecer a primeira; proximidade aprendida pode favorecer a segunda, mas ambas precisam de avaliação e acesso correto.\n\n## Pistas\n**Pista 1 —** A melhor distância não torna um documento elegível. Resolva audiência e atualidade antes da aritmética.\n**Pista 2 —** Dois documentos podem ter vetores iguais. Um desempate estável evita mudanças de ordem sem uma mudança real nos dados.\n\n## Solução comentada\nranking=[rb-a,rb-b,rb-c]; restricted_returned=false; stale_returned=false; filter_stage=antes_do_ranking; similarity_proves_truth=false; pgvector_verified=false.\n\nA distância euclidiana é uma escolha explícita deste cenário. Distância cosseno, produto interno e normalização têm comportamentos diferentes; não substitua uma métrica pela outra sem rever objetivos e resultados. O ranking ordena candidatos, não verifica a correção do conteúdo. Um texto muito parecido pode estar errado, desatualizado ou fora do contexto.\n\nO algoritmo local valida formato, unicidade de IDs, dimensão e números finitos. Filtra current e audience antes de calcular e ordenar, e devolve somente IDs elegíveis. A audiência inválida é recusada, e uma consulta sem candidatos devolve lista vazia. O texto dos documentos é dado; não há interpretação como comando.\n\n## Critério de conclusão\nO ranking e as cinco decisões coincidem com a solução; a conta de pelo menos uma distância está explícita; sua explicação distingue proximidade, atualidade e autorização. Execute os testes com python scripts/bounded.py 30 .venv/Scripts/python.exe -m unittest backend.tests.test_data_04_06 -v. Eles verificam acesso, ordem, empate, vazio e entrada inválida. Não comprovam recall, qualidade semântica, tempo de consulta ou pgvector instalado. A autoria permanece em preparação até a integração.\n\n## Variação\nRemova mentalmente todos os documentos elegíveis. A resposta correta é uma lista vazia, nunca um documento restrito como fallback. Depois imagine documentos maiores divididos em trechos: a autorização precisa acompanhar cada trecho e a citação deve conservar ID e versão da origem.\n\n## Referências primárias\nO repositório oficial pgvector descreve armazenamento, operadores de distância e busca aproximada. Consulte a documentação da versão escolhida antes de um laboratório com extensão real. PostgreSQL Row Security Policies complementa a discussão de autorização de linhas; este exercício usa uma audiência sintética fixa, não implementa autenticação.",
+  "sources": [
+    {
+      "title": "pgvector — documentação oficial",
+      "url": "https://github.com/pgvector/pgvector",
+      "reviewed_on": "2026-09-20"
+    },
+    {
+      "title": "PostgreSQL — Row Security Policies",
+      "url": "https://www.postgresql.org/docs/current/ddl-rowsecurity.html",
+      "reviewed_on": "2026-09-20"
+    }
+  ],
+  "fixture": {
+    "scenario": "backend/content/fixtures/data-05/scenario.json",
+    "answers": "backend/content/fixtures/data-05/answer-template.json",
+    "validator": "scripts/validate_data_04_06.py",
+    "tests": "backend/tests/test_data_04_06.py"
+  }
+}

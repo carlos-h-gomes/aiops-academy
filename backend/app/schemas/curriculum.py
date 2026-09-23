@@ -43,7 +43,7 @@ class Duration(Metadata):
 
 
 class Practice(Metadata):
-    kind: Literal['simulation']
+    kind: Literal['simulation', 'guided_fixture']
     lab_id: Identity
     title: Text
     limitations: Text
@@ -81,8 +81,8 @@ class Unit(Metadata):
             elif translation.content_version is not None:
                 raise ValueError('Planned translation cannot claim a content revision.')
         if self.status == 'available':
-            if self.lesson_day is None or not self.content_version or self.duration_minutes is None or self.practice is None or not self.sources or locales['pt-BR'].status != 'available':
-                raise ValueError('Available unit needs source lesson, duration, practice, references and Portuguese content.')
+            if not self.content_version or self.duration_minutes is None or self.practice is None or not self.sources or locales['pt-BR'].status != 'available':
+                raise ValueError('Available unit needs a revision, duration, practice, references and Portuguese content.')
         elif any(x is not None for x in (self.lesson_day, self.content_version, self.duration_minutes, self.practice)) or self.sources or self.verified_tool_versions:
             raise ValueError('Planned unit cannot claim available content, measured practice or references.')
         return self
@@ -156,19 +156,32 @@ class Curriculum(Metadata):
         return self
 
 
+class UnitLesson(Metadata):
+    """Read-only authored detail for an available non-legacy unit."""
+    id: Identity
+    title: Text
+    summary: Text
+    body: Annotated[str, Field(min_length=1, max_length=80_000)]
+    content_version: Annotated[str, Field(min_length=1, max_length=40)]
+    duration_minutes: Duration
+    practice: Practice
+    sources: Annotated[list[Source], Field(min_length=1, max_length=30)]
+
+
 def validate_content_links(value: Curriculum, course: dict, manuals: list, labs: dict):
     """Check authored references against actual content before exposing or writing it."""
     lessons = {lesson['day']: lesson for lesson in course['lessons']}
     sources = {source['id']: source for source in course['sources']}
     guides = {guide['id']: guide for guide in manuals}
-    available = [unit for unit in value.units if unit.status == 'available']
-    if {unit.lesson_day for unit in available} != set(lessons):
+    legacy_available = [unit for unit in value.units if unit.status == 'available' and unit.lesson_day is not None]
+    nonlegacy_available = [unit for unit in value.units if unit.status == 'available' and unit.lesson_day is None]
+    if {unit.lesson_day for unit in legacy_available} != set(lessons):
         raise ValueError('All legacy lessons must remain represented once.')
     for track in value.tracks:
         for guide in track.guides:
             if guide.id not in guides or guide.title != guides[guide.id]['title']:
                 raise ValueError('Missing or stale library guide.')
-    for unit in available:
+    for unit in legacy_available:
         lesson = lessons[unit.lesson_day]
         expected_sources = [Source(title=sources[key]['title'], url=sources[key]['url']) for key in lesson['sources']]
         if unit.title != lesson['title'] or unit.summary != lesson['summary'] or unit.competencies != lesson['objectives'] or unit.content_version != course['version'] or unit.sources != expected_sources:
@@ -178,4 +191,7 @@ def validate_content_links(value: Curriculum, course: dict, manuals: list, labs:
             raise ValueError('Missing or stale practice reference.')
         if unit.duration_minutes.essential != 180 or unit.duration_minutes.complete != lesson['minutes']:
             raise ValueError('Lesson duration does not match the legacy course.')
+    for unit in nonlegacy_available:
+        if unit.practice.kind != 'guided_fixture' or unit.practice.lab_id != unit.id:
+            raise ValueError('Available non-legacy unit needs its fixed guided fixture reference.')
     return value

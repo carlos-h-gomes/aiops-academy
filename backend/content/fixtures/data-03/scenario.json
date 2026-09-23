@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "origin": "synthetic",
+  "runtime_verified": false,
+  "description": "Planos simplificados inventados para exercício; não são saída capturada do PostgreSQL.",
+  "before": {"node": "Seq Scan", "estimated_rows": 100, "actual_rows_per_loop": 10, "loops": 1, "rows_removed_per_loop": 19990},
+  "after": {"node": "Index Scan", "estimated_rows": 10, "actual_rows_per_loop": 10, "loops": 1, "rows_removed_per_loop": 0},
+  "repeated_node": {"node": "Index Scan", "estimated_rows": 2, "actual_rows_per_loop": 3, "loops": 4, "rows_removed_per_loop": 0}
+}

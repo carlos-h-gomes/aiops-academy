@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "id": "agents-02",
+  "track_id": "agents",
+  "order": 2,
+  "title": "Modelos, assistentes e ferramentas",
+  "summary": "Distinguir modelo, aplicativo, runtime e integração.",
+  "status": "available",
+  "prerequisites": ["agents-01"],
+  "competencies": [
+    "Descrever o papel de cada camada",
+    "Comparar resultados com uma tarefa e critérios fixos"
+  ],
+  "duration_minutes": {"essential": 75, "complete": 120},
+  "translations": [
+    {"locale": "pt-BR", "authoring_status": "authored"},
+    {"locale": "en", "authoring_status": "planned"},
+    {"locale": "es", "authoring_status": "planned"}
+  ],
+  "body": "## Objetivo observável\nAo final, você deverá diferenciar modelo, assistente, orquestrador, estado e ferramenta; localizar cada responsabilidade no mapa `layers-v1`; e comparar os resultados fixos do simulador pela mesma rubrica de completude, impacto, ambiguidade e responsabilidade. Você deverá demonstrar que uma saída plausível não concede autorização nem muda a policy.\n\n## Contexto e limites\nModelo produz inferências; assistente combina instruções e experiência de uso; orquestrador controla sequência e limites; estado registra progresso explícito; ferramenta oferece uma capacidade delimitada. Misturar as camadas esconde quem decide e torna uma frase gerada capaz de parecer mais poderosa do que é. Nesta prática, nenhuma camada chama um modelo: respostas pré-definidas isolam o contrato do comportamento probabilístico.\n\nA policy é autoridade local. O controlador escolhe apenas `fixture_classifier` ou `fixture_reader` conforme ação e alvo fixos. O estado é efêmero e a ferramenta apenas calcula uma classificação ou devolve uma referência sintética. Não há runtime de modelo, prompt privado, memória persistente, retrieval, API, rede ou provider.\n\n## Exemplo sintético\nA fixture `layers-v1` enumera `model`, `assistant`, `orchestrator`, `state` e `tool`. O pedido `inspect_layers` só pode usar `fixture_reader` no alvo `agent-layers` e exige aprovação externa vinculada. A resposta `layer-map-available` é um código pré-definido; ela descreve disponibilidade didática, mas não aprova o pedido.\n\n## Exercício\n1. Monte uma tabela com camada, responsabilidade, entrada, saída e limite.\n2. Compare `use-fixed-rule`, `assist-with-review`, `human-only` e `complete-inputs-first` usando a mesma rubrica.\n3. Envie `inspect_layers` sem aprovação e confirme `hold/held`.\n4. Explique por que o código de resposta não pode preencher `approval_id`.\n5. Retome o mesmo pedido com o registro válido e confirme `ready/completed`.\n6. Verifique que não existe chamada de modelo e que rede, processo e escrita permanecem zero.\n7. Identifique qual camada bloquearia ferramenta ou alvo fora da allowlist.\n\n## Pistas\n**Pista 1 — nomeie a autoridade:** modelo e assistente podem sugerir; policy e aprovação externa decidem capacidade.\n\n**Pista 2 — compare contrato, não eloquência:** use os mesmos critérios fixos para todas as respostas pré-definidas.\n\n## Solução comentada\nO modelo seria responsável por inferência, mas está ausente. O assistente seria a experiência que apresenta a tarefa; o controlador local cumpre o papel mínimo de orquestrador; `ControllerState` preserva apenas idempotência e transições na memória; e os dois adaptadores internos são ferramentas fechadas. A policy permanece separada de todas essas saídas.\n\nO pedido sem aprovação chega a `held` porque uma resposta plausível não cria decisão humana. Na retomada, o controlador confere emissor, status, expiração e vínculo a sujeito, ação, alvo, ferramenta, fixture, versão e chave de idempotência. Só depois chama o leitor interno. O artefato retornado é a referência sintética `layers-v1-1`, não o conteúdo irrestrito da fixture.\n\n## Critério de conclusão\nConclua quando descrever corretamente as cinco camadas, aplicar a mesma rubrica aos casos fixos, reproduzir hold e retomada e provar que a resposta pré-definida não altera autorização. Confirme zero modelo, provider, rede e efeito externo. `agents-02` e as traduções PT-BR, EN e ES continuam `planned`.\n\n## Variação\nTroque mentalmente a resposta pré-definida por outra igualmente plausível e repita a avaliação. A decisão de policy deve permanecer igual porque autoridade depende dos campos estruturados e do registro externo, não da redação. Não adicione provider ou prompt real.\n\n## Referências primárias\nFontes oficiais revisadas em 2026-09-11: NIST AI RMF 1.0 e NIST AI 600-1 para distinguir contexto, medição, governança e riscos de sistemas de IA; e o OWASP Top 10 for Agentic Applications 2026 para riscos de tool misuse, identity and privilege abuse e human-agent trust exploitation. O recorte não adota runtime/modelo, portanto não atribui documentação de provider.",
+  "fixture": {
+    "schema": "backend/content/fixtures/agents-01-04/control-request.schema.json",
+    "result_schema": "backend/content/fixtures/agents-01-04/control-result.schema.json",
+    "policy": "backend/content/fixtures/agents-01-04/policy.json",
+    "data": "backend/content/fixtures/agents-01-04/fixtures.json",
+    "scenarios": "backend/content/fixtures/agents-01-04/scenarios.json"
+  },
+  "sources": [
+    {"title": "NIST AI 100-1 — Artificial Intelligence Risk Management Framework 1.0", "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10", "reviewed_on": "2026-09-11"},
+    {"title": "NIST AI 600-1 — Generative Artificial Intelligence Profile", "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence", "reviewed_on": "2026-09-11"},
+    {"title": "OWASP Top 10 for Agentic Applications for 2026", "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/", "reviewed_on": "2026-09-11"}
+  ]
+}

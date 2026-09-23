@@ -1,0 +1,175 @@
+{
+  "schema_version": "1.0",
+  "unit_id": "agents-08",
+  "scenarios": [
+    {
+      "scenario_id": "matched",
+      "label": "Valores correspondentes",
+      "input": {
+        "batch_id": "C-100",
+        "ledger": [
+          {
+            "transaction_id": "R-100",
+            "cents": 1250,
+            "currency": "BRL"
+          }
+        ],
+        "statement": [
+          {
+            "transaction_id": "R-100",
+            "cents": 1250,
+            "currency": "BRL"
+          }
+        ],
+        "requested_action": "reconcile"
+      },
+      "expected": {
+        "decision": "balanced",
+        "reason": "sample_matches",
+        "matched_ids": [
+          "R-100"
+        ],
+        "exceptions": [],
+        "financial_action_allowed": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "amount-difference",
+      "label": "Diferença de cem centavos",
+      "input": {
+        "batch_id": "C-100",
+        "ledger": [
+          {
+            "transaction_id": "R-101",
+            "cents": 2000,
+            "currency": "BRL"
+          }
+        ],
+        "statement": [
+          {
+            "transaction_id": "R-101",
+            "cents": 1900,
+            "currency": "BRL"
+          }
+        ],
+        "requested_action": "reconcile"
+      },
+      "expected": {
+        "decision": "review",
+        "reason": "exceptions_require_review",
+        "matched_ids": [],
+        "exceptions": [
+          {
+            "transaction_id": "R-101",
+            "reason": "amount_mismatch",
+            "delta_cents": -100
+          }
+        ],
+        "financial_action_allowed": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "missing-record",
+      "label": "Livro sem linha correspondente",
+      "input": {
+        "batch_id": "C-100",
+        "ledger": [
+          {
+            "transaction_id": "R-102",
+            "cents": 1250,
+            "currency": "BRL"
+          }
+        ],
+        "statement": [],
+        "requested_action": "reconcile"
+      },
+      "expected": {
+        "decision": "review",
+        "reason": "exceptions_require_review",
+        "matched_ids": [],
+        "exceptions": [
+          {
+            "transaction_id": "R-102",
+            "reason": "missing_statement"
+          }
+        ],
+        "financial_action_allowed": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "duplicate",
+      "label": "Chave duplicada no livro",
+      "input": {
+        "batch_id": "C-100",
+        "ledger": [
+          {
+            "transaction_id": "R-100",
+            "cents": 1250,
+            "currency": "BRL"
+          },
+          {
+            "transaction_id": "R-100",
+            "cents": 1250,
+            "currency": "BRL"
+          }
+        ],
+        "statement": [
+          {
+            "transaction_id": "R-100",
+            "cents": 1250,
+            "currency": "BRL"
+          }
+        ],
+        "requested_action": "reconcile"
+      },
+      "expected": {
+        "decision": "review",
+        "reason": "exceptions_require_review",
+        "matched_ids": [],
+        "exceptions": [
+          {
+            "transaction_id": "R-100",
+            "reason": "duplicate_id",
+            "ledger_count": 2,
+            "statement_count": 1
+          }
+        ],
+        "financial_action_allowed": false,
+        "external_effects": 0
+      }
+    },
+    {
+      "scenario_id": "payment-blocked",
+      "label": "Pagamento fora da capacidade",
+      "input": {
+        "batch_id": "C-100",
+        "ledger": [
+          {
+            "transaction_id": "R-100",
+            "cents": 1250,
+            "currency": "BRL"
+          }
+        ],
+        "statement": [
+          {
+            "transaction_id": "R-100",
+            "cents": 1250,
+            "currency": "BRL"
+          }
+        ],
+        "requested_action": "pay"
+      },
+      "expected": {
+        "decision": "block",
+        "reason": "external_action_forbidden",
+        "matched_ids": [],
+        "exceptions": [],
+        "financial_action_allowed": false,
+        "external_effects": 0
+      }
+    }
+  ]
+}

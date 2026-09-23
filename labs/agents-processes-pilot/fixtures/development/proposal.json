@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "proposal_id": "proposal-bug-1042-v1",
+  "artifact_version": "1.0",
+  "source_path": "repository/src/totals.py",
+  "test_path": "repository/tests/test_totals.py",
+  "hypothesis": "A implementação trunca o desconto antes da subtração, mas o contrato exige arredondamento half-up do total final.",
+  "evidence": [
+    "repository/src/totals.py:9",
+    "repository/tests/test_totals.py:7"
+  ],
+  "before": "    return subtotal_cents - (subtotal_cents * discount_percent // 100)\n",
+  "after": "    return (subtotal_cents * (100 - discount_percent) + 50) // 100\n",
+  "proposed_tests": [
+    "199 centavos com 15% retorna 169",
+    "200 centavos com 15% permanece 170",
+    "subtotal negativo e percentual fora de 0..100 continuam recusados"
+  ]
+}

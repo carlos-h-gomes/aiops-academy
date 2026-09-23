@@ -1,8 +1,8 @@
 # AIOps Academy — Technical Documentation
 
-Status: public local-download beta
-Version: 1.2.0-beta.1
-Reviewed: 2026-09-07
+Status: local release candidate pending public upload
+Version: 1.2.0-beta.2
+Reviewed: 2026-09-23
 Owner: local learner / root implementation
 
 ## Purpose, scope, and users
@@ -35,7 +35,7 @@ Launcher: --port, --seconds até 28800 e --no-browser. --qa usa artifacts/qa.sql
 
 ## Local development, build, and tests
 
-preparar.cmd chama scripts/prepare.py: cria .venv, instala requisitos binários e npm ci --ignore-scripts, compila TypeScript/Vite. scripts/bounded.py executa argumentos revisados via safe_exec com timeout e cleanup. Testes Python em backend/tests. Comandos e exits em docs/VALIDATION.md.
+preparar.cmd chama scripts/prepare.py: cria .venv, instala requisitos binários e npm ci --ignore-scripts, compila TypeScript/Vite. scripts/bounded.py executa argumentos revisados via safe_exec com timeout e cleanup. Testes Python ficam em backend/tests; os comandos automatizados ficam no workflow `.github/workflows/ci.yml`.
 
 ## Deployment, compatibility, migration, and rollback
 
@@ -59,7 +59,7 @@ Simuladores não são ferramentas completas. SSH, WinRM, AAP, Dynatrace, AWS/GCP
 
 ## Evidence and authoritative references
 
-docs/VALIDATION.md registra checks. docs/architecture/DIRECTORY-MAP.md registra decisões. Referências do curso em backend/content/course.json. Dependências identificadas pelos locks; proveniência e hashes no inventário de artefatos.
+[Mapa de diretórios](architecture/DIRECTORY-MAP.md) registra decisões. Referências do curso ficam em backend/content/course.json. Dependências são identificadas pelos locks; proveniência e hashes acompanham o inventário local de artefatos, que não integra o pacote público.
 ## Beta 1.2.0 — biblioteca e autoria
 
 O endpoint /api/v1/manuals serve 25 entradas: 12 essenciais, seis extension e sete tooling. Campos opcionais: summary, category, minutes, recommended_after e sources. Consumidores antigos continuam recebendo id/title/body; IDs da trilha e backup não mudaram. scripts/content_catalog.py valida tipos, identidade única, fontes HTTPS e limites antes de escrever atomicamente manuals.json. author_manuals.py mantém o núcleo e agrega módulos por nome. A biblioteca apresenta categorias, busca e limites de prática; não executa produtos de terceiros.
@@ -74,20 +74,26 @@ O formulário CalendarSettings possui a edição temporária e desabilita campos
 
 Backup conserva versão 1, IDs e namespaces. Leitor novo aceita arquivos antigos e novos; leitor antigo pode rejeitar taxas expandidas. Para rollback, preservar backup atual e exportar uma cópia com 3h/5h antes de substituir código e build. Não editar o JSON ou banco para forçar compatibilidade. Testes cobrem ida/volta, undo e rejeição sem substituir o estado/ponto de recuperação.
 
-Verificação: testes de API em banco temporário, datas com Node e `frontend/tests/pace.test.mjs` após build. O teste de interface usa porta loopback efêmera identificada pela inicialização do próprio processo, contexto Chrome isolado, data sintética fixa e ambiente minimizado. Encerra o servidor e remove somente sua pasta temporária verificada. Relatório e capturas ficam em `artifacts/pace`; veja `docs/VALIDATION.md` para resultados e limites.
+Verificação: testes de API em banco temporário, datas com Node e `frontend/tests/pace.test.mjs` após build. O teste de interface usa porta loopback efêmera identificada pela inicialização do próprio processo, contexto Chrome isolado, data sintética fixa e ambiente minimizado. Encerra o servidor e remove somente sua pasta temporária verificada. Relatório e capturas ficam em `artifacts/pace`, fora do pacote público; os limites aplicáveis permanecem descritos neste documento.
 
 ## Beta 1.2.0 — catálogo versionado
 
-GET /api/v1/curriculum é somente leitura, com response_model `Curriculum`. O catálogo tem schema_version 1.0, revisão 2026.09.07.1, quatro trilhas e 50 registros: 30 available ligados às aulas antigas e 20 planned sem corpo/prática/duração concluídos. `metadata_reviewed_on` é revisão dos metadados, não execução recente de cada fonte ou produto. Português disponível aponta para a revisão original 1.1.0; traduções en/es são planejadas.
+GET /api/v1/curriculum é somente leitura, com response_model `Curriculum`. O catálogo tem schema_version 1.0, quatro trilhas e 50 registros: 30 aulas legadas com dia do calendário e 20 aulas guiadas não legadas disponíveis por ID. `GET /api/v1/units/{unit_id}` só aceita IDs publicados e retorna conteúdo limitado; não lê nem escreve progresso. `GET /api/v1/units/{unit_id}/lab` e `POST /api/v1/units/{unit_id}/lab/run` atendem labs fechados das 20 aulas de Dados, Segurança e Agentes, com opções fechadas e avaliação determinística em memória. Não aceitam texto executável, SQL, caminhos, URLs, comandos ou persistência. `metadata_reviewed_on` é revisão dos metadados, não execução recente de cada fonte ou produto. Português disponível aponta para a revisão local; traduções en/es permanecem planejadas.
 
 Autoria em scripts/author_curriculum.py gera backend/content/curriculum.json e schemas/curriculum.schema.json a partir do curso/biblioteca e do plano editorial. Pydantic estrito em backend/app/schemas/curriculum.py valida IDs, tipos, grafo acíclico, ordens, fontes HTTPS e consistência de disponibilidade/tradução. `validate_content_links` confronta título, resumo, objetivos, versão, duração, referências, labs e guias com os fontes reais antes de publicar o catálogo local. Falha de autoria não substitui a saída anterior. Não editar o JSON gerado isoladamente.
 
 Models lê o catálogo até 1 MB e manuais até 2 MB; o serviço expõe o modelo validado. Leitura bem-sucedida é mantida em cache até reinício. Se arquivo estiver ausente/inconsistente, a API retorna erro interno seguro e rotas legadas continuam funcionando. Após regenerar conteúdo, reinicie o aplicativo.
 
-IDs infra-01…infra-30 mapeiam explicitamente dias 1…30; data-01…06, security-01…06 e agents-01…08 reservam o planejamento aprovado. Renomear ou reutilizar esses IDs exigirá migração própria. Não houve alteração do SQLite, dos critérios de conclusão ou de backup v1. Frontend projeta `completed` pelos dias; não cria outro registro de conclusão. Guias não são aulas-base. Pré-requisitos são informativos.
+IDs infra-01…infra-30 mapeiam explicitamente dias 1…30; data-01…06, security-01…06 e agents-01…08 preservam o planejamento aprovado. Os 20 IDs não legados estão publicados localmente; os labs fechados expostos ficam em `models/unit_labs.py`, `services/unit_labs.py` e schemas próprios. Renomear ou reutilizar esses IDs exigirá migração própria. Não houve alteração do SQLite, dos critérios de conclusão ou de backup v1. Frontend projeta `completed` pelos dias; não cria outro registro de conclusão. Guias não são aulas-base. Pré-requisitos são informativos.
 
 Frontend usa api/curriculum para transporte, useCurriculum para loading/error/retry, services/curriculum para filtro/projeção e TracksPage/LearningUnitCard para apresentação. Novas rotas #/tracks, #/tracks/id e #/library/id preservam #/trail e #/day/n. URLs da biblioteca são identificadores validados, nunca caminhos de arquivo. Texto é renderizado por React; nenhuma entrada do catálogo concede execução de comandos.
 
 Testes novos: backend/tests/test_curriculum.py, frontend/tests/curriculum.test.mjs e tracks.test.mjs. Este último usa helper support/local-app.mjs, Chrome isolado, porta efêmera e backup sintético. Env mínimo e cleanup ficam limitados ao processo e pasta criados pelo teste. Biblioteca antiga continua coberta por library.test.mjs.
 
-`.gitignore` e package_app.py excluem `/data` do aluno, preservando frontend/src/data (tipos de aplicação). O pacote exige a presença desses tipos e do catálogo/schema; a extração nova verifica quatro trilhas e 50 registros. A preparação completa também foi exercitada em uma pasta nova no mesmo Windows, mas isso não equivale à instalação em outro computador. O workflow hospedado cobre preparação, testes de API/progresso, calendário/catálogo, laboratórios de referência e reprodução de conteúdo; os cenários Chrome permanecem locais.
+`.gitignore` e package_app.py excluem `/data` do aluno, memória privada `docs/ai`, dependências instaladas, fixtures e validadores de manutenção, além dos dois laboratórios piloto. O pacote beta.2 inclui uma allowlist explícita dos 20 corpos de aulas guiadas em `backend/content/planned-units`; qualquer outro rascunho nessa pasta continua excluído. `frontend/src/data` (tipos de aplicação) continua no pacote. O pacote exige a presença desses tipos e do catálogo/schema; a extração nova verifica quatro trilhas, 50 registros e as rotas de aula guiada. A preparação completa também foi exercitada em uma pasta nova no mesmo Windows, mas isso não equivale à instalação em outro computador. O workflow hospedado cobre preparação, testes de API/progresso, calendário/catálogo, laboratórios de referência e reprodução de conteúdo; os cenários Chrome permanecem locais.
+
+## Piloto local agents-05 — integração didática de 2026-09-15
+
+No workspace de manutenção, a autoria PT-BR em backend/content/planned-units/agents-05.json aponta para o roteiro e a entrada guiada em labs/agents-processes-pilot. learning_session.py apresenta evidências e decisões; DevelopmentTriage mantém a autoridade sobre leitura, diff, aprovação sintética e arquivos temporários. As ações são finitas e a aprovação positiva exige SHA-256 explícito. Nenhum backend/frontend importa ou executa esse código.
+
+O piloto usa a imagem local qualificada por ID e o perfil runtime.env com dez limites não secretos; o Compose padrão abre review. Não há serviço persistente, modelo, nova dependência ou migração. Cada invocação recria o cenário e limpa seus artefatos. A qualificação da imagem permanece separada da validação desta entrada. `agents-05` agora está disponível no catálogo por meio de um lab fechado do aplicativo; o piloto continua opcional, separado do runtime e não é iniciado pelo frontend ou backend. O piloto não foi acrescentado ao pacote distribuído.

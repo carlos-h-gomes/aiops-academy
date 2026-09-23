@@ -49,7 +49,10 @@
       "additionalProperties": false,
       "properties": {
         "kind": {
-          "const": "simulation",
+          "enum": [
+            "simulation",
+            "guided_fixture"
+          ],
           "title": "Kind",
           "type": "string"
         },

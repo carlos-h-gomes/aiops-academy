@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aiops-academy.invalid/schemas/security-06-agent-request-v1.json",
+  "title": "Pedido estático do policy engine didático de agentes",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "subject",
+    "operation",
+    "target",
+    "tool",
+    "authorization_id",
+    "approval_id",
+    "user_input",
+    "retrieved_context",
+    "tool_output"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "request_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"
+    },
+    "subject": {"$ref": "#/$defs/identifier"},
+    "operation": {"$ref": "#/$defs/identifier"},
+    "target": {"$ref": "#/$defs/identifier"},
+    "tool": {"$ref": "#/$defs/identifier"},
+    "authorization_id": {"$ref": "#/$defs/optionalIdentifier"},
+    "approval_id": {"$ref": "#/$defs/optionalIdentifier"},
+    "user_input": {"$ref": "#/$defs/untrustedText"},
+    "retrieved_context": {"$ref": "#/$defs/untrustedText"},
+    "tool_output": {"$ref": "#/$defs/untrustedText"}
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{1,63}$"
+    },
+    "optionalIdentifier": {
+      "oneOf": [
+        {"$ref": "#/$defs/identifier"},
+        {"type": "null"}
+      ]
+    },
+    "untrustedText": {
+      "type": "string",
+      "maxLength": 500
+    }
+  }
+}

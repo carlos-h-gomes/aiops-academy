@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "track_id": "data",
+  "status": "available",
+  "duration_minutes": {"essential": 90, "complete": 150},
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "id": "data-04",
+  "order": 4,
+  "title": "Transações, backup e restauração",
+  "summary": "Preservar consistência e demonstrar recuperação com dados sintéticos.",
+  "prerequisites": [
+    "data-03"
+  ],
+  "competencies": [
+    "Explicar limites de uma transação",
+    "Verificar uma restauração sem sobrescrever a origem"
+  ],
+  "body": "## Objetivo observável\nPrever o resultado de uma transação que falha, explicar por que o rollback pertence ao controlador e conferir uma cópia restaurada em destino separado. Entregue seis respostas e um registro com estado, contagens, checksum lógico e integridade referencial. Pré-requisito: data-03.\n\n## Contexto e limites\nUma transação reúne alterações que precisam ser confirmadas ou desfeitas como uma unidade. Uma falha de instrução não autoriza presumir que todas as instruções anteriores foram revertidas: o cliente deve tratar o erro e encerrar a transação conforme o contrato do mecanismo. Aqui o controlador captura a violação de FK e chama rollback explicitamente.\n\nO laboratório de referência usa duas conexões SQLite em memória com dados inventados. A operação backup copia a base para a segunda conexão, que começa vazia. Nenhum arquivo de banco do aluno é aberto, nenhum SQL do aluno é executado, e nenhum banco existente é sobrescrito. Isso exercita rollback, cópia e verificação com SQLite; não é qualificação de pg_dump, pg_restore, WAL, recuperação pontual ou PostgreSQL. A simulação interativa usa decisões fechadas sobre os mesmos fatos.\n\nBackup é um meio de recuperação, não a prova de que será possível recuperar. Um teste de restauração deve definir origem, destino novo, versão e critérios de consistência antes de qualquer escrita. RPO descreve a perda de dados tolerada; RTO descreve o tempo tolerado até a recuperação. Este exercício não mede nenhum deles. O checksum lógico compara conteúdo ordenado; sozinho não autentica o produtor do backup e não demonstra todas as propriedades do esquema.\n\n## Exemplo sintético\nA origem contém serviço quotes e incidente inc-100 aberto, ligado a quotes. A primeira instrução da transação muda inc-100 para resolvido. A segunda tenta inserir inc-200 apontando para missing-service: a FK falha. Sem confirmação, o controlador executa rollback; inc-100 volta a aberto e inc-200 não existe.\n\nDepois, backup copia a origem para uma conexão diferente em memória. As duas bases devem conter um serviço e um incidente, com as mesmas linhas ordenadas e o mesmo checksum SHA-256 lógico. A checagem de FK do destino deve estar vazia. Uma alteração de teste feita somente no destino não pode alterar o estado ou checksum da origem.\n\n## Exercício\n1. Leia backend/content/fixtures/data-04/scenario.json e identifique a origem sintética, as duas tabelas e o erro de FK.\n2. Antes da execução, escolha o estado esperado de inc-100 depois do rollback: aberto ou resolvido. Explique por que a primeira alteração também deve ser desfeita.\n3. Escolha o destino do backup: nova_conexao. Justifique por que origem e destino nunca podem ser o mesmo objeto.\n4. Copie answer-template.json para submission.json na mesma pasta. Preencha after_rollback, backup_destination, source_unchanged, rows_and_checksum_match, foreign_keys_valid e postgresql_verified usando os tipos do cenário.\n5. Com o ambiente Python preparado, na raiz do aplicativo execute: python scripts/bounded.py 30 .venv/Scripts/python.exe scripts/validate_data_04_06.py --unit data-04 --submission. O comando usa somente o arquivo fixo da unidade e mostra os campos a rever; não executa as respostas como código.\n6. Para verificar a execução de referência, use o mesmo comando sem --submission. Ele constrói as bases em memória, força a falha transacional, copia para destino novo e verifica a origem após alterar o destino. Compare os indicadores com sua previsão.\n7. Registre o que as checagens provam e o que falta em uma recuperação real: versão do mecanismo, permissões, extensão, índices, volume, relógio, janela de indisponibilidade, origem confiável e ensaio de recuperação.\n8. Execute os testes focados indicados ao final e descreva como o fluxo recusa destino igual à origem ou destino já preenchido.\n\n## Pistas\n**Pista 1 —** Localize commit e rollback como decisões diferentes. Uma FK protege o vínculo; ela não substitui o tratamento da transação inteira.\n**Pista 2 —** Confira identidade de origem/destino antes da cópia. Compare conteúdo e regras depois; contagem igual também ocorre com linhas incorretas.\n\n## Solução comentada\nafter_rollback=aberto; backup_destination=nova_conexao; source_unchanged=true; rows_and_checksum_match=true; foreign_keys_valid=true; postgresql_verified=false.\n\nO verificador abre conexões descartáveis, ativa FK, carrega o cenário e confirma apenas a carga inicial. Na transação de exercício, a inserção inválida gera erro, o controlador reverte a transação e compara todas as linhas com a fotografia inicial. A função de cópia recusa a própria origem e destinos que já contêm objetos. Depois da cópia compara conteúdo, checksum e FK. Ao modificar a cópia, confirma novamente que a origem continua intacta. Todas as conexões são fechadas ao final, inclusive diante de erro.\n\nA prova de checksum se refere ao conteúdo lógico conhecido, ordenado e sintético. Não use esse resultado como certificado de restauração de uma aplicação completa. Dados de outra origem devem passar por validação de autenticidade e formato; um dump SQL pode conter instruções e não deve ser tratado como arquivo inofensivo.\n\n## Critério de conclusão\nSeis respostas corretas; explicação do rollback; justificativa para destino separado; distinção entre integridade de linhas, integridade referencial e autenticidade. A execução de referência deve indicar rollback, correspondência da cópia, FK válida e origem preservada. Verificação técnica: python scripts/bounded.py 30 .venv/Scripts/python.exe -m unittest backend.tests.test_data_04_06 -v. O resultado automatizado verifica os casos fixos; a explicação continua sendo trabalho do aluno. A autoria permanece em preparação até a integração curricular.\n\n## Variação\nImagine que a origem e o destino têm a mesma contagem, mas o estado de inc-100 difere. Explique por que a contagem passa e o checksum lógico falha. Em seguida avalie um backup ausente ou corrompido: o fluxo correto interrompe antes da escrita e preserva a origem; este exercício não carrega arquivos de backup externos.\n\n## Referências primárias\nPostgreSQL: transações e backup, como comparação conceitual com o mecanismo de produção; Python sqlite3: API de backup e controle de transação. Os links não constituem evidência de PostgreSQL executado. A prática declara explicitamente SQLite em memória.",
+  "sources": [
+    {
+      "title": "PostgreSQL — Transactions",
+      "url": "https://www.postgresql.org/docs/current/tutorial-transactions.html",
+      "reviewed_on": "2026-09-20"
+    },
+    {
+      "title": "PostgreSQL — Backup and Restore",
+      "url": "https://www.postgresql.org/docs/current/backup.html",
+      "reviewed_on": "2026-09-20"
+    },
+    {
+      "title": "Python — sqlite3",
+      "url": "https://docs.python.org/3/library/sqlite3.html",
+      "reviewed_on": "2026-09-20"
+    }
+  ],
+  "fixture": {
+    "scenario": "backend/content/fixtures/data-04/scenario.json",
+    "answers": "backend/content/fixtures/data-04/answer-template.json",
+    "validator": "scripts/validate_data_04_06.py",
+    "tests": "backend/tests/test_data_04_06.py"
+  }
+}

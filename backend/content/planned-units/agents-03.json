@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "id": "agents-03",
+  "track_id": "agents",
+  "order": 3,
+  "title": "Saídas estruturadas e ferramentas",
+  "summary": "Validar pedidos de ação antes de executar uma ferramenta permitida.",
+  "status": "available",
+  "prerequisites": ["agents-02"],
+  "competencies": [
+    "Validar entrada e saída com schema",
+    "Rejeitar ferramenta ou alvo fora do escopo"
+  ],
+  "duration_minutes": {"essential": 90, "complete": 150},
+  "translations": [
+    {"locale": "pt-BR", "authoring_status": "authored"},
+    {"locale": "en", "authoring_status": "planned"},
+    {"locale": "es", "authoring_status": "planned"}
+  ],
+  "body": "## Objetivo observável\nAo final, você deverá validar um pedido e um resultado contra contratos fechados; executar apenas uma operação fixture allowlisted; e obter recusas tipadas para campo extra, tipo incorreto, ação, ferramenta, alvo ou fixture não permitidos. Você também deverá provar que `command`, URL e caminho arbitrário não existem no contrato.\n\n## Contexto e limites\nSaída estruturada reduz ambiguidade, mas não concede autoridade. O schema de entrada fixa doze campos: versões, pedido, sujeito, ação, alvo, ferramenta, fixture, aprovação, idempotência, orçamento e versão do artefato. `additionalProperties=false` impede anexar comando, URL, host, caminho ou argumento livre. O schema de saída limita decisão, estado, motivo, transições, resultado mínimo e contadores.\n\nA validação estrutural ocorre antes da policy. Em seguida, a policy cruza sujeito, ação, ferramenta, alvo e fixture. Somente `classify_process/fixture_classifier/process-intake` e `inspect_layers/fixture_reader/agent-layers` existem. Os adaptadores recebem objetos já carregados pelo chamador e usam apenas comparações; não abrem arquivo, executam shell, resolvem URL ou escrevem fora da memória.\n\n## Exemplo sintético\n`classify-rule` satisfaz o schema e a allowlist, consome dois passos e chama uma vez o classificador interno. Se `tool` mudar para `shell`, o resultado é `block/tool_not_allowed` antes do adaptador. Se surgir o campo extra `url`, a forma falha com `schema_extra_field`; seu valor nunca é interpretado nem repetido no relatório.\n\n## Exercício\n1. Liste os doze campos de entrada e os doze campos superiores da saída.\n2. Confirme `additionalProperties=false` no pedido, resultado, transição, payload e contadores.\n3. Execute um caso permitido e valide decisão, estado, motivo e contadores.\n4. Acrescente `command` a uma cópia do pedido e confirme `schema_extra_field`.\n5. Troque a ferramenta por `shell` e o alvo por um identificador externo, em cópias separadas, e confirme negações tipadas.\n6. Troque `step_budget` por texto e confirme falha de tipo antes da policy.\n7. Verifique estaticamente que o controlador não importa bibliotecas de rede, subprocesso ou filesystem.\n\n## Pistas\n**Pista 1 — valide de fora para dentro:** forma, sujeito, ação, ferramenta, alvo, fixture, orçamento e aprovação antecedem qualquer adaptador.\n\n**Pista 2 — campo ausente é diferente de campo negado:** um erro de schema não deve ser confundido com uma ação válida fora da allowlist.\n\n## Solução comentada\nO pedido permitido tem versões `1.0`, identificadores limitados e orçamento inteiro. A policy encontra o sujeito e a ação, confere o par ferramenta/alvo e verifica que a fixture pertence ao alvo. Só então o adaptador interno retorna campos enumerados. O resultado volta a ser validado e os contadores externos precisam continuar zero.\n\nCampo extra retorna `schema_extra_field`; campo ausente, `schema_required_field_missing`; tipo inválido de orçamento, `schema_step_budget_invalid`. Ação, ferramenta, alvo e fixture fora do contrato retornam respectivamente `action_not_allowed`, `tool_not_allowed`, `target_not_allowed` e `fixture_not_allowed`. Nenhum erro ecoa o valor rejeitado.\n\n## Critério de conclusão\nConclua quando um pedido permitido e sua saída passarem nos schemas, todas as mutações forem negadas pelo código esperado e nenhuma propriedade desconhecida alcançar um adaptador. Confirme uma chamada somente à ferramenta interna e zero rede, subprocesso e escrita externa. `agents-03` e PT-BR/EN/ES permanecem `planned`.\n\n## Variação\nEm uma cópia em memória, use uma fixture válida do alvo errado. O pedido deve falhar como `fixture_not_allowed` sem ler o payload. Depois restaure fixture e alvo e confirme resultado determinístico. Não crie wildcard nem conversão automática de tipos.\n\n## Referências primárias\nFontes oficiais revisadas em 2026-09-11: JSON Schema Draft 2020-12, publicado em 16 de junho de 2022, para fechamento estrutural; OWASP Top 10 for Agentic Applications 2026 para tool misuse e unexpected code execution; e NIST AI 600-1 para validação e gestão de risco de sistemas generativos. A implementação manual cobre somente este schema didático e não pretende ser um validador JSON Schema geral.",
+  "fixture": {
+    "schema": "backend/content/fixtures/agents-01-04/control-request.schema.json",
+    "result_schema": "backend/content/fixtures/agents-01-04/control-result.schema.json",
+    "policy": "backend/content/fixtures/agents-01-04/policy.json",
+    "data": "backend/content/fixtures/agents-01-04/fixtures.json",
+    "scenarios": "backend/content/fixtures/agents-01-04/scenarios.json"
+  },
+  "sources": [
+    {"title": "JSON Schema Draft 2020-12", "url": "https://json-schema.org/draft/2020-12", "reviewed_on": "2026-09-11"},
+    {"title": "OWASP Top 10 for Agentic Applications for 2026", "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/", "reviewed_on": "2026-09-11"},
+    {"title": "NIST AI 600-1 — Generative Artificial Intelligence Profile", "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence", "reviewed_on": "2026-09-11"}
+  ]
+}

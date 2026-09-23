@@ -1,7 +1,7 @@
 # Directory ownership
 
 Status: public local-download beta
-Version: 1.2.0-beta.1
+Version: 1.2.0-beta.2
 Reviewed: 2026-09-06
 Owner: local learner / root implementation
 

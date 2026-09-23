@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "fixtures": [
+    {
+      "fixture_id": "process-routine",
+      "fixture_version": "1.0",
+      "kind": "process_request",
+      "payload": {
+        "impact": "low",
+        "ambiguity": "low",
+        "inputs_complete": true,
+        "owner": "operations",
+        "preset_response": "use-fixed-rule"
+      }
+    },
+    {
+      "fixture_id": "process-ambiguous",
+      "fixture_version": "1.0",
+      "kind": "process_request",
+      "payload": {
+        "impact": "low",
+        "ambiguity": "high",
+        "inputs_complete": true,
+        "owner": "human-reviewer",
+        "preset_response": "assist-with-review"
+      }
+    },
+    {
+      "fixture_id": "process-high-impact",
+      "fixture_version": "1.0",
+      "kind": "process_request",
+      "payload": {
+        "impact": "high",
+        "ambiguity": "high",
+        "inputs_complete": true,
+        "owner": "human-reviewer",
+        "preset_response": "human-only"
+      }
+    },
+    {
+      "fixture_id": "process-incomplete",
+      "fixture_version": "1.0",
+      "kind": "process_request",
+      "payload": {
+        "impact": "medium",
+        "ambiguity": "low",
+        "inputs_complete": false,
+        "owner": "human-reviewer",
+        "preset_response": "complete-inputs-first"
+      }
+    },
+    {
+      "fixture_id": "layers-v1",
+      "fixture_version": "1.0",
+      "kind": "layer_map",
+      "payload": {
+        "layers": ["model", "assistant", "orchestrator", "state", "tool"],
+        "preset_response": "layer-map-available"
+      }
+    }
+  ]
+}

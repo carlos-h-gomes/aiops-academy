@@ -1,0 +1,170 @@
+{
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "scenario_id": "recover-authorized-copy",
+      "incident": {
+        "incident_id": "inc-fixture-005",
+        "source_id": "origin-slot-alpha",
+        "signal_id": "signal-fixture-17",
+        "source_snapshot": {
+          "generation": 7,
+          "records": [
+            {"id": "runbook-1", "state": "suspect-copy"},
+            {"id": "runbook-2", "state": "known-good"}
+          ]
+        },
+        "known_good_snapshot": {
+          "generation": 6,
+          "records": [
+            {"id": "runbook-1", "state": "known-good"},
+            {"id": "runbook-2", "state": "known-good"}
+          ]
+        }
+      },
+      "evidence": {
+        "incident_id": "inc-fixture-005",
+        "signal_id": "signal-fixture-17",
+        "observed_at": "2026-09-10T12:00:00-03:00",
+        "summary": "Mudança sintética detectada na cópia didática."
+      },
+      "decision_steps": [
+        "detect",
+        "preserve_evidence",
+        "contain",
+        "eradicate",
+        "recover",
+        "verify",
+        "prevent"
+      ],
+      "containment": {
+        "action": "isolate-fixture-workload",
+        "target": "fixture-workload-5"
+      },
+      "eradication": {
+        "action": "remove-fixture-change-from-copy"
+      },
+      "recovery": {
+        "destination": "recovery-slot-beta",
+        "snapshot": "known_good_snapshot"
+      },
+      "verification": {
+        "postconditions": [
+          "origin_unchanged",
+          "destination_matches_known_good",
+          "containment_remains_active",
+          "prevention_recorded"
+        ]
+      },
+      "prevention": {
+        "control": "require-reviewed-fixture-generation"
+      }
+    },
+    {
+      "scenario_id": "reject-missing-evidence",
+      "incident": {
+        "incident_id": "inc-fixture-005",
+        "source_id": "origin-slot-alpha",
+        "signal_id": "signal-fixture-17",
+        "source_snapshot": {"generation": 7, "records": []},
+        "known_good_snapshot": {"generation": 6, "records": []}
+      },
+      "evidence": {},
+      "decision_steps": ["detect", "preserve_evidence", "contain", "eradicate", "recover", "verify", "prevent"],
+      "containment": {"action": "isolate-fixture-workload", "target": "fixture-workload-5"},
+      "eradication": {"action": "remove-fixture-change-from-copy"},
+      "recovery": {"destination": "recovery-slot-beta", "snapshot": "known_good_snapshot"},
+      "verification": {"postconditions": ["origin_unchanged", "destination_matches_known_good", "containment_remains_active", "prevention_recorded"]},
+      "prevention": {"control": "require-reviewed-fixture-generation"}
+    },
+    {
+      "scenario_id": "reject-excess-evidence",
+      "incident": {
+        "incident_id": "inc-fixture-005",
+        "source_id": "origin-slot-alpha",
+        "signal_id": "signal-fixture-17",
+        "source_snapshot": {"generation": 7, "records": []},
+        "known_good_snapshot": {"generation": 6, "records": []}
+      },
+      "evidence": {
+        "incident_id": "inc-fixture-005",
+        "signal_id": "signal-fixture-17",
+        "observed_at": "2026-09-10T12:00:00-03:00",
+        "summary": "Resumo sintético suficiente.",
+        "raw_payload": "CONTEUDO-INERTE-QUE-NAO-DEVE-SER-PERSISTIDO"
+      },
+      "decision_steps": ["detect", "preserve_evidence", "contain", "eradicate", "recover", "verify", "prevent"],
+      "containment": {"action": "isolate-fixture-workload", "target": "fixture-workload-5"},
+      "eradication": {"action": "remove-fixture-change-from-copy"},
+      "recovery": {"destination": "recovery-slot-beta", "snapshot": "known_good_snapshot"},
+      "verification": {"postconditions": ["origin_unchanged", "destination_matches_known_good", "containment_remains_active", "prevention_recorded"]},
+      "prevention": {"control": "require-reviewed-fixture-generation"}
+    },
+    {
+      "scenario_id": "reject-wrong-order",
+      "incident": {
+        "incident_id": "inc-fixture-005",
+        "source_id": "origin-slot-alpha",
+        "signal_id": "signal-fixture-17",
+        "source_snapshot": {"generation": 7, "records": []},
+        "known_good_snapshot": {"generation": 6, "records": []}
+      },
+      "evidence": {
+        "incident_id": "inc-fixture-005",
+        "signal_id": "signal-fixture-17",
+        "observed_at": "2026-09-10T12:00:00-03:00",
+        "summary": "Resumo sintético suficiente."
+      },
+      "decision_steps": ["detect", "contain", "preserve_evidence", "eradicate", "recover", "verify", "prevent"],
+      "containment": {"action": "isolate-fixture-workload", "target": "fixture-workload-5"},
+      "eradication": {"action": "remove-fixture-change-from-copy"},
+      "recovery": {"destination": "recovery-slot-beta", "snapshot": "known_good_snapshot"},
+      "verification": {"postconditions": ["origin_unchanged", "destination_matches_known_good", "containment_remains_active", "prevention_recorded"]},
+      "prevention": {"control": "require-reviewed-fixture-generation"}
+    },
+    {
+      "scenario_id": "reject-wrong-destination",
+      "incident": {
+        "incident_id": "inc-fixture-005",
+        "source_id": "origin-slot-alpha",
+        "signal_id": "signal-fixture-17",
+        "source_snapshot": {"generation": 7, "records": []},
+        "known_good_snapshot": {"generation": 6, "records": []}
+      },
+      "evidence": {
+        "incident_id": "inc-fixture-005",
+        "signal_id": "signal-fixture-17",
+        "observed_at": "2026-09-10T12:00:00-03:00",
+        "summary": "Resumo sintético suficiente."
+      },
+      "decision_steps": ["detect", "preserve_evidence", "contain", "eradicate", "recover", "verify", "prevent"],
+      "containment": {"action": "isolate-fixture-workload", "target": "fixture-workload-5"},
+      "eradication": {"action": "remove-fixture-change-from-copy"},
+      "recovery": {"destination": "origin-slot-alpha", "snapshot": "known_good_snapshot"},
+      "verification": {"postconditions": ["origin_unchanged", "destination_matches_known_good", "containment_remains_active", "prevention_recorded"]},
+      "prevention": {"control": "require-reviewed-fixture-generation"}
+    },
+    {
+      "scenario_id": "reject-missing-postcondition",
+      "incident": {
+        "incident_id": "inc-fixture-005",
+        "source_id": "origin-slot-alpha",
+        "signal_id": "signal-fixture-17",
+        "source_snapshot": {"generation": 7, "records": []},
+        "known_good_snapshot": {"generation": 6, "records": []}
+      },
+      "evidence": {
+        "incident_id": "inc-fixture-005",
+        "signal_id": "signal-fixture-17",
+        "observed_at": "2026-09-10T12:00:00-03:00",
+        "summary": "Resumo sintético suficiente."
+      },
+      "decision_steps": ["detect", "preserve_evidence", "contain", "eradicate", "recover", "verify", "prevent"],
+      "containment": {"action": "isolate-fixture-workload", "target": "fixture-workload-5"},
+      "eradication": {"action": "remove-fixture-change-from-copy"},
+      "recovery": {"destination": "recovery-slot-beta", "snapshot": "known_good_snapshot"},
+      "verification": {"postconditions": ["origin_unchanged", "destination_matches_known_good", "prevention_recorded"]},
+      "prevention": {"control": "require-reviewed-fixture-generation"}
+    }
+  ]
+}

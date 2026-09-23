@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "id": "agents-06",
+  "track_id": "agents",
+  "order": 6,
+  "title": "Atendimento: chamados e runbooks",
+  "summary": "Classificar solicitações e preparar resposta citando procedimentos.",
+  "status": "available",
+  "prerequisites": [
+    "agents-05"
+  ],
+  "competencies": [
+    "Recuperar fontes permitidas",
+    "Recusar sem evidência e encaminhar para revisão"
+  ],
+  "duration_minutes": {"essential": 75, "complete": 120},
+  "translations": [
+    {
+      "locale": "pt-BR",
+      "authoring_status": "authored"
+    },
+    {
+      "locale": "en",
+      "authoring_status": "planned"
+    },
+    {
+      "locale": "es",
+      "authoring_status": "planned"
+    }
+  ],
+  "body": "## Objetivo observável\nClassifique seis chamados fictícios, proponha um rascunho citando um runbook permitido e encaminhe casos sem evidência, sensíveis ou de alto impacto. Explique por que encontrar um procedimento não autoriza executá-lo ou enviar a resposta.\n\n## Contexto e limites\nUma triagem útil separa categoria, evidência e decisão. O identificador de um runbook precisa corresponder à categoria do chamado; uma fonte sobre acesso não sustenta diagnóstico de desempenho. Este laboratório usa somente os identificadores RB-ACCESS-1 e RB-PERF-1. O primeiro recomenda verificar o estado sintético da conta e encaminhar recuperação ao responsável. O segundo recomenda comparar latência e erros da amostra sintética antes de sugerir diagnóstico. Não há reset de senha, sessão remota nem alteração de serviço.\n\nO avaliador aplica regras a objetos fechados. Chamado, runbook e rascunho são dados fictícios; texto não concede autoridade. Alto impacto e presença de informação sensível exigem revisão humana. Somente a ação draft existe. Nenhuma mensagem é enviada; o retorno é uma orientação fixa com referência, não uma resposta de modelo.\n\n## Exemplo sintético\nT-100 é um chamado de acesso de baixo impacto com RB-ACCESS-1. O resultado draft_ready cita esse runbook e mantém requires_review=true. T-101 tem a mesma categoria sem evidência: hold/evidence_missing, sem rascunho. Assim, uma ausência não vira uma justificativa inventada.\n\n## Exercício\n1. Abra os cenários de agents-06 e identifique categoria, impacto, evidências e ação solicitada.\n2. Preveja a decisão de routine antes de executar a prática.\n3. Compare missing-evidence e wrong-source; explique ausência versus fonte incompatível.\n4. Execute high-impact e sensitive; observe que ambos encaminham para uma pessoa, sem expor dados.\n5. Execute send-blocked e confirme que aprovação de conteúdo não adiciona capacidade de envio.\n6. Compare cada retorno com a coluna expected da fixture, depois repita routine.\n7. Registre runbook citado, motivo da decisão, responsável pela revisão e limite da prática.\n\n## Pistas\n**Pista 1 — fonte certa:** confirme o par categoria/runbook antes de avaliar a qualidade do rascunho.\n\n**Pista 2 — prioridade:** ação externa é bloqueada; sensibilidade e alto impacto exigem revisão antes da preparação da resposta.\n\n## Solução comentada\nroutine produz rascunho determinístico apoiado em RB-ACCESS-1. missing-evidence fica em hold porque nenhuma fonte foi fornecida. wrong-source também fica em hold: RB-PERF-1 existe, mas não sustenta um chamado de acesso. high-impact e sensitive usam human_review_required; a pessoa deve avaliar o caso em um processo próprio, sem copiar dados reais para o laboratório. send-blocked retorna external_action_forbidden. Nenhum cenário executa o procedimento descrito.\n\nA comparação usa referências exatas, não palavras semelhantes. Repetir a mesma entrada devolve a mesma saída e não altera a fixture. requires_review continua verdadeiro inclusive no rascunho pronto: pronto para revisar não é enviado.\n\n## Critério de conclusão\nReproduza as seis decisões, associe o rascunho à única referência permitida para sua categoria e explique duas situações de escalonamento. Confirme que envio, rede, modelo, subprocesso e escrita externa permanecem ausentes. A conclusão é didática; a publicação e o registro de progresso dependem da integração do aplicativo.\n\n## Variação\nEm uma cópia em memória, troque a categoria para performance e a evidência para RB-PERF-1. Antecipe a mudança da citação. Não acrescente URLs, credenciais, dados de clientes ou runbooks corporativos.\n\n## Referências primárias\nAs fontes conceituais abaixo sustentam governança e validação de contratos; a policy didática está explicitada nesta aula e em sua fixture. Os metadados de revisão de fontes foram reaproveitados da base editorial de 2026-09-11. O laboratório não certifica processos de atendimento.",
+  "fixture": {
+    "scenarios": "backend/content/fixtures/agents-06/scenarios.json",
+    "evaluator": "scripts/validate_agents_06_08.py"
+  },
+  "sources": [
+    {
+      "title": "NIST AI RMF 1.0 — governança, contexto e medição",
+      "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10",
+      "reviewed_on": "2026-09-11"
+    },
+    {
+      "title": "JSON Schema Draft 2020-12 — contratos fechados",
+      "url": "https://json-schema.org/draft/2020-12",
+      "reviewed_on": "2026-09-11"
+    }
+  ]
+}

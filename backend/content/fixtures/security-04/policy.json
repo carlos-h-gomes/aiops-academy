@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "forbidden_tags": [
+    "latest"
+  ],
+  "digest_algorithm": "sha256",
+  "require_verified_provenance": true,
+  "allowed_verification_basis": [
+    "synthetic-offline-proof"
+  ],
+  "allowed_license_status": [
+    "confirmed"
+  ],
+  "required_runtime_controls": {
+    "runs_as_non_root": true,
+    "read_only": true,
+    "no_new_privileges": true,
+    "cap_drop_all": true,
+    "resource_limits_declared": true
+  },
+  "evidence_fields": [
+    "scenario_id",
+    "decision",
+    "findings"
+  ],
+  "disclaimer": "Uma inspeção estática, um SBOM ou um scanner cobrem somente o que foi declarado e observado; não garantem ausência de vulnerabilidade, autenticidade do publicador ou segurança em runtime."
+}
