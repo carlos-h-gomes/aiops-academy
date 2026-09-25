@@ -14,6 +14,18 @@ def index():
 @router.get('/favicon.svg')
 def icon():return FileResponse(DIST/'favicon.svg')
 
+@router.get('/manifest.webmanifest')
+def manifest():
+    file=DIST/'manifest.webmanifest'
+    if not file.is_file():raise HTTPException(404)
+    return FileResponse(file,media_type='application/manifest+json')
+
+@router.get('/sw.js')
+def service_worker():
+    file=DIST/'sw.js'
+    if not file.is_file():raise HTTPException(404)
+    return FileResponse(file,media_type='application/javascript')
+
 @router.get('/assets/{path:path}')
 def asset(path:str):
     base=(DIST/'assets').resolve()

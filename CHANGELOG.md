@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.2.0-beta.3 — 2026-09-24
+
+- As 50 aulas disponíveis passam a compartilhar um calendário coerente e progresso local por unidade, preservando os IDs e backups das 30 aulas legadas.
+- A PWA local disponibiliza a interface e leituras de estudo já visitadas sem armazenar escritas, exportações ou filas de sincronização.
+- Conta e sincronização são opt-in: não existe endpoint padrão, tráfego automático, domínio da empresa, conta de aluno, migração remota ou serviço hospedado nesta candidata.
+- A fonte compatível com Cloudflare e sua migração D1 permanecem cobertas por testes locais; a prévia externa isolada não recebeu código do adaptador nem dados de aluno.
 
 ## 1.2.0-beta.2 — 2026-09-23
 

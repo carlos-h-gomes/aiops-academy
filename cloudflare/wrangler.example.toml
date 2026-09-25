@@ -1,0 +1,17 @@
+# Template only. It deliberately cannot deploy: replace every placeholder only after
+# the protected Cloudflare approval and record the resulting values outside Git.
+name = "REPLACE_WITH_WORKER_NAME"
+main = "src/worker.mjs"
+compatibility_date = "2026-09-24"
+workers_dev = false
+
+[vars]
+# Comma-separated exact origins. Keep this placeholder until Pages and, if needed,
+# the declared local development origin have been approved.
+ALLOWED_ORIGINS = "REPLACE_WITH_HTTPS_PAGES_ORIGIN"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "REPLACE_WITH_D1_DATABASE_NAME"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"

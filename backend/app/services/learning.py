@@ -4,6 +4,7 @@ import math
 import random
 import time
 from app.models.catalog import COURSE,LESSONS,LABS,LAB_MAP
+from app.models.curriculum import load_curriculum
 from app.repositories import storage
 
 def catalog():
@@ -17,6 +18,65 @@ def get_lesson(day):
     return LESSONS[day]
 
 def progress():return storage.progress()
+
+def _guided_unit(unit_id):
+    try:
+        unit=next(item for item in load_curriculum().units if item.id==unit_id)
+    except StopIteration as error:
+        raise ValueError('Aula guiada inexistente.') from error
+    if unit.status!='available' or unit.lesson_day is not None:
+        raise ValueError('Aula guiada inexistente.')
+    return unit
+
+def _unit_state(progress,unit_id):
+    return progress['unit_progress'].setdefault(unit_id,dict(lab_passed=False,completed=False,note='',review=None))
+
+def unit_progress(unit_id):
+    _guided_unit(unit_id)
+    return storage.progress()['unit_progress'].get(unit_id,dict(lab_passed=False,completed=False,note='',review=None))
+
+def record_unit_lab(unit_id,passed):
+    _guided_unit(unit_id)
+    if not passed:
+        return unit_progress(unit_id)
+    def update(value):
+        _unit_state(value,unit_id)['lab_passed']=True
+        return _unit_state(value,unit_id)
+    return storage.update_progress(update)
+
+def save_unit_note(unit_id,text):
+    _guided_unit(unit_id)
+    def update(value):
+        state=_unit_state(value,unit_id)
+        state['note']=text
+        return state
+    return storage.update_progress(update)
+
+def complete_unit(unit_id):
+    _guided_unit(unit_id)
+    def update(value):
+        state=_unit_state(value,unit_id)
+        if not state['lab_passed']:
+            raise ValueError('Resolva o lab guiado antes de concluir a aula.')
+        if len(state['note'].strip())<80:
+            raise ValueError('Registre uma evidência de pelo menos 80 caracteres antes de concluir a aula.')
+        state['completed']=True
+        state['review']=dict(due=(date.today()+timedelta(days=1)).isoformat(),interval=1,last_score=100)
+        return state
+    return storage.update_progress(update)
+
+def review_unit(unit_id,rating):
+    _guided_unit(unit_id)
+    def update(value):
+        state=_unit_state(value,unit_id)
+        if not state['completed']:
+            raise ValueError('Conclua a aula antes de registrar uma revisão.')
+        previous=state.get('review') or dict(interval=0,last_score=100)
+        old=previous.get('interval',0)
+        interval={'again':0,'hard':1,'good':min(14,max(1,old*2+1)),'easy':min(21,max(3,old*3+1))}[rating]
+        state['review']=dict(due=(date.today()+timedelta(days=interval)).isoformat(),interval=interval,last_score=previous.get('last_score',100))
+        return state
+    return storage.update_progress(update)
 
 def review_card(day):
     q=get_lesson(day)['quiz'][0]
@@ -62,7 +122,7 @@ def review(day,rating):
         p['reviews'][str(day)]=dict(due=(date.today()+timedelta(days=interval)).isoformat(),interval=interval,last_score=previous.get('last_score',0))
     return storage.update_progress(update)
 
-def backup(): return dict(version=1,**storage.progress())
+def backup(): return dict(version=2,**storage.progress())
 
 def restore(value):
     value=dict(value)
@@ -71,17 +131,27 @@ def restore(value):
         if any(k not in {str(x) for x in LESSONS} for k in value[key]): raise ValueError('Backup contém dias inválidos.')
     if any(x not in LESSONS for x in value['completed']): raise ValueError('Dias concluídos inválidos.')
     if any(k not in LAB_MAP for k in value['labs']): raise ValueError('Laboratório inválido no backup.')
+    guided={unit.id for unit in load_curriculum().units if unit.status=='available' and unit.lesson_day is None}
+    if any(unit_id not in guided for unit_id in value['unit_progress']): raise ValueError('Aula guiada inválida no backup.')
     if any(len(v)>12000 for v in value['notes'].values()): raise ValueError('Nota excede o limite.')
     if any(not math.isfinite(v) or not 0<=v<=100 for v in value['quizzes'].values()): raise ValueError('Pontuação inválida.')
     for r in value['reviews'].values():
         if set(r)!={'due','interval','last_score'}: raise ValueError('Revisão inválida.')
         date.fromisoformat(r['due'])
         if type(r['interval'])!=int or not 0<=r['interval']<=21 or type(r['last_score']) not in (int,float) or not 0<=r['last_score']<=100: raise ValueError('Intervalo inválido.')
+    for state in value['unit_progress'].values():
+        if set(state)-{'lab_passed','completed','note','review'}: raise ValueError('Progresso da aula guiada inválido.')
+        if type(state.get('lab_passed',False)) is not bool or type(state.get('completed',False)) is not bool or type(state.get('note','')) is not str or len(state.get('note',''))>12000: raise ValueError('Progresso da aula guiada inválido.')
+        review=state.get('review')
+        if review is not None:
+            if set(review)!={'due','interval','last_score'}: raise ValueError('Revisão da aula guiada inválida.')
+            date.fromisoformat(review['due'])
+            if type(review['interval'])!=int or not 0<=review['interval']<=21 or type(review['last_score']) not in (int,float) or not 0<=review['last_score']<=100: raise ValueError('Revisão da aula guiada inválida.')
     if not date(2000,1,1)<=date.fromisoformat(value['settings']['start_date'])<=date(2100,12,31): raise ValueError('Data de backup inválida.')
     value['completed']=sorted(set(value['completed']))
     with storage.transaction() as db:
         storage.write(db,'pre-restore',storage.read(db,'progress',storage.default_progress()))
-        storage.write(db,'progress',value)
+        storage.write(db,'progress',storage.hydrate_progress(value))
     return value
 
 def undo_restore():
@@ -133,4 +203,8 @@ def portfolio():
         note=p['notes'].get(str(day),'').strip()
         if note:
             lines.extend([f'## Dia {day:02d} — {lesson["title"]}',f'Checkpoint: {p["quizzes"].get(str(day),0)}% | Concluído: {"sim" if day in p["completed"] else "não"}', '',note,''])
+    guided={unit.id:unit for unit in load_curriculum().units if unit.status=='available' and unit.lesson_day is None}
+    for unit_id,state in p['unit_progress'].items():
+        if state.get('note','').strip() and unit_id in guided:
+            lines.extend([f'## {guided[unit_id].title}',f'Lab guiado: {"resolvido" if state.get("lab_passed") else "pendente"} | Concluída: {"sim" if state.get("completed") else "não"}', '',state['note'].strip(),''])
     return '\n'.join(lines)

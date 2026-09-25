@@ -1,8 +1,8 @@
 # AIOps Academy — Technical Documentation
 
-Status: local release candidate pending public upload
-Version: 1.2.0-beta.2
-Reviewed: 2026-09-23
+Status: public beta
+Version: 1.2.0-beta.3 candidate
+Reviewed: 2026-09-24
 Owner: local learner / root implementation
 
 ## Purpose, scope, and users
@@ -11,11 +11,11 @@ App individual para estudo intensivo local. As bancadas não executam código en
 
 ## Architecture and runtime boundaries
 
-Frontend build estático e backend HTTP na mesma origem 127.0.0.1:8765. Python serve apenas assets construídos e endpoints permitidos. Controller → service → repository/model. Composição em main.py/App.tsx. Não há imports de fonte entre frontend/backend.
+Frontend build estático e backend HTTP na mesma origem 127.0.0.1:8765. Python serve apenas assets construídos e endpoints permitidos. Controller → service → repository/model. Composição em main.py/App.tsx. Não há imports de fonte entre frontend/backend. O build inclui manifest e service worker de escopo raiz; o worker faz cache local apenas da interface e de leituras permitidas já obtidas, sem interceptar escritas.
 
 ## Module and directory responsibilities
 
-backend/app/controllers: HTTP e arquivos estáticos permitidos. services: correção, progresso e políticas. repositories: transações SQLite. models: catálogo e fixtures. schemas: validação v1. frontend/src/api: fetch com timeout; context/hooks: estado e navegação; services: seleção de percurso; pages/components: UI; utils: funções puras. backend/content: dados do curso; labs/real: exercícios separados; scripts: preparação e validação; artifacts: kit e evidências.
+backend/app/controllers: HTTP e arquivos estáticos permitidos. services: correção, progresso e políticas. repositories: transações SQLite. models: catálogo e fixtures. schemas: validação v1. frontend/src/api: fetch com timeout; context/hooks: estado e navegação; services: seleção de percurso e preferência de idioma; pages/components: UI; utils: funções puras. `LocaleSettings` persiste somente a preferência do navegador e mantém `lang=pt-BR` enquanto inglês/espanhol não tiverem conteúdo editorial revisado. backend/content: dados do curso; labs/real: exercícios separados; scripts: preparação e validação; artifacts: kit e evidências.
 
 ## API contracts and integrations
 
@@ -23,7 +23,7 @@ backend/app/controllers: HTTP e arquivos estáticos permitidos. services: corre�
 
 ## Data ownership, schemas, and migrations
 
-SQLite state(key,value JSON), transações BEGIN IMMEDIATE. Progress tem settings, notes, completed, quizzes, labs, reviews. Backup v1 é validado antes da substituição atômica; pre-restore preserva estado anterior. Sessões têm ID aleatório, expiram após 8h, limitam 250 ações e retenção total de 500. Mudança incompatível deve introduzir migração versionada. Não há migração automática silenciosa.
+SQLite state(key,value JSON), transações BEGIN IMMEDIATE. Progress tem settings, notes, completed, quizzes, labs, reviews e `unit_progress` aditivo para aulas guiadas. Backup v2 é validado antes da substituição atômica; o restore também aceita v1 e pre-restore preserva estado anterior. Sessões têm ID aleatório, expiram após 8h, limitam 250 ações e retenção total de 500. Mudança incompatível deve introduzir migração versionada. Não há migração automática silenciosa.
 
 ## Authentication, authorization, and security controls
 
@@ -41,6 +41,8 @@ preparar.cmd chama scripts/prepare.py: cria .venv, instala requisitos binários 
 
 A beta é distribuída para execução local, não como serviço hospedado. iniciar.cmd abre o navegador; sessão limita-se a 8h. Porta ocupada não é encerrada. Para voltar uma versão, pare o app, exporte/preserve o backup e substitua somente os fontes/build por uma extração limpa da versão anterior; não extraia arquivos sobre `data/`. O pacote portátil não contém dados do aluno. Backups v1 continuam aceitos pela beta; um aplicativo antigo pode rejeitar os ritmos novos.
 
+O diretório `cloudflare/` contém a fonte do adaptador: `migrations/0001_accounts_and_sync.sql` cria tabelas D1 por identidade de aluno, verificador, códigos de recuperação, sessão, snapshot, operações e throttle; `src/worker.mjs` implementa registro, login, recuperação, logout e pull/push autenticados. `src/sync.mjs` limita lotes a 50 operações/64 KiB, une conclusões e laboratórios de forma monotônica, mantém o maior checkpoint e devolve conflito explícito para preferências, revisões ou evidências concorrentes; uma substituição só é aceita quando a pessoa escolhe expressamente manter a cópia local. A origem HTTP é recusada pelo navegador do produto; no Worker, CORS só responde para origens exatas em `ALLOWED_ORIGINS`, sem curinga ou reflexão. A página Ajustes oferece o controle opt-in, exige que a pessoa salve um endpoint HTTPS e guarda o token apenas na sessão do navegador. Sob autorização separada, foi criado um Worker de prévia `workers.dev` com uma base D1 nova vinculada como `DB`, a origem local exata como única origem permitida e logs/tracing persistentes desativados. O código do adaptador e a migração ainda não foram publicados/executados, não há contas de alunos nem Pages, e não há domínio, rota ou recurso da empresa. `cloudflare/wrangler.example.toml` e [CLOUDFLARE-DEPLOYMENT-CHECKLIST.md](CLOUDFLARE-DEPLOYMENT-CHECKLIST.md) continuam sem IDs, tokens ou segredos versionados. Mudanças D1 só podem ocorrer por migração revisada após aprovação externa.
+
 ## Observability, alerts, and incident response
 
 Health v1 identifica produto e versão. Sem telemetria externa, sem access log contendo notas. Exceções de aplicação têm mensagem segura. Não há monitor ou SLA de produção. Falha de banco: preserve rascunho e confira espaço/permissão antes de restaurar. Servidor de QA limitado por tempo.
@@ -51,7 +53,7 @@ Exportar backup pela UI ou GET /api/v1/backup. Restaurar exige confirmação e v
 
 ## Operations, support, and troubleshooting
 
-Porta padrão8765. Falha por ausência de build: preparar.cmd. Falha de dependência: examinar saída limitada e corrigir instalação sem privilégios globais. Outra aplicação na porta: --port8766. Sem internet: aulas locais funcionam após setup; links oficiais não. Não remova banco para resolver erro sem backup.
+Porta padrão8765. Falha por ausência de build: preparar.cmd. Falha de dependência: examinar saída limitada e corrigir instalação sem privilégios globais. Outra aplicação na porta: --port8766. Sem internet: a PWA pode reabrir a interface e conteúdo já visitado, mas salvar, restaurar, exportar ou carregar algo ainda não cacheado requer o app local. Links oficiais não funcionam offline. Não remova banco para resolver erro sem backup.
 
 ## Known limitations and residual risks
 
@@ -70,9 +72,9 @@ Os testes frontend/tests/library.test.mjs usam Chrome instalado em contexto isol
 
 `Settings.daily_hours` aceita somente os números 0.5, 0.75, 1, 1.5, 2, 3 e 5. Booleanos, strings e outros valores retornam 422, tanto em PUT /api/v1/settings quanto em POST /api/v1/restore. Data inicial permanece entre 2000-01-01 e 2100-12-31. Novo progresso usa 1h/dia; progresso já persistido não é migrado nem reescrito no primeiro acesso.
 
-O formulário CalendarSettings possui a edição temporária e desabilita campos durante o salvamento. `utils/dates.ts` centraliza a estimativa de apresentação: abaixo de 3h/dia, `ceil(90/h)` dias corridos e início da aula n em `floor((n-1)*3/h)` dias após o início. As taxas legadas 3/5 mantêm 30 dias. Datas são civis locais, construídas ao meio-dia; o total não desconta fins de semana. A estimativa não autoriza conclusão nem modifica as regras de avaliação.
+O formulário CalendarSettings possui a edição temporária e desabilita campos durante o salvamento. `utils/dates.ts` centraliza a estimativa de apresentação: `ceil(7050/(h*60))` dias corridos para 117,5 horas essenciais das 50 aulas. As datas das unidades usam a soma da duração essencial anterior e a disponibilidade diária. Datas são civis locais, construídas ao meio-dia; o total não desconta fins de semana. A estimativa não autoriza conclusão nem modifica as regras de avaliação.
 
-Backup conserva versão 1, IDs e namespaces. Leitor novo aceita arquivos antigos e novos; leitor antigo pode rejeitar taxas expandidas. Para rollback, preservar backup atual e exportar uma cópia com 3h/5h antes de substituir código e build. Não editar o JSON ou banco para forçar compatibilidade. Testes cobrem ida/volta, undo e rejeição sem substituir o estado/ponto de recuperação.
+Backup v2 conserva IDs e namespaces legados e acrescenta `unit_progress`; o leitor atual aceita arquivos v1 e v2. Um leitor antigo pode rejeitar backup v2, independentemente do ritmo escolhido. Para rollback, preservar o backup atual, substituir somente código e build, e não editar JSON ou banco para forçar compatibilidade. Testes cobrem ida/volta, undo e rejeição sem substituir o estado/ponto de recuperação.
 
 Verificação: testes de API em banco temporário, datas com Node e `frontend/tests/pace.test.mjs` após build. O teste de interface usa porta loopback efêmera identificada pela inicialização do próprio processo, contexto Chrome isolado, data sintética fixa e ambiente minimizado. Encerra o servidor e remove somente sua pasta temporária verificada. Relatório e capturas ficam em `artifacts/pace`, fora do pacote público; os limites aplicáveis permanecem descritos neste documento.
 
@@ -84,13 +86,19 @@ Autoria em scripts/author_curriculum.py gera backend/content/curriculum.json e s
 
 Models lê o catálogo até 1 MB e manuais até 2 MB; o serviço expõe o modelo validado. Leitura bem-sucedida é mantida em cache até reinício. Se arquivo estiver ausente/inconsistente, a API retorna erro interno seguro e rotas legadas continuam funcionando. Após regenerar conteúdo, reinicie o aplicativo.
 
-IDs infra-01…infra-30 mapeiam explicitamente dias 1…30; data-01…06, security-01…06 e agents-01…08 preservam o planejamento aprovado. Os 20 IDs não legados estão publicados localmente; os labs fechados expostos ficam em `models/unit_labs.py`, `services/unit_labs.py` e schemas próprios. Renomear ou reutilizar esses IDs exigirá migração própria. Não houve alteração do SQLite, dos critérios de conclusão ou de backup v1. Frontend projeta `completed` pelos dias; não cria outro registro de conclusão. Guias não são aulas-base. Pré-requisitos são informativos.
+IDs infra-01…infra-30 mapeiam explicitamente dias 1…30; data-01…06, security-01…06 e agents-01…08 preservam o planejamento aprovado. Os 20 IDs não legados estão publicados localmente; os labs fechados expostos ficam em `models/unit_labs.py`, `services/unit_labs.py` e schemas próprios. Renomear ou reutilizar esses IDs exigirá migração própria. `unit_progress` mantém resultado de lab, evidência, conclusão e revisão por ID, enquanto `completed` dos dias legados fica inalterado. Backup v2 preserva os dois namespaces e o restore aceita v1. Guias não são aulas-base. Pré-requisitos são informativos.
 
 Frontend usa api/curriculum para transporte, useCurriculum para loading/error/retry, services/curriculum para filtro/projeção e TracksPage/LearningUnitCard para apresentação. Novas rotas #/tracks, #/tracks/id e #/library/id preservam #/trail e #/day/n. URLs da biblioteca são identificadores validados, nunca caminhos de arquivo. Texto é renderizado por React; nenhuma entrada do catálogo concede execução de comandos.
 
 Testes novos: backend/tests/test_curriculum.py, frontend/tests/curriculum.test.mjs e tracks.test.mjs. Este último usa helper support/local-app.mjs, Chrome isolado, porta efêmera e backup sintético. Env mínimo e cleanup ficam limitados ao processo e pasta criados pelo teste. Biblioteca antiga continua coberta por library.test.mjs.
 
 `.gitignore` e package_app.py excluem `/data` do aluno, memória privada `docs/ai`, dependências instaladas, fixtures e validadores de manutenção, além dos dois laboratórios piloto. O pacote beta.2 inclui uma allowlist explícita dos 20 corpos de aulas guiadas em `backend/content/planned-units`; qualquer outro rascunho nessa pasta continua excluído. `frontend/src/data` (tipos de aplicação) continua no pacote. O pacote exige a presença desses tipos e do catálogo/schema; a extração nova verifica quatro trilhas, 50 registros e as rotas de aula guiada. A preparação completa também foi exercitada em uma pasta nova no mesmo Windows, mas isso não equivale à instalação em outro computador. O workflow hospedado cobre preparação, testes de API/progresso, calendário/catálogo, laboratórios de referência e reprodução de conteúdo; os cenários Chrome permanecem locais.
+
+## Incremento local não publicado — progresso das 50 aulas
+
+O working tree posterior à beta.2 preserva `notes`, `completed`, `quizzes`, `labs` e `reviews` legados por dia e acrescenta `unit_progress` por ID somente para as 20 aulas guiadas. O estado de cada unidade tem `lab_passed`, `note`, `completed` e uma revisão opcional. `POST /api/v1/units/{id}/lab/run` continua avaliando somente escolhas fechadas; quando correto, registra apenas `lab_passed`, sem armazenar respostas. `PUT /api/v1/units/{id}/note`, `POST /api/v1/units/{id}/complete` e `POST /api/v1/units/{id}/review` aceitam somente IDs publicados e não interferem com a conclusão diária legada.
+
+Backup novo usa versão 2; o restore aceita versões 1 e 2 e normaliza a ausência de `unit_progress` como vazio. A conclusão exige lab correto e evidência de pelo menos 80 caracteres. O frontend projeta os dois namespaces sem misturar IDs e mostra as 50 aulas no calendário sugestivo, calculado por duração essencial e disponibilidade diária. Esse é um incremento local ainda não qualificado para pacote ou publicação.
 
 ## Piloto local agents-05 — integração didática de 2026-09-15
 

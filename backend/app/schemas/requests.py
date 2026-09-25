@@ -32,12 +32,19 @@ class LabRun(Input):
 class Rating(Input):
     rating: Literal['again','hard','good','easy']
 
+class UnitProgressState(Input):
+    lab_passed: bool = False
+    completed: bool = False
+    note: str = Field(default='',max_length=12000)
+    review: dict[str,object] | None = None
+
 class Restore(Input):
-    version: Literal[1]
+    version: Literal[1,2]
     settings: Settings
     notes: dict[str,str] = Field(max_length=30)
     completed: list[int] = Field(max_length=30)
     quizzes: dict[str,float] = Field(max_length=30)
     labs: dict[str,bool] = Field(max_length=20)
     reviews: dict[str,dict] = Field(max_length=30)
+    unit_progress: dict[str,UnitProgressState] = Field(default_factory=dict,max_length=20)
     confirm: Literal[True]

@@ -2,7 +2,7 @@
 
 **Aprenda. Teste. Explique.**
 
-Beta local `1.2.0-beta.2`, distribuída como código-fonte e pacote portátil para Windows.
+Última beta pública `1.2.0-beta.2`; candidata local `1.2.0-beta.3`, distribuída como código-fonte e pacote portátil para Windows após sua validação de release.
 
 Um ambiente local de aprendizagem prática em infraestrutura, automação, observabilidade e IA. Para quem está começando ou quer consolidar fundamentos com exercícios e evidências — no próprio ritmo, sem depender de uma vaga ou empresa específica.
 
@@ -26,7 +26,7 @@ Na instalação já preparada, basta abrir iniciar.cmd. A sessão dura até 8 ho
 | Bancadas | 11 simuladores com correção, pistas e soluções |
 | Avaliações | Banco de 60 questões e seis configurações de simulado |
 | Biblioteca | 12 manuais essenciais, 6 aprofundamentos e 7 guias de ferramentas |
-| Continuidade | Revisão espaçada, notas, portfólio e backup v1 |
+| Continuidade | Revisão espaçada, notas, portfólio e backup v2 (compatível com v1) |
 | Prática real | Exercícios Python, serviço HTTP e playbook Ansible |
 
 O percurso cobre Linux, Windows, redes, Python, Git, Ansible/AAP, Dynatrace/DQL, OpenTelemetry, SLO, AWS S3/Lambda/OpenSearch, GCP, eventos, anomalias, RAG e resposta a incidentes.
@@ -37,9 +37,9 @@ O percurso cobre Linux, Windows, redes, Python, Git, Ansible/AAP, Dynatrace/DQL,
 
 Cada dia exige checkpoint com pelo menos 80%, laboratório resolvido e uma evidência escrita. Notas livres são autoavaliação; a pontuação não certifica senioridade. As bancadas são simulações explícitas com gramáticas limitadas. Roteiros de nuvem e ferramentas reais são opcionais e não executam recursos externos automaticamente.
 
-Percurso completo: até 5 horas por aula, com quatro aulas de consolidação de 3 horas — 142 horas. Percurso essencial: 90 horas, divisíveis em sessões de 30 min a 3h. Novos alunos começam com 1h/dia; preferências anteriores são mantidas. O calendário acompanha Infraestrutura e AIOps e não bloqueia o acesso às aulas.
+Percurso essencial: 117,5 horas para as 50 aulas disponíveis, divisíveis em sessões de 30 min a 5h. Novos alunos começam com 1h/dia; preferências anteriores são mantidas. O calendário acompanha todas as trilhas e não bloqueia o acesso às aulas.
 
-Em **Trilhas de estudo**, escolha Infraestrutura e AIOps, Dados/SQL/RAG, Segurança operacional ou Agentes/processos. As 30 aulas do calendário estão em Infraestrutura; as seis aulas de Dados, seis de Segurança e oito de Agentes/processos ficam disponíveis por ID e não registram progresso. Cada uma tem um lab guiado de decisões fechadas, sem executar SQL, arquivos, comandos, rede ou ferramentas externas do aluno. Guias complementares continuam disponíveis nas quatro trilhas. As 20 aulas guiadas não entram na conclusão do calendário de 30 dias.
+Em **Trilhas de estudo**, escolha Infraestrutura e AIOps, Dados/SQL/RAG, Segurança operacional ou Agentes/processos. As 50 aulas entram no calendário e no progresso local; as 20 aulas guiadas usam labs de decisões fechadas, sem executar SQL, arquivos, comandos, rede ou ferramentas externas do aluno. Guias complementares continuam disponíveis nas quatro trilhas.
 
 ## Construído para evoluir
 
@@ -54,4 +54,4 @@ FastAPI + React/TypeScript, API `/api/v1`, persistência SQLite e conteúdo vers
 
 ## Estado do projeto
 
-Beta local `1.2.0-beta.2`, sucessora da `1.2.0-beta.1`. Código sob [MIT](LICENSE); conteúdo original sob [CC BY 4.0](CONTENT-LICENSE.md). A distribuição é para uso individual no Windows e não hospeda uma aplicação, não cria contas e não sincroniza dados. A preparação foi repetida em uma extração nova no mesmo computador; ainda não há prova de instalação em um segundo computador. A V1 mais ampla continua em implementação incremental; veja o [roadmap](ROADMAP.md) e as [Releases](https://github.com/carlos-h-gomes/aiops-academy/releases).
+A última beta pública é `1.2.0-beta.2`; `1.2.0-beta.3` é a candidata local em validação. Código sob [MIT](LICENSE); conteúdo original sob [CC BY 4.0](CONTENT-LICENSE.md). A distribuição é para uso individual no Windows e não hospeda uma aplicação, não cria contas e não sincroniza dados por padrão. A preparação foi repetida em uma extração nova no mesmo computador; ainda não há prova de instalação em um segundo computador. A V1 mais ampla continua em implementação incremental; veja o [roadmap](ROADMAP.md) e as [Releases](https://github.com/carlos-h-gomes/aiops-academy/releases).

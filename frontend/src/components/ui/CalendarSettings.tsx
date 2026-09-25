@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import {Save} from 'lucide-react'
-import {planEnd, studyDays, validStudyStart} from '../../utils/dates'
+import {ESSENTIAL_STUDY_MINUTES,planEnd, studyDays, validStudyStart} from '../../utils/dates'
 import type {Progress} from '../../data/types'
 
 type Settings = Progress['settings']
@@ -19,7 +19,7 @@ export function CalendarSettings({settings,busy,onSave}:{settings:Settings;busy:
     {!valid&&<p id="start-error" role="alert">Escolha uma data válida entre 01/01/2000 e 31/12/2100.</p>}
     <label className="form-label" htmlFor="daily-hours">Disponibilidade por dia</label>
     <select id="daily-hours" value={hours} disabled={busy} onChange={e=>setHours(Number(e.target.value) as Settings['daily_hours'])}>{rates.map(rate=><option key={rate.hours} value={rate.hours}>{rate.label}</option>)}</select>
-    <p className="muted">{hours===5?'Completo: 142h, com 3h nos quatro checkpoints e até 5h nos demais dias.':'Essencial: estimativa de 90h para aulas, prática e evidências. Divida cada aula em sessões; aprofundamentos são opcionais.'}</p>
+    <p className="muted">Essencial: estimativa de {(ESSENTIAL_STUDY_MINUTES/60).toLocaleString('pt-BR')}h para as 50 aulas, prática e evidências. Divida cada aula em sessões; aprofundamentos são opcionais.</p>
     <p role="status" className="small">{busy?'Salvando preferências…':`Previsão de término: ${end} · ${studyDays(hours)} dias de estudo.`}</p>
     <div className="notice">Esta previsão considera estudo todos os dias, a partir da data escolhida. Uma aula pode ocupar várias sessões. Folgas e pausas prolongam o prazo; o calendário não bloqueia atividades nem apaga seu progresso.</div>
     <button className="primary" disabled={busy||!valid} onClick={()=>onSave({start_date:start,daily_hours:hours})}><Save size={17}/>Salvar preferências</button>

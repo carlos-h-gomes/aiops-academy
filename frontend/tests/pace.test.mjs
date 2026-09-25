@@ -66,12 +66,12 @@ try {
     const rate=page.getByLabel('Disponibilidade por dia')
     const save=page.getByRole('button',{name:'Salvar preferências'})
     await start.fill('2028-02-01')
-    for(const [hours,days] of [['0.5',180],['0.75',120],['1',90],['1.5',60],['2',45],['3',30],['5',30]]) {
+    for(const [hours,days] of [['0.5',235],['0.75',157],['1',118],['1.5',79],['2',59],['3',40],['5',24]]) {
       await rate.selectOption(hours)
       await expect(page.getByRole('status').filter({hasText:'Previsão de término'})).toContainText(`${days} dias de estudo`)
     }
     await rate.selectOption('1')
-    await expect(page.getByRole('status').filter({hasText:'Previsão de término'})).toContainText('30/04/2028')
+    await expect(page.getByRole('status').filter({hasText:'Previsão de término'})).toContainText('28/05/2028')
     await start.fill('')
     await expect(start).toHaveAttribute('aria-invalid','true')
     await expect(page.getByRole('alert')).toContainText('Escolha uma data válida')
@@ -82,7 +82,7 @@ try {
     await expect(save).toBeFocused()
     await page.keyboard.press('Enter')
     await expect(page.getByRole('status').filter({hasText:'Preferências salvas'})).toBeVisible()
-    await expect(page.locator('.target-date')).toHaveText('Previsão 30/04')
+    await expect(page.locator('.target-date')).toHaveText('Previsão 28/05')
     const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze()
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)
     checks.push({width,violations:axe.violations.map(v=>({id:v.id,impact:v.impact,targets:v.nodes.map(n=>n.target)})),overflow})
@@ -94,8 +94,8 @@ try {
     await expect(start).toHaveValue('2028-02-01')
     await page.goto(origin+'/#/')
     await expect(page.locator('.hero-foot')).toContainText('60 min por dia')
-    await expect(page.locator('.stats-grid')).toContainText('Previsão: 30/04')
-    await expect(page.locator('.stats-grid .stat').last().locator('strong')).toContainText('89')
+    await expect(page.locator('.stats-grid')).toContainText('Previsão: 28/05')
+    await expect(page.locator('.stats-grid .stat').last().locator('strong')).toContainText('117')
     await page.goto(origin+'/#/trail')
     await expect(page.locator('a.lesson-row[href="#/day/2"] .date-label')).toHaveText('04/02')
     await page.locator('a.lesson-row[href="#/day/2"]').click()
@@ -112,7 +112,7 @@ try {
   await save.click()
   await expect(page.getByRole('alert')).toHaveText('Falha sintética ao salvar')
   await expect(rate).toHaveValue('0.5')
-  await expect(page.locator('.target-date')).toHaveText('Previsão 30/04')
+  await expect(page.locator('.target-date')).toHaveText('Previsão 28/05')
   await page.screenshot({path:path.join(output,'error-320.png'),fullPage:true})
   await page.unroute('**/api/v1/settings')
   await page.route('**/api/v1/settings',route=>route.abort())
@@ -124,19 +124,19 @@ try {
   const saving=new Promise(resolve=>{releaseSave=resolve})
   await page.route('**/api/v1/settings',async route=>{await saving;await route.continue()})
   await save.click()
-  await expect(page.getByRole('status')).toHaveText('Salvando preferências…')
+  await expect(page.getByRole('status').filter({hasText:'Salvando preferências…'})).toHaveText('Salvando preferências…')
   await expect(save).toBeDisabled()
   await expect(rate).toBeDisabled()
   await expect(page.getByLabel('Início do percurso')).toBeDisabled()
   releaseSave()
   await expect(page.getByRole('status').filter({hasText:'Preferências salvas'})).toBeVisible()
   await page.unroute('**/api/v1/settings')
-  // Old intensive rates retain the original thirty-day calendar after a light rate.
-  for(const hours of ['3','5']) {
+  // The full 50-unit calendar stays accurate after a light rate.
+  for(const [hours,target] of [['3','11/03'],['5','24/02']]) {
     await rate.selectOption(hours)
     await save.click()
     await expect(page.getByRole('status').filter({hasText:'Preferências salvas'})).toBeVisible()
-    await expect(page.locator('.target-date')).toHaveText('Previsão 01/03')
+    await expect(page.locator('.target-date')).toHaveText(`Previsão ${target}`)
   }
   expect(errors).toEqual([])
   await writeFile(path.join(output,'checks.json'),JSON.stringify({checks,loading:'passed',keyboard:'passed',invalid:'passed',persistence:'passed',crossRouteDates:'passed',failureAndRetry:'passed',busy:'passed',legacyDates:'passed',pageErrors:errors},null,2))

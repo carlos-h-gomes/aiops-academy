@@ -25,7 +25,7 @@ try {
     await new Promise(resolve=>setTimeout(resolve,100))
   }
   browser = await chromium.launch({channel:'chrome',headless:true})
-  const context = await browser.newContext({reducedMotion:'reduce'})
+  const context = await browser.newContext({reducedMotion:'reduce',serviceWorkers:'block'})
   const page = await context.newPage()
   page.setDefaultTimeout(8000)
   const errors = []

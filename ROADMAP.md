@@ -1,6 +1,6 @@
 # Roadmap do AIOps Academy
 
-Atualização de planejamento, 2026-09-07: a direção da V1 pública e seu backlog foram aprovados; a implementação incremental começou. Essa direção amplia o plano abaixo para quatro trilhas, contas opcionais e PWA; substitui como direção aprovada a sequência futura 1.2–1.4 abaixo, mantida como histórico. Não altera o marco entregue 1.1 nem representa funcionalidades implementadas.
+Atualização de planejamento, 2026-09-23: a direção da V1 pública foi refinada para estudo individual autoatendido. A próxima evolução une as 50 aulas ao progresso e calendário, adiciona contas opcionais exclusivamente para sincronização pessoal, PWA e internacionalização com revisão editorial. Turmas, instrutores, convites, diretório de alunos, pagamentos e serviço de e-mail não fazem parte do produto. Cloudflare Pages + Workers + D1 é o alvo de hospedagem mínima; a criação de recursos e a publicação continuam sujeitas a autorização específica. Labs de SQL, Ansible e Docker permanecem locais por instaladores controlados, sem execução no site público. A sequência 1.2–1.4 abaixo é histórico de planejamento e não representa funcionalidades implementadas.
 
 Direção: tornar o estudo de AIOps acessível, prático e verificável. Português primeiro, funcionamento local e evolução sem apagar o progresso de quem já começou. As etapas abaixo são propostas de escopo, não promessas de data.
 

@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs'
 import {trackUnits,trackSummary,unitComplete} from '../src/services/curriculum.ts'
 
 const catalog=JSON.parse(readFileSync(new URL('../../backend/content/curriculum.json',import.meta.url),'utf8'))
-const progress={settings:{start_date:'2035-12-15',daily_hours:0.75},completed:[1,2],notes:{'1':'Synthetic note'},quizzes:{'1':100},labs:{linux:true},reviews:{}}
+const progress={settings:{start_date:'2035-12-15',daily_hours:0.75},completed:[1,2],notes:{'1':'Synthetic note'},quizzes:{'1':100},labs:{linux:true},reviews:{},unit_progress:{}}
 
 test('track filtering respects accents, status, ordering and input immutability',()=>{
   const before=JSON.stringify(catalog)
@@ -25,8 +25,8 @@ test('legacy completed days project once without modifying study state',()=>{
   assert.equal(JSON.stringify(progress),before)
 })
 
-test('guided nonlegacy lessons do not project into legacy progress',()=>{
+test('guided nonlegacy lessons project their own individual progress',()=>{
   const units=trackUnits(catalog.units,'agents')
-  assert.deepEqual(trackSummary(units,progress),{available:8,planned:0,trackable:0,complete:0,essentialMinutes:645})
+  assert.deepEqual(trackSummary(units,progress),{available:8,planned:0,trackable:8,complete:0,essentialMinutes:645})
   assert.equal(unitComplete(units[0],progress),false)
 })

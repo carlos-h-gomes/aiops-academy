@@ -19,6 +19,7 @@ labs/real/ansible/.venv/
 *.log
 artifacts/
 frontend/dist/
+cloudflare/dist/
 frontend/*.tsbuildinfo
 docs/ai/
 .coverage

@@ -2,11 +2,12 @@ import {ArrowUpRight} from 'lucide-react'
 import type {LearningUnit} from '../../data/curriculum'
 import {Badge,External} from './Common'
 
-export function LearningUnitCard({unit,units,complete}:{unit:LearningUnit;units:LearningUnit[];complete:boolean}) {
+export function LearningUnitCard({unit,units,complete,scheduledDate}:{unit:LearningUnit;units:LearningUnit[];complete:boolean;scheduledDate?:string|null}) {
   return <article className="panel curriculum-unit" id={unit.id} aria-labelledby={`title-${unit.id}`}>
     <div className="curriculum-unit-heading"><span className="eyebrow">UNIDADE {String(unit.order).padStart(2,'0')}</span><Badge tone={complete?'lime-badge':''}>{complete?'Concluída':unit.status==='available'?'Disponível':'Em preparação'}</Badge></div>
     <h3 id={`title-${unit.id}`}>{unit.title}</h3>
     <p className="muted">{unit.summary}</p>
+    {scheduledDate&&<p className="small">Início sugerido: <strong>{scheduledDate}</strong></p>}
     <ul className="curriculum-competencies">{unit.competencies.map(item=><li key={item}>{item}</li>)}</ul>
     {unit.duration_minutes?<p className="small">{unit.duration_minutes.essential/60}h no essencial · {unit.duration_minutes.complete/60}h no completo. Divida em sessões.</p>:<p className="small muted">Conteúdo e duração ainda em preparação.</p>}
     {unit.status==='available'&&<a className="primary" href={unit.lesson_day!==null?`#/day/${unit.lesson_day}`:`#/unit/${unit.id}`}>{complete?'Revisitar aula':'Abrir aula'}<span className="sr-only">: {unit.title}</span><ArrowUpRight size={16}/></a>}

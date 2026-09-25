@@ -32,8 +32,31 @@ def unit_lab(unit_id: str):
 
 @router.post('/units/{unit_id}/lab/run', response_model=UnitLabResult)
 def unit_lab_run(unit_id: str, value: UnitLabRun):
-    try:return unit_labs.run(unit_id, value.answers)
+    try:
+        result=unit_labs.run(unit_id, value.answers)
+        learning.record_unit_lab(unit_id,result.correct)
+        return result
     except (RuntimeError, ValueError) as error:raise HTTPException(status_code=404, detail='Lab não encontrado.') from error
+
+@router.get('/units/{unit_id}/progress')
+def guided_unit_progress(unit_id: str):
+    try:return learning.unit_progress(unit_id)
+    except ValueError as error:raise HTTPException(status_code=404, detail='Aula não encontrada.') from error
+
+@router.put('/units/{unit_id}/note')
+def guided_unit_note(unit_id: str,value: Note):
+    try:return learning.save_unit_note(unit_id,value.text)
+    except ValueError as error:raise HTTPException(status_code=404, detail='Aula não encontrada.') from error
+
+@router.post('/units/{unit_id}/complete')
+def guided_unit_complete(unit_id: str):
+    try:return learning.complete_unit(unit_id)
+    except ValueError as error:raise HTTPException(status_code=422, detail=str(error)) from error
+
+@router.post('/units/{unit_id}/review')
+def guided_unit_review(unit_id: str,value: Rating):
+    try:return learning.review_unit(unit_id,value.rating)
+    except ValueError as error:raise HTTPException(status_code=422, detail=str(error)) from error
 
 @router.get('/progress')
 def progress():return learning.progress()

@@ -1,12 +1,13 @@
+function reportAppAvailability(available:boolean){window.dispatchEvent(new CustomEvent('academy-app-availability',{detail:available}))}
 export async function request<T=any>(path:string,method='GET',body?:unknown):Promise<T>{
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000)
   try{
     const response=await fetch('/api/v1'+path,{method,signal:controller.signal,headers:{'Content-Type':'application/json','X-Academy-Client':'local'},...(body!==undefined?{body:JSON.stringify(body)}:{})})
-    const data=await response.json()
+    const data=await response.json();reportAppAvailability(true)
     if(!response.ok)throw new Error(typeof data.detail==='string'?data.detail:'Não foi possível concluir esta ação.')
     return data
   }catch(error){
-    if(error instanceof TypeError||error instanceof DOMException)throw new Error('O app local não respondeu. Abra iniciar.cmd e tente novamente. Seu rascunho foi mantido.')
+    if(error instanceof TypeError||error instanceof DOMException){reportAppAvailability(false);throw new Error('O app local não respondeu. Abra iniciar.cmd e tente novamente. Seu rascunho foi mantido.')}
     throw error
   }finally{clearTimeout(timer)}
 }

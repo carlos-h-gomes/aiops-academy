@@ -11,8 +11,8 @@ import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '1.2.0-beta.2'
-PUBLIC_TREE_ROOTS = {'backend', 'frontend', 'scripts', 'labs', 'schemas', 'artifacts', '.github'}
+VERSION = '1.2.0-beta.3'
+PUBLIC_TREE_ROOTS = {'backend', 'frontend', 'cloudflare', 'scripts', 'labs', 'schemas', 'artifacts', '.github'}
 PUBLIC_ROOT_FILES = {
     '.editorconfig', '.gitattributes', '.gitignore', 'CHANGELOG.md', 'CONTENT-LICENSE.md',
     'CONTRIBUTING.md', 'iniciar.cmd', 'launcher.py', 'LICENSE', 'preparar.cmd', 'README.md',
@@ -34,6 +34,7 @@ EXCLUDED_PARTS = {'node_modules', '.venv', '__pycache__', 'workspace', '.git', '
 EXCLUDED_PREFIXES = (
     ('data',),
     ('docs', 'ai'),
+    ('cloudflare', 'dist'),
     ('backend', 'content', 'fixtures'),
     ('labs', 'agents-processes-pilot'),
     ('labs', 'observability-pilot'),

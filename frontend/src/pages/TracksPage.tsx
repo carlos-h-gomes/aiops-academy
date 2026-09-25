@@ -2,7 +2,7 @@ import {useState} from 'react'
 import {ArrowLeft,ArrowUpRight,BookOpen,Search} from 'lucide-react'
 import {useAcademy} from '../context/AcademyContext'
 import {useCurriculum} from '../hooks/useCurriculum'
-import {trackUnits,trackSummary,unitComplete,type Availability} from '../services/curriculum'
+import {scheduledUnitDate,trackUnits,trackSummary,unitComplete,type Availability} from '../services/curriculum'
 import {PageTitle,Message,Meter} from '../components/ui/Common'
 import {LearningUnitCard} from '../components/ui/LearningUnitCard'
 import '../assets/curriculum.css'
@@ -22,10 +22,10 @@ export function TracksPage({trackId}:{trackId?:string}) {
     <div className="curriculum-tracks">{catalog.tracks.map(item=>{const summary=trackSummary(trackUnits(catalog.units,item.id),progress);return <article className="panel curriculum-track" key={item.id}>
       <BookOpen size={24} aria-hidden="true"/><h2>{item.title}</h2><p className="muted">{item.summary}</p>
       <p className="small">{summary.available} aulas disponíveis · {summary.planned} em preparação</p>
-      {summary.available>0?<>{summary.trackable>0?<><p className="small">{summary.complete}/{summary.trackable} aulas concluídas · {summary.essentialMinutes/60}h essenciais</p><Meter value={summary.complete/summary.trackable*100} label={`Progresso: ${item.title}`}/></>:<p className="small">Aula guiada disponível · o progresso ainda não é registrado.</p>}</>:<p className="small">Comece pelos {item.guides.length} guias complementares.</p>}
+      {summary.available>0?<><p className="small">{summary.complete}/{summary.trackable} aulas concluídas · {summary.essentialMinutes/60}h essenciais</p><Meter value={summary.complete/summary.trackable*100} label={`Progresso: ${item.title}`}/></>:<p className="small">Comece pelos {item.guides.length} guias complementares.</p>}
       <a className="primary" href={`#/tracks/${item.id}`}>Explorar trilha<span className="sr-only">: {item.title}</span><ArrowUpRight size={17}/></a>
     </article>})}</div>
-    <p className="small muted curriculum-footnote">O calendário em Preferências acompanha o percurso de Infraestrutura e AIOps. Trocar de página não altera suas notas, datas ou conclusões.</p>
+    <p className="small muted curriculum-footnote">O calendário considera as 50 aulas disponíveis na ordem das trilhas. Cada aula mostra uma data de início sugerida conforme o ritmo escolhido em Preferências.</p>
   </>
   const all=trackUnits(catalog.units,track.id)
   const matches=trackUnits(catalog.units,track.id,query,status)
@@ -33,12 +33,12 @@ export function TracksPage({trackId}:{trackId?:string}) {
   return <>
     <a className="back-link" href="#/tracks"><ArrowLeft size={16}/>Todas as trilhas</a>
     <PageTitle eyebrow="APRENDER, PRATICAR, EXPLICAR" title={track.title} description={track.summary}/>
-    <div className="notice"><strong>Ao longo deste percurso</strong><p>{track.outcome}</p><p>{summary.available} aulas disponíveis · {summary.planned} em preparação.{summary.trackable>0?` ${summary.complete}/${summary.trackable} aulas concluídas.`:summary.available>0?' A aula guiada não registra progresso ainda.':' As novas aulas ainda não podem ser iniciadas; explore os guias abaixo.'}</p></div>
+    <div className="notice"><strong>Ao longo deste percurso</strong><p>{track.outcome}</p><p>{summary.available} aulas disponíveis · {summary.planned} em preparação. {summary.complete}/{summary.trackable} aulas concluídas.</p></div>
     {track.id==='infra'&&<a className="secondary" href="#/trail">Ver calendário das 30 aulas</a>}
     <section className="curriculum-guides" aria-labelledby="guides-title"><h2 id="guides-title">Guias para estudar agora</h2><p className="muted small">Conteúdos complementares da Biblioteca. Eles não substituem as novas aulas nem contam como sua conclusão.</p><ul>{track.guides.map(guide=><li key={guide.id}><a href={`#/library/${guide.id}`}>{guide.title}<ArrowUpRight size={15}/></a></li>)}</ul></section>
     <h2>Unidades do percurso</h2>
     <div className="toolbar"><label className="search"><Search size={18}/><input aria-label="Buscar unidades" placeholder="Buscar tema ou competência…" value={query} onChange={event=>setQuery(event.target.value)}/></label><label className="filter-label">Disponibilidade<select value={status} onChange={event=>setStatus(event.target.value as Availability)}><option value="all">Todas</option><option value="available">Disponíveis</option><option value="planned">Em preparação</option></select></label></div>
     <p className="small muted" role="status">{matches.length} unidades encontradas</p>
-    {matches.length?<div className="curriculum-units">{matches.map(unit=><LearningUnitCard unit={unit} units={catalog.units} complete={unitComplete(unit,progress)} key={unit.id}/>)}</div>:<div className="empty-state"><h3>Nenhuma unidade para estes filtros</h3><button className="secondary" onClick={()=>{setQuery('');setStatus('all')}}>Limpar filtros</button></div>}
+    {matches.length?<div className="curriculum-units">{matches.map(unit=><LearningUnitCard unit={unit} units={catalog.units} complete={unitComplete(unit,progress)} scheduledDate={scheduledUnitDate(unit,catalog.units,progress)} key={unit.id}/>)}</div>:<div className="empty-state"><h3>Nenhuma unidade para estes filtros</h3><button className="secondary" onClick={()=>{setQuery('');setStatus('all')}}>Limpar filtros</button></div>}
   </>
 }

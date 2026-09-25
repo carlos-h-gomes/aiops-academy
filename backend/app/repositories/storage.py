@@ -32,7 +32,17 @@ def write(connection,key,value):
     connection.execute('INSERT INTO state(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value',(key,json.dumps(value,ensure_ascii=False,allow_nan=False)))
 
 def default_progress():
-    return dict(settings=dict(start_date=date.today().isoformat(),daily_hours=1),notes={},completed=[],quizzes={},labs={},reviews={})
+    return dict(settings=dict(start_date=date.today().isoformat(),daily_hours=1),notes={},completed=[],quizzes={},labs={},reviews={},unit_progress={})
+
+def hydrate_progress(value):
+    """Additive compatibility for pre-unit-progress local backups and databases."""
+    if not isinstance(value,dict):
+        raise ValueError('Progresso local inválido.')
+    default=default_progress()
+    hydrated={**default,**value}
+    if not isinstance(hydrated['unit_progress'],dict):
+        raise ValueError('Progresso das unidades inválido.')
+    return hydrated
 
 def progress():
     with transaction() as db:
@@ -40,11 +50,11 @@ def progress():
         if value is None:
             value=default_progress()
             write(db,'progress',value)
-        return value
+        return hydrate_progress(value)
 
 def update_progress(fn):
     with transaction() as db:
-        value=read(db,'progress',default_progress())
+        value=hydrate_progress(read(db,'progress',default_progress()))
         result=fn(value)
         write(db,'progress',value)
         return value if result is None else result

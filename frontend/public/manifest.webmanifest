@@ -1,0 +1,14 @@
+{
+  "name": "AIOps Academy",
+  "short_name": "AIOps Academy",
+  "description": "Aulas e práticas locais para infraestrutura, automação e IA.",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#111410",
+  "theme_color": "#111410",
+  "icons": [
+    {"src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}
